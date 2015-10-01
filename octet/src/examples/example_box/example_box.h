@@ -49,8 +49,8 @@ namespace octet {
 	  node->rotate(9, vec3(0, 1, 0));
       
 	  scene_node *node2 = app_scene->get_mesh_instance(1)->get_node();
-	  //node2->rotate(1, vec3(1, 0, 0));
-	  node2->rotate(0.3, vec3(0, 1, 0));
+	  node2->rotate(1, vec3(1, 0, 0));
+	  node2->rotate(0.5, vec3(0, 0, 1));
     }
   };
 }
