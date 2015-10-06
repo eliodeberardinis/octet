@@ -265,17 +265,35 @@ namespace octet {
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
 	  }
-	  else if (is_key_down(key_right)) {
+	   else if (is_key_down(key_right)) {
 		  if (myDirection != RIGHT)
 		  {
 			  myDirection = RIGHT;
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
         sprites[ship_sprite].translate(+ship_speed, 0);
-        if (sprites[ship_sprite].collides_with(sprites[first_border_sprite+3])) {
-          sprites[ship_sprite].translate(-ship_speed, 0);
+		if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
+			sprites[ship_sprite].translate(-ship_speed, 0);
+
         }
       }
+	   else if (is_key_down(key_up)) {
+
+		   sprites[ship_sprite].translate(0, +ship_speed);
+		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
+			   sprites[ship_sprite].translate(0, -ship_speed);
+
+		   }
+	   }
+
+	   else if (is_key_down(key_down)) {
+
+		   sprites[ship_sprite].translate(0, -ship_speed);
+		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
+			   sprites[ship_sprite].translate(0, +ship_speed);
+
+		   }
+	   }
     }
 
     // fire button (space)
