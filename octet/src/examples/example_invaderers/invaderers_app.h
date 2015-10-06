@@ -98,10 +98,15 @@ namespace octet {
       glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
-    // move the object
-    void translate(float x, float y) {
-      modelToWorld.translate(x, y, 0);
-    }
+	// move the object
+	void translate(float x, float y) {
+		modelToWorld.translate(x, y, 0);
+	}
+
+	// move the object
+	void rotate(float angle, float x, float y, float z) {
+		modelToWorld.rotate(angle, x, y, z);
+	}
 
     // position the object relative to another.
     void set_relative(sprite &rhs, float x, float y) {
@@ -198,13 +203,22 @@ namespace octet {
     sprite sprites[num_sprites];
 
     // random number generator
-    class random randomizer;
+     class random randomizer;
 
     // a texture for our text
     GLuint font_texture;
 
     // information for our text
     bitmap_font font;
+
+	enum direction{
+		LEFT,
+		RIGHT,
+		UP,
+		DOWN
+	};
+
+	direction myDirection;
 
     ALuint get_sound_source() { return sources[cur_source++ % num_sound_sources]; }
 
@@ -240,12 +254,23 @@ namespace octet {
     void move_ship() {
       const float ship_speed = 0.05f;
       // left and right arrows
-      if (is_key_down(key_left)) {
-        sprites[ship_sprite].translate(-ship_speed, 0);
-        if (sprites[ship_sprite].collides_with(sprites[first_border_sprite+2])) {
-          sprites[ship_sprite].translate(+ship_speed, 0);
-        }
-      } else if (is_key_down(key_right)) {
+	  if (is_key_down(key_left)) {
+		  if (myDirection != LEFT)
+		  {
+			  myDirection = LEFT;
+			  sprites[ship_sprite].rotate(180, 0, 1, 0);
+		  }
+		  sprites[ship_sprite].translate(+ship_speed, 0);
+			if (sprites[ship_sprite].collides_with(sprites[first_border_sprite+2])) {
+			  sprites[ship_sprite].translate(-ship_speed, 0);
+			}
+	  }
+	  else if (is_key_down(key_right)) {
+		  if (myDirection != RIGHT)
+		  {
+			  myDirection = RIGHT;
+			  sprites[ship_sprite].rotate(180, 0, 1, 0);
+		  }
         sprites[ship_sprite].translate(+ship_speed, 0);
         if (sprites[ship_sprite].collides_with(sprites[first_border_sprite+3])) {
           sprites[ship_sprite].translate(-ship_speed, 0);
@@ -418,13 +443,15 @@ namespace octet {
       // set up the shader
       texture_shader_.init();
 
+	  myDirection = UP;
+
       // set up the matrices with a camera 5 units from the origin
       cameraToWorld.loadIdentity();
       cameraToWorld.translate(0, 0, 3);
 
       font_texture = resource_dict::get_texture_handle(GL_RGBA, "assets/big_0.gif");
 
-      GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/ship.gif");
+      GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
       sprites[ship_sprite].init(ship, 0, -2.75f, 0.25f, 0.25f);
 
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
