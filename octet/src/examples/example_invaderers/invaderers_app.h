@@ -253,7 +253,8 @@ namespace octet {
     // use the keyboard to move the ship
     void move_ship() {
       const float ship_speed = 0.05f;
-      // left and right arrows
+	  
+      // left and right and up and down arrows
 	  if (is_key_down(key_left)) {
 		  if (myDirection != LEFT)
 		  {
@@ -265,7 +266,7 @@ namespace octet {
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
 	  }
-	   else if (is_key_down(key_right)) {
+	  else if (is_key_down(key_right)) {
 		  if (myDirection != RIGHT)
 		  {
 			  myDirection = RIGHT;
@@ -280,7 +281,7 @@ namespace octet {
 	   else if (is_key_down(key_up)) {
 
 		   sprites[ship_sprite].translate(0, +ship_speed);
-		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
+		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) {
 			   sprites[ship_sprite].translate(0, -ship_speed);
 
 		   }
@@ -289,7 +290,7 @@ namespace octet {
 	   else if (is_key_down(key_down)) {
 
 		   sprites[ship_sprite].translate(0, -ship_speed);
-		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
+		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) {
 			   sprites[ship_sprite].translate(0, +ship_speed);
 
 		   }
@@ -475,7 +476,7 @@ namespace octet {
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
 
-      GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/invaderer.gif");
+      GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/bowser.gif");
       for (int j = 0; j != num_rows; ++j) {
         for (int i = 0; i != num_cols; ++i) {
           assert(first_invaderer_sprite + i + j*num_cols <= last_invaderer_sprite);
@@ -485,12 +486,12 @@ namespace octet {
         }
       }
 
-      // set the border to white for clarity
-      GLuint white = resource_dict::get_texture_handle(GL_RGB, "#ffffff");
-      sprites[first_border_sprite+0].init(white, 0, -3, 6, 0.2f);
-      sprites[first_border_sprite+1].init(white, 0,  3, 6, 0.2f);
-      sprites[first_border_sprite+2].init(white, -3, 0, 0.2f, 6);
-      sprites[first_border_sprite+3].init(white, 3,  0, 0.2f, 6);
+      // set the border to yellow for clarity
+      GLuint yellow = resource_dict::get_texture_handle(GL_RGB, "#cbee16");
+	  sprites[first_border_sprite + 0].init(yellow, 0, -3, 6, 0.2f);
+	  sprites[first_border_sprite + 1].init(yellow, 0, 3, 6, 0.2f);
+	  sprites[first_border_sprite + 2].init(yellow, -3, 0, 0.2f, 6);
+	  sprites[first_border_sprite + 3].init(yellow, 3, 0, 0.2f, 6);
 
       // use the missile texture
       GLuint missile = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/missile.gif");
@@ -501,7 +502,7 @@ namespace octet {
       }
 
       // use the bomb texture
-      GLuint bomb = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/bomb.gif");
+      GLuint bomb = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/Fireball.gif");
       for (int i = 0; i != num_bombs; ++i) {
         // create bombs off-screen
         sprites[first_bomb_sprite+i].init(bomb, 20, 0, 0.0625f, 0.25f);
