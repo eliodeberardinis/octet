@@ -9,6 +9,7 @@ namespace octet {
   class example_shapes : public app {
     // scene for drawing box
     ref<visual_scene> app_scene;
+	btDiscreteDynamicsWorld* world; 
 
   public:
     example_shapes(int argc, char **argv) : app(argc, argv) {
@@ -22,6 +23,7 @@ namespace octet {
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
+	  world = app_scene->getWorld();
 
       material *red = new material(vec4(1, 0, 0, 1));
       material *green = new material(vec4(0, 1, 0, 1));
@@ -29,11 +31,18 @@ namespace octet {
 
       mat4t mat;
       mat.translate(-3, 6, 0);
-      app_scene->add_shape(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, true);
+	  btRigidBody* firstSphere = NULL;
+	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
 
       mat.loadIdentity();
-      mat.translate(0, 10, 0);
-      app_scene->add_shape(mat, new mesh_box(vec3(2, 2, 2)), red, true);
+	  mat.translate(0, 10, 0);
+	  btRigidBody* firstBox = NULL;
+	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
+
+	  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
+	  hinge->setLimit(0, 180);
+	  world->addConstraint(hinge);
+
 
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
