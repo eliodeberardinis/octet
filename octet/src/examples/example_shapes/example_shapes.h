@@ -30,20 +30,45 @@ namespace octet {
       material *blue = new material(vec4(0, 0, 1, 1));
 
       mat4t mat;
-      mat.translate(-3, 6, 0);
+      mat.translate(0, 10, 0);
 	  btRigidBody* firstSphere = NULL;
 	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
 
       mat.loadIdentity();
-	  mat.translate(0, 10, 0);
+	  mat.translate(0, 5, 0);
 	  btRigidBody* firstBox = NULL;
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
+	  firstBox->isKinematicObject = true;
 
-	  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
+	/*  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
 	  hinge->setLimit(0, 180);
-	  world->addConstraint(hinge);
+	  world->addConstraint(hinge);*/
+	  
+	  //add spring contraint
 
+	  btTransform frameInA, frameInB;
+	  frameInA = btTransform::getIdentity();
+	  frameInA.setOrigin(btVector3(btScalar(10.), btScalar(0.), btScalar(0.)));
+	  frameInB = btTransform::getIdentity();
+	  frameInB.setOrigin(btVector3(btScalar(0.), btScalar(0.), btScalar(0.)));
 
+	  btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*firstBox, *firstSphere, frameInA, frameInB, true);
+	  pGen6DOFSpring->setLinearUpperLimit(btVector3(5., 0., 0.));
+	  pGen6DOFSpring->setLinearLowerLimit(btVector3(-5., 0., 0.));
+
+	  pGen6DOFSpring->setAngularLowerLimit(btVector3(0.f, 0.f, -1.5f));
+	  pGen6DOFSpring->setAngularUpperLimit(btVector3(0.f, 0.f, 1.5f));
+
+	  world->addConstraint(pGen6DOFSpring, true);
+	  pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
+
+	  pGen6DOFSpring->enableSpring(0, true);
+	  pGen6DOFSpring->setStiffness(0, 39.478f);
+	  pGen6DOFSpring->setDamping(0, 0.5f);
+	  pGen6DOFSpring->enableSpring(5, true);
+	  pGen6DOFSpring->setStiffness(5, 39.478f);
+	  pGen6DOFSpring->setDamping(0, 0.3f);
+	  pGen6DOFSpring->setEquilibriumPoint();
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
       app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
