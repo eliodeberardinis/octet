@@ -18,6 +18,8 @@ namespace octet {
     ~example_shapes() {
     }
 
+	btRigidBody* firstBox = NULL;//declaring the first box globally
+
     /// this is called once OpenGL is initialized
     void app_init() {
       app_scene =  new visual_scene();
@@ -30,15 +32,15 @@ namespace octet {
       material *blue = new material(vec4(0, 0, 1, 1));
 
       mat4t mat;
-      mat.translate(0, 10, 0);
+      mat.translate(0, 20, 0);
 	  btRigidBody* firstSphere = NULL;
 	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
 
       mat.loadIdentity();
-	  mat.translate(0, 5, 0);
-	  btRigidBody* firstBox = NULL;
+	  mat.translate(2, 5, 0);
+	  /*btRigidBody* firstBox = NULL;*/
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
-	  firstBox->isKinematicObject = true;
+	  
 
 	/*  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
 	  hinge->setLimit(0, 180);
@@ -69,6 +71,7 @@ namespace octet {
 	  pGen6DOFSpring->setStiffness(5, 39.478f);
 	  pGen6DOFSpring->setDamping(0, 0.3f);
 	  pGen6DOFSpring->setEquilibriumPoint();
+
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
       app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
@@ -90,6 +93,9 @@ namespace octet {
 
       // draw the scene
       app_scene->render((float)vx / vy);
+
+	  /*firstBox->setLinearVelocity(btVector3(0, 0, 0));
+	*/
     }
   };
 }
