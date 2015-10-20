@@ -17,6 +17,7 @@
 //   Audio
 //
 
+
 namespace octet {
   class sprite {
     // where is our sprite (overkill for a 2D game!)
@@ -249,12 +250,14 @@ namespace octet {
         sprites[game_over_sprite].translate(-20, 0);
       }
     }
-
+	
     // use the keyboard to move the ship
     void move_ship() {
       const float ship_speed = 0.05f;
 	  
+	  
       // left and right and up and down arrows
+	  
 	  if (is_key_down(key_left)) {
 		  if (myDirection != LEFT)
 		  {
@@ -396,7 +399,7 @@ namespace octet {
       }
     }
 
-    // move the array of enemies
+    // move the array of enemies (left and right)
     void move_invaders(float dx, float dy) {
       for (int j = 0; j != num_invaderers; ++j) {
         sprite &invaderer = sprites[first_invaderer_sprite+j];
@@ -405,6 +408,16 @@ namespace octet {
         }
       }
     }
+
+	// move the array of enemies (up and down)
+	void move_invaders2(float up, float down) {
+		for (int j = 0; j != num_invaderers; ++j) {
+			sprite &invaderer = sprites[first_invaderer_sprite + j];
+			if (invaderer.is_enabled()) {
+				invaderer.translate(up, down);
+			}
+		}
+	}
 
     // check if any invaders hit the sides.
     bool invaders_collide(sprite &border) {

@@ -76,6 +76,8 @@ namespace octet { namespace scene {
         0, 4, 1, 5, 2, 6, 3, 7
       };
 
+	  
+
       /// render immediate data (this is inefficient!)
       glBindBuffer(GL_ARRAY_BUFFER, 0);
       glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 0, (void*)pos );
@@ -295,6 +297,8 @@ namespace octet { namespace scene {
         delete dispatcher;
       #endif
     }
+
+#ifdef OCTET_BULLET
 	/// helper to add a mesh to a scene and also to create the corresponding physics object
 	mesh_instance *add_shapeRB(mat4t_in mat, mesh *msh, material *mtl, btRigidBody** rigidBody, bool is_dynamic = false, float mass = 1, collison_shape_t *shape = NULL) {
 		scene_node *node = new scene_node(this);
@@ -306,7 +310,6 @@ namespace octet { namespace scene {
 			add_mesh_instance(result);
 		}
 
-#ifdef OCTET_BULLET
 		btMatrix3x3 matrix(get_btMatrix3x3(mat));
 		btVector3 pos(get_btVector3(mat[3].xyz()));
 
@@ -329,13 +332,13 @@ namespace octet { namespace scene {
 			(*rigidBody)->setUserPointer(node);
 			node->set_rigid_body((*rigidBody));
 		}
-#endif
 		return result;
 	}
 
 	btDiscreteDynamicsWorld* getWorld(){
 		return world;
 	}
+#endif
 
     /// helper to add a mesh to a scene and also to create the corresponding physics object
     mesh_instance *add_shape(mat4t_in mat, mesh *msh, material *mtl, bool is_dynamic=false, float mass=1, collison_shape_t *shape=NULL) {
