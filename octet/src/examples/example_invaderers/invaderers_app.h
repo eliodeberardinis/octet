@@ -409,7 +409,8 @@ namespace octet {
       }
     }
 
-	// move the array of enemies (up and down)
+
+	// move the array of enemies (up and down) WORK ON THIS BECAUSE IT DOESN'T DO WHAT YOU WANT.
 	void move_invaders2(float up, float down) {
 		for (int j = 0; j != num_invaderers; ++j) {
 			sprite &invaderer = sprites[first_invaderer_sprite + j];
