@@ -75,6 +75,8 @@ namespace octet {
         -halfWidth,  halfHeight, 0,
       };
 
+
+
       // attribute_pos (=0) is position of each corner
       // each corner has 3 floats (x, y, z)
       // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
@@ -98,6 +100,68 @@ namespace octet {
       // finally, draw the sprite (4 vertices)
       glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
+
+	void render_background(texture_shader &shader, mat4t &cameraToWorld, int position) {
+		// invisible sprite... used for gameplay.
+		if (!texture) return;
+
+		// build a projection matrix: model -> world -> camera -> projection
+		// the projection space is the cube -1 <= x/w, y/w, z/w <= 1
+		mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
+
+		// set up opengl to draw textured triangles using sampler 0 (GL_TEXTURE0)
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		// use "old skool" rendering
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		shader.render(modelToProjection, 0);
+
+		// this is an array of the positions of the corners of the sprite in 3D
+		// a straight "float" here means this array is being generated here at runtime.
+		float vertices[] = {
+			-halfWidth, -halfHeight, 0,
+			halfWidth, -halfHeight, 0,
+			halfWidth, halfHeight, 0,
+			-halfWidth, halfHeight, 0,
+		};
+
+
+
+		// attribute_pos (=0) is position of each corner
+		// each corner has 3 floats (x, y, z)
+		// there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
+		glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)vertices);
+		glEnableVertexAttribArray(attribute_pos);
+
+		float tw = 0.3f * 10 / 36;
+		float th = 0.3f * 5 / 36;
+		int x = position % 10;
+		int y = position / 10;
+
+		float uvx_min = tw * x - tw / 2;
+		float uvy_min = th * y - tw/2;
+		float uvx_max = tw * x + tw/2;
+		float uvy_max = th * y + tw/2;
+
+		// this is an array of the positions of the corners of the texture in 2D
+		static const float uvs[] = {
+			uvx_min, uvy_min,
+			uvx_max, uvy_min,
+			uvx_max, uvy_max,
+			uvx_min, uvy_max,
+		};
+
+		// attribute_uv is position in the texture of each corner
+		// each corner (vertex) has 2 floats (x, y)
+		// there is no gap between the 2 floats and hence the stride is 2*sizeof(float)
+		glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)uvs);
+		glEnableVertexAttribArray(attribute_uv);
+
+		// finally, draw the sprite (4 vertices)
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	}
 
 	// move the object
 	void translate(float x, float y) {
@@ -202,6 +266,7 @@ namespace octet {
 
     // big array of sprites
     sprite sprites[num_sprites];
+	sprite test_sprite;
 
     // random number generator
      class random randomizer;
@@ -272,6 +337,7 @@ namespace octet {
 	  else if (is_key_down(key_right)) {
 		  if (myDirection != RIGHT)
 		  {
+			  printf("here");
 			  myDirection = RIGHT;
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
@@ -476,7 +542,7 @@ namespace octet {
       // set up the shader
       texture_shader_.init();
 
-	  myDirection = UP;
+	  myDirection = RIGHT;
 
       // set up the matrices with a camera 5 units from the origin
       cameraToWorld.loadIdentity();
@@ -522,6 +588,9 @@ namespace octet {
         sprites[first_bomb_sprite+i].init(bomb, 20, 0, 0.0625f, 0.25f);
         sprites[first_bomb_sprite+i].is_enabled() = false;
       }
+
+	  GLuint tst = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tilemap.gif");
+	  test_sprite.init(tst, 0, 0, 0.3f, 0.3f);
 
       // sounds
       whoosh = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
@@ -570,6 +639,11 @@ namespace octet {
 
       // set a viewport - includes whole window area
       glViewport(x, y, w, h);
+
+	  int screen_width = 0;
+	  int screen_height = 0;
+	  get_viewport_size(screen_width, screen_height);
+	  printf("%d %d\n", screen_width, screen_height);
 
       // clear the background to black
       glClearColor(0, 0, 0, 1);
