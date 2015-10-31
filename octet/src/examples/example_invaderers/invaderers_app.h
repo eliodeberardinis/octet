@@ -159,10 +159,10 @@ namespace octet {
 		num_borders = 4,
 		num_invaderers = num_rows * num_cols,
 
-		// sprite definitions
+	  // sprite definitions
 	  ship_sprite = 0,
-	  /*dirt_sprite = 0,
-	  bush_sprite =0,*/
+	  dirt_sprite,
+	  bush_sprite,
       game_over_sprite,
 
       first_invaderer_sprite,
@@ -264,6 +264,8 @@ namespace octet {
       const float ship_speed = 0.05f;
 	  
 	  
+	  
+	  
       // left and right and up and down arrows
 	  
 	  if (is_key_down(key_left)) {
@@ -273,7 +275,7 @@ namespace octet {
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
-		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(bush_sprite))) {
+		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(map_sprites[bush_sprite]))) {
 		
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
@@ -603,6 +605,7 @@ namespace octet {
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+	  //draw the map sprites
 	  for (int i = 0; i < map_sprites.size(); ++i) {
 		  map_sprites[i].render(texture_shader_, cameraToWorld);
 	  }
@@ -660,8 +663,8 @@ namespace octet {
 	//GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
 	//sprites[ship_sprite].init(ship, 0, -2.5f, 0.25f, 0.25f);
 
-	sprite bush_sprite;
-	sprite dirt_sprite;
+	/*sprite bush_sprite;
+	sprite dirt_sprite;*/
 
 	void setup_visual_map() {
 
@@ -674,13 +677,13 @@ namespace octet {
 				//sprite temp;
 				
 				if (map[i][j] == 1) {
-					bush_sprite.init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites.push_back(bush_sprite);
+					sprites[bush_sprite].init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					map_sprites.push_back(sprites[bush_sprite]);
 					
 				}
 				else if (map[i][j] == 0) {
-					dirt_sprite.init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites.push_back(dirt_sprite);
+					sprites[dirt_sprite].init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					map_sprites.push_back(sprites[dirt_sprite]);
 					
 				}
 				//map_sprites.push_back(temp);
