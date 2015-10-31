@@ -159,8 +159,10 @@ namespace octet {
 		num_borders = 4,
 		num_invaderers = num_rows * num_cols,
 
-	// sprite definitions
+		// sprite definitions
 	  ship_sprite = 0,
+	  /*dirt_sprite = 0,
+	  bush_sprite =0,*/
       game_over_sprite,
 
       first_invaderer_sprite,
@@ -271,7 +273,7 @@ namespace octet {
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
-		  if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) {
+		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(bush_sprite))) {
 		
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
@@ -658,7 +660,8 @@ namespace octet {
 	//GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
 	//sprites[ship_sprite].init(ship, 0, -2.5f, 0.25f, 0.25f);
 
-	
+	sprite bush_sprite;
+	sprite dirt_sprite;
 
 	void setup_visual_map() {
 
@@ -668,17 +671,19 @@ namespace octet {
 		for (int i = 0; i < map_height; ++i) {
 			for (int j = 0; j < map_width; ++j) {
 
-				sprite temp;
+				//sprite temp;
 				
 				if (map[i][j] == 1) {
-					temp.init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					bush_sprite.init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					map_sprites.push_back(bush_sprite);
 					
 				}
 				else if (map[i][j] == 0) {
-					temp.init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					dirt_sprite.init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					map_sprites.push_back(dirt_sprite);
 					
 				}
-				map_sprites.push_back(temp);
+				//map_sprites.push_back(temp);
 			}
 		}
 	}
