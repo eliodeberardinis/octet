@@ -75,8 +75,6 @@ namespace octet {
         -halfWidth,  halfHeight, 0,
       };
 
-
-
       // attribute_pos (=0) is position of each corner
       // each corner has 3 floats (x, y, z)
       // there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
@@ -101,74 +99,12 @@ namespace octet {
       glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
-	void render_background(texture_shader &shader, mat4t &cameraToWorld, int position) {
-		// invisible sprite... used for gameplay.
-		if (!texture) return;
-
-		// build a projection matrix: model -> world -> camera -> projection
-		// the projection space is the cube -1 <= x/w, y/w, z/w <= 1
-		mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
-
-		// set up opengl to draw textured triangles using sampler 0 (GL_TEXTURE0)
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture);
-
-		// use "old skool" rendering
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		shader.render(modelToProjection, 0);
-
-		// this is an array of the positions of the corners of the sprite in 3D
-		// a straight "float" here means this array is being generated here at runtime.
-		float vertices[] = {
-			-halfWidth, -halfHeight, 0,
-			halfWidth, -halfHeight, 0,
-			halfWidth, halfHeight, 0,
-			-halfWidth, halfHeight, 0,
-		};
-
-
-
-		// attribute_pos (=0) is position of each corner
-		// each corner has 3 floats (x, y, z)
-		// there is no gap between the 3 floats and hence the stride is 3*sizeof(float)
-		glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)vertices);
-		glEnableVertexAttribArray(attribute_pos);
-
-		float tw = 0.3f * 10 / 36;
-		float th = 0.3f * 5 / 36;
-		int x = position % 10;
-		int y = position / 10;
-
-		float uvx_min = tw * x - tw / 2;
-		float uvy_min = th * y - tw/2;
-		float uvx_max = tw * x + tw/2;
-		float uvy_max = th * y + tw/2;
-
-		// this is an array of the positions of the corners of the texture in 2D
-		static const float uvs[] = {
-			uvx_min, uvy_min,
-			uvx_max, uvy_min,
-			uvx_max, uvy_max,
-			uvx_min, uvy_max,
-		};
-
-		// attribute_uv is position in the texture of each corner
-		// each corner (vertex) has 2 floats (x, y)
-		// there is no gap between the 2 floats and hence the stride is 2*sizeof(float)
-		glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)uvs);
-		glEnableVertexAttribArray(attribute_uv);
-
-		// finally, draw the sprite (4 vertices)
-		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	}
-
 	// move the object
 	void translate(float x, float y) {
 		modelToWorld.translate(x, y, 0);
 	}
 
-	// move the object
+	// rotate the object
 	void rotate(float angle, float x, float y, float z) {
 		modelToWorld.rotate(angle, x, y, z);
 	}
@@ -215,16 +151,16 @@ namespace octet {
     texture_shader texture_shader_;
 
     enum {
-      num_sound_sources = 8,
-      num_rows = 5,
-      num_cols = 10,
-      num_missiles = 2,
-      num_bombs = 2,
-      num_borders = 4,
-      num_invaderers = num_rows * num_cols,
+		num_sound_sources = 8,
+		num_rows = 5,
+		num_cols = 10,
+		num_missiles = 2,
+		num_bombs = 2,
+		num_borders = 4,
+		num_invaderers = num_rows * num_cols,
 
-      // sprite definitions
-      ship_sprite = 0,
+	// sprite definitions
+	  ship_sprite = 0,
       game_over_sprite,
 
       first_invaderer_sprite,
@@ -286,6 +222,11 @@ namespace octet {
 
 	direction myDirection;
 
+	static const int map_width = 20;
+	static const int map_height = 20;
+	int map[map_height][map_width];
+	dynarray<sprite> map_sprites;
+
     ALuint get_sound_source() { return sources[cur_source++ % num_sound_sources]; }
 
     // called when we hit an enemy
@@ -330,14 +271,15 @@ namespace octet {
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
-			if (sprites[ship_sprite].collides_with(sprites[first_border_sprite+2])) {
+		  if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) {
+		
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
 	  }
 	  else if (is_key_down(key_right)) {
 		  if (myDirection != RIGHT)
 		  {
-			  printf("here");
+			  
 			  myDirection = RIGHT;
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
@@ -465,7 +407,7 @@ namespace octet {
       }
     }
 
-    // move the array of enemies (left and right)
+    // move the array of enemies 
     void move_invaders(float dx, float dy) {
       for (int j = 0; j != num_invaderers; ++j) {
         sprite &invaderer = sprites[first_invaderer_sprite+j];
@@ -539,19 +481,23 @@ namespace octet {
 
     // this is called once OpenGL is initialized
     void app_init() {
+
       // set up the shader
       texture_shader_.init();
 
+	  read_csv();
+	  setup_visual_map();
+
 	  myDirection = RIGHT;
 
-      // set up the matrices with a camera 5 units from the origin
+      // set up the matrices with a camera 3 units from the origin
       cameraToWorld.loadIdentity();
       cameraToWorld.translate(0, 0, 3);
 
       font_texture = resource_dict::get_texture_handle(GL_RGBA, "assets/big_0.gif");
 
       GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
-      sprites[ship_sprite].init(ship, 0, -2.75f, 0.25f, 0.25f);
+      sprites[ship_sprite].init(ship, 0, -2.5f, 0.25f, 0.25f);
 
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
@@ -589,7 +535,7 @@ namespace octet {
         sprites[first_bomb_sprite+i].is_enabled() = false;
       }
 
-	  GLuint tst = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tilemap.gif");
+	  GLuint tst = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
 	  test_sprite.init(tst, 0, 0, 0.3f, 0.3f);
 
       // sounds
@@ -643,7 +589,6 @@ namespace octet {
 	  int screen_width = 0;
 	  int screen_height = 0;
 	  get_viewport_size(screen_width, screen_height);
-	  printf("%d %d\n", screen_width, screen_height);
 
       // clear the background to black
       glClearColor(0, 0, 0, 1);
@@ -655,6 +600,10 @@ namespace octet {
       // allow alpha blend (transparency when alpha channel is 0)
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	  for (int i = 0; i < map_sprites.size(); ++i) {
+		  map_sprites[i].render(texture_shader_, cameraToWorld);
+	  }
 
       // draw all the sprites
       for (int i = 0; i != num_sprites; ++i) {
@@ -669,5 +618,70 @@ namespace octet {
       vec4 &cpos = cameraToWorld.w();
       alListener3f(AL_POSITION, cpos.x(), cpos.y(), cpos.z());
     }
+	//called to read a CSV file for the background map
+	void read_csv() {
+
+		std::ifstream file("mapcsv.csv");
+
+		char buffer[2048];
+		int i = 0;
+		
+		while (!file.eof()) {
+			file.getline(buffer, sizeof(buffer));
+			
+			char *b = buffer;
+			for (int j = 0; ; ++j) {
+				char *e = b;
+				while (*e != 0 && *e != ';') ++e;
+
+				map[i][j] = std::atoi(b);
+
+				if (*e != ';') break;
+				b = e + 1;
+			}
+			++i;
+		}
+	}
+	//Check for successful reading of CSV file in the console
+	void print_csv() {
+		for (int i = 0; i < map_height; ++i) {
+			for (int j = 0; j < map_width; ++j) {
+				printf("%d ", map[i][j]);
+			}
+			printf("\n");
+		}
+	}
+
+	
+
+
+	//GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
+	//sprites[ship_sprite].init(ship, 0, -2.5f, 0.25f, 0.25f);
+
+	
+
+	void setup_visual_map() {
+
+		GLuint bush = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
+		GLuint dirt = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_dirt.gif");
+
+		for (int i = 0; i < map_height; ++i) {
+			for (int j = 0; j < map_width; ++j) {
+
+				sprite temp;
+				
+				if (map[i][j] == 1) {
+					temp.init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					
+				}
+				else if (map[i][j] == 0) {
+					temp.init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					
+				}
+				map_sprites.push_back(temp);
+			}
+		}
+	}
+
   };
 }
