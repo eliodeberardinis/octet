@@ -262,6 +262,7 @@ namespace octet {
     // use the keyboard to move the ship
     void move_ship() {
       const float ship_speed = 0.05f;
+	  sprite &bush = map_sprites[bush_sprite + num_bush];
 	  
 	  
 	  
@@ -275,7 +276,7 @@ namespace octet {
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
-		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(map_sprites[bush_sprite]))) {
+		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (mario_collide(bush))) {
 		
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
@@ -443,6 +444,17 @@ namespace octet {
       return false;
     }
 
+	bool mario_collide(sprite &bush) {
+		
+			sprite &mario = sprites[ship_sprite];
+
+			if (mario.collides_with(bush)) {
+				return true;
+			
+		}
+		return false;
+	}
+
 
     void draw_text(texture_shader &shader, float x, float y, float scale, const char *text) {
       mat4t modelToWorld;
@@ -581,6 +593,8 @@ namespace octet {
         invader_velocity = -invader_velocity;
         move_invaders(invader_velocity, -0.1f);
       }
+
+	
     }
 
     // this is called to draw the world
@@ -665,8 +679,11 @@ namespace octet {
 
 	/*sprite bush_sprite;
 	sprite dirt_sprite;*/
+	int num_bush = 0;
 
 	void setup_visual_map() {
+
+		
 
 		GLuint bush = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
 		GLuint dirt = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_dirt.gif");
@@ -679,6 +696,7 @@ namespace octet {
 				if (map[i][j] == 1) {
 					sprites[bush_sprite].init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
 					map_sprites.push_back(sprites[bush_sprite]);
+					num_bush++;
 					
 				}
 				else if (map[i][j] == 0) {
