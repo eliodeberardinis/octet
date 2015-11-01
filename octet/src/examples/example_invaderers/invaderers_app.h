@@ -606,7 +606,7 @@ namespace octet {
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	  //draw the map sprites
-	  for (int i = 0; i < map_sprites.size(); ++i) {
+	  for (unsigned int i = 0; i < map_sprites.size(); ++i) {
 		  map_sprites[i].render(texture_shader_, cameraToWorld);
 	  }
 
