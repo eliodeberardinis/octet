@@ -161,8 +161,7 @@ namespace octet {
 
 	  // sprite definitions
 	  ship_sprite = 0,
-	  dirt_sprite,
-	  bush_sprite,
+
       game_over_sprite,
 
       first_invaderer_sprite,
@@ -176,6 +175,9 @@ namespace octet {
 
       first_border_sprite,
       last_border_sprite = first_border_sprite + num_borders - 1,
+
+	  dirt_sprite,
+	  bush_sprite,
 
       num_sprites,
 
@@ -606,7 +608,7 @@ namespace octet {
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	  //draw the map sprites
-	  for (int i = 0; i < map_sprites.size(); ++i) {
+	  for (unsigned int i = 0; i < map_sprites.size(); ++i) {
 		  map_sprites[i].render(texture_shader_, cameraToWorld);
 	  }
 
@@ -666,6 +668,9 @@ namespace octet {
 	/*sprite bush_sprite;
 	sprite dirt_sprite;*/
 
+	
+
+
 	void setup_visual_map() {
 
 		GLuint bush = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
@@ -678,12 +683,13 @@ namespace octet {
 				
 				if (map[i][j] == 1) {
 					sprites[bush_sprite].init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites.push_back(sprites[bush_sprite]);
+					//map_sprites.push_back(sprites[bush_sprite]);
+					
 					
 				}
 				else if (map[i][j] == 0) {
-					sprites[dirt_sprite].init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites.push_back(sprites[dirt_sprite]);
+				    sprites[dirt_sprite].init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					//map_sprites.push_back(sprites[dirt_sprite]);
 					
 				}
 				//map_sprites.push_back(temp);
