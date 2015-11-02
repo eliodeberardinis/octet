@@ -276,7 +276,7 @@ namespace octet {
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
-		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (mario_collide(bush))) {
+		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(sprites[bush_sprite + num_bush]))) {
 		
 			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
@@ -424,14 +424,14 @@ namespace octet {
 
 
 	// move the array of enemies (up and down) WORK ON THIS BECAUSE IT DOESN'T DO WHAT YOU WANT.
-	void move_invaders2(float up, float down) {
-		for (int j = 0; j != num_invaderers; ++j) {
-			sprite &invaderer = sprites[first_invaderer_sprite + j];
-			if (invaderer.is_enabled()) {
-				invaderer.translate(up, down);
-			}
-		}
-	}
+	//void move_invaders2(float up, float down) {
+	//	for (int j = 0; j != num_invaderers; ++j) {
+	//		sprite &invaderer = sprites[first_invaderer_sprite + j];
+	//		if (invaderer.is_enabled()) {
+	//			invaderer.translate(0, -0.01f);
+	//		}
+	//	}
+	//}
 
     // check if any invaders hit the sides.
     bool invaders_collide(sprite &border) {
@@ -444,9 +444,10 @@ namespace octet {
       return false;
     }
 
+	//trying to create a function to detect the bush as a border
 	bool mario_collide(sprite &bush) {
 		
-			sprite &mario = sprites[ship_sprite];
+			sprite &mario = sprites[ship_sprite +num_bush];
 
 			if (mario.collides_with(bush)) {
 				return true;
@@ -593,6 +594,10 @@ namespace octet {
         invader_velocity = -invader_velocity;
         move_invaders(invader_velocity, -0.1f);
       }
+
+	 
+
+	
 
 	
     }
