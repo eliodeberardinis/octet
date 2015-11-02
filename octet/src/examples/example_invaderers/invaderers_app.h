@@ -260,61 +260,58 @@ namespace octet {
     }
 	
     // use the keyboard to move the ship
-	void move_ship() {
-		const float ship_speed = 0.05f;
+    void move_ship() {
+      const float ship_speed = 0.05f;
+	  sprite &bush = map_sprites[bush_sprite + num_bush];
+	  
+	  
+	  
+	  
+      // left and right and up and down arrows
+	  
+	  if (is_key_down(key_left)) {
+		  if (myDirection != LEFT)
+		  {
+			  myDirection = LEFT;
+			  sprites[ship_sprite].rotate(180, 0, 1, 0);
+		  }
+		  sprites[ship_sprite].translate(+ship_speed, 0);
+		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(sprites[bush_sprite + num_bush]))) {
 		
-
-
-
-
-		// left and right and up and down arrows
-
-		if (is_key_down(key_left)) {
-			if (myDirection != LEFT)
-			{
-				myDirection = LEFT;
-				sprites[ship_sprite].rotate(180, 0, 1, 0);
+			  sprites[ship_sprite].translate(-ship_speed, 0);
 			}
-			sprites[ship_sprite].translate(+ship_speed, 0);
-			for (int i = 2; i < num_bush; i++){
-				if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(sprites[bush_sprite + i]))) {
+	  }
+	  else if (is_key_down(key_right)) {
+		  if (myDirection != RIGHT)
+		  {
+			  
+			  myDirection = RIGHT;
+			  sprites[ship_sprite].rotate(180, 0, 1, 0);
+		  }
+        sprites[ship_sprite].translate(+ship_speed, 0);
+		if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
+			sprites[ship_sprite].translate(-ship_speed, 0);
 
-					sprites[ship_sprite].translate(-ship_speed, 0);
-				}
-			}
-			
-			 if (is_key_down(key_right)) { //add else here
-				if (myDirection != RIGHT)
-				{
+        }
+      }
+	   else if (is_key_down(key_up)) {
 
-					myDirection = RIGHT;
-					sprites[ship_sprite].rotate(180, 0, 1, 0);
-				}
-				sprites[ship_sprite].translate(+ship_speed, 0);
-				if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
-					sprites[ship_sprite].translate(-ship_speed, 0);
+		   sprites[ship_sprite].translate(0, +ship_speed);
+		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) {
+			   sprites[ship_sprite].translate(0, -ship_speed);
 
-				}
-			}
-			else if (is_key_down(key_up)) {
+		   }
+	   }
 
-				sprites[ship_sprite].translate(0, +ship_speed);
-				if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) {
-					sprites[ship_sprite].translate(0, -ship_speed);
+	   else if (is_key_down(key_down)) {
 
-				}
-			}
+		   sprites[ship_sprite].translate(0, -ship_speed);
+		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) {
+			   sprites[ship_sprite].translate(0, +ship_speed);
 
-			else if (is_key_down(key_down)) {
-
-				sprites[ship_sprite].translate(0, -ship_speed);
-				if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) {
-					sprites[ship_sprite].translate(0, +ship_speed);
-
-				}
-			}
-		}
-	
+		   }
+	   }
+    }
 
     // fire button (space)
     void fire_missiles() {
