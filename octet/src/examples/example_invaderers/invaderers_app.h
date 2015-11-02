@@ -161,8 +161,10 @@ namespace octet {
 
 	  // sprite definitions
 	  ship_sprite = 0,
+	  mushroom_sprite=0,
 	  dirt_sprite,
 	  bush_sprite,
+	  
       game_over_sprite,
 
       first_invaderer_sprite,
@@ -227,7 +229,9 @@ namespace octet {
 	static const int map_width = 20;
 	static const int map_height = 20;
 	int map[map_height][map_width];
+	int map2[map_height][map_width];
 	dynarray<sprite> map_sprites;
+	dynarray<sprite> object_sprites;
 
     ALuint get_sound_source() { return sources[cur_source++ % num_sound_sources]; }
 
@@ -276,12 +280,16 @@ namespace octet {
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
-		  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(sprites[bush_sprite + num_bush]))) {
-		
-			  sprites[ship_sprite].translate(-ship_speed, 0);
-			}
-	  }
-	  else if (is_key_down(key_right)) {
+
+		  for (int i = 0; i < 9; i++){
+
+			  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(object_sprites[mushroom_sprite+i]))) {
+
+				  sprites[ship_sprite].translate(-ship_speed, 0);
+			  }
+	          }
+	          }
+	      else if (is_key_down(key_right)) {
 		  if (myDirection != RIGHT)
 		  {
 			  
@@ -447,7 +455,7 @@ namespace octet {
 	//trying to create a function to detect the bush as a border
 	bool mario_collide(sprite &bush) {
 		
-			sprite &mario = sprites[ship_sprite +num_bush];
+			sprite &mario = sprites[ship_sprite];
 
 			if (mario.collides_with(bush)) {
 				return true;
@@ -503,7 +511,9 @@ namespace octet {
       texture_shader_.init();
 
 	  read_csv();
+	  read_csv2();
 	  setup_visual_map();
+	  setup_object_map();
 
 	  myDirection = RIGHT;
 
@@ -629,6 +639,11 @@ namespace octet {
 		  map_sprites[i].render(texture_shader_, cameraToWorld);
 	  }
 
+	  //draw the object sprites
+	  for (unsigned int i = 0; i < object_sprites.size(); ++i) {
+		  object_sprites[i].render(texture_shader_, cameraToWorld);
+	  }
+
       // draw all the sprites
       for (int i = 0; i != num_sprites; ++i) {
         sprites[i].render(texture_shader_, cameraToWorld);
@@ -666,6 +681,31 @@ namespace octet {
 			++i;
 		}
 	}
+
+	// read CSV for object map
+	void read_csv2() {
+
+		std::ifstream file("mapcsv2.csv");
+
+		char buffer[2048];
+		int i = 0;
+
+		while (!file.eof()) {
+			file.getline(buffer, sizeof(buffer));
+
+			char *b = buffer;
+			for (int j = 0;; ++j) {
+				char *e = b;
+				while (*e != 0 && *e != ';') ++e;
+
+				map2[i][j] = std::atoi(b);
+
+				if (*e != ';') break;
+				b = e + 1;
+			}
+			++i;
+		}
+	}
 	//Check for successful reading of CSV file in the console
 	void print_csv() {
 		for (int i = 0; i < map_height; ++i) {
@@ -687,9 +727,7 @@ namespace octet {
 	int num_bush = 0;
 
 	void setup_visual_map() {
-
 		
-
 		GLuint bush = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
 		GLuint dirt = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_dirt.gif");
 
@@ -701,7 +739,8 @@ namespace octet {
 				if (map[i][j] == 1) {
 					sprites[bush_sprite].init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
 					map_sprites.push_back(sprites[bush_sprite]);
-					num_bush++;
+					
+					
 					
 				}
 				else if (map[i][j] == 0) {
@@ -713,6 +752,39 @@ namespace octet {
 			}
 		}
 	}
+
+	void setup_object_map() {
+
+
+
+		GLuint mushroom = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/mushroom.gif");
+		
+
+		for (int i = 0; i < map_height; ++i) {
+			for (int j = 0; j < map_width; ++j) {
+
+				//sprite temp;
+
+				if (map2[i][j] == 1) {
+					sprites[mushroom_sprite].init(mushroom, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					object_sprites.push_back(sprites[mushroom_sprite]);
+					
+
+				}
+				
+
+				}
+			
+			}
+		}
+
+	/*void mario_collide_mushroom(){
+		for (unsigned int i = 0; i < object_sprites.size(); ++i) {
+			if (object_sprites[i] )
+		}
+
+	}*/
+
 
   };
 }
