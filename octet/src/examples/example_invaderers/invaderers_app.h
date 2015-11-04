@@ -162,8 +162,8 @@ namespace octet {
 	  // sprite definitions
 	  ship_sprite = 0,
 	  mushroom_sprite=0,
-	  dirt_sprite,
-	  bush_sprite,
+	  dirt_sprite =0,
+	  bush_sprite=0,
 	  
       game_over_sprite,
 
@@ -230,7 +230,8 @@ namespace octet {
 	static const int map_height = 20;
 	int map[map_height][map_width];
 	int map2[map_height][map_width];
-	dynarray<sprite> map_sprites;
+	dynarray<sprite> map_sprites_bush;
+	dynarray<sprite> map_sprites_dirt;
 	dynarray<sprite> object_sprites;
 
     ALuint get_sound_source() { return sources[cur_source++ % num_sound_sources]; }
@@ -266,7 +267,7 @@ namespace octet {
     // use the keyboard to move the ship
     void move_ship() {
       const float ship_speed = 0.05f;
-	  sprite &bush = map_sprites[bush_sprite + num_bush];
+	
 	  
 	  
 	  
@@ -281,9 +282,9 @@ namespace octet {
 		  }
 		  sprites[ship_sprite].translate(+ship_speed, 0);
 
-		  for (int i = 0; i < 9; i++){
+		  for (int i = 0; i < num_bush; i++){
 
-			  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(object_sprites[mushroom_sprite+i]))) {
+			  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite+i]))) {
 
 				  sprites[ship_sprite].translate(-ship_speed, 0);
 			  }
@@ -296,27 +297,34 @@ namespace octet {
 			  myDirection = RIGHT;
 			  sprites[ship_sprite].rotate(180, 0, 1, 0);
 		  }
-        sprites[ship_sprite].translate(+ship_speed, 0);
-		if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) {
-			sprites[ship_sprite].translate(-ship_speed, 0);
 
+        sprites[ship_sprite].translate(+ship_speed, 0);
+
+		for (int i = 0; i < num_bush; i++) {
+		if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite + i]))) {
+			sprites[ship_sprite].translate(-ship_speed, 0);
+		}
         }
       }
 	   else if (is_key_down(key_up)) {
 
 		   sprites[ship_sprite].translate(0, +ship_speed);
-		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) {
-			   sprites[ship_sprite].translate(0, -ship_speed);
 
+		   for (int i = 0; i < num_bush; i++) {
+			   if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite + i]))) {
+				   sprites[ship_sprite].translate(0, -ship_speed);
+			   }
 		   }
 	   }
 
 	   else if (is_key_down(key_down)) {
 
 		   sprites[ship_sprite].translate(0, -ship_speed);
-		   if (sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) {
-			   sprites[ship_sprite].translate(0, +ship_speed);
 
+		   for(int i = 0; i < num_bush; i++) {
+			   if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite + i]))) {
+				   sprites[ship_sprite].translate(0, +ship_speed);
+			   }
 		   }
 	   }
     }
@@ -452,17 +460,7 @@ namespace octet {
       return false;
     }
 
-	//trying to create a function to detect the bush as a border
-	bool mario_collide(sprite &bush) {
-		
-			sprite &mario = sprites[ship_sprite];
-
-			if (mario.collides_with(bush)) {
-				return true;
-			
-		}
-		return false;
-	}
+	
 
 
     void draw_text(texture_shader &shader, float x, float y, float scale, const char *text) {
@@ -634,9 +632,14 @@ namespace octet {
       glEnable(GL_BLEND);
       glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	  //draw the map sprites
-	  for (unsigned int i = 0; i < map_sprites.size(); ++i) {
-		  map_sprites[i].render(texture_shader_, cameraToWorld);
+	  //draw the map sprites (bush)
+	  for (unsigned int i = 0; i < map_sprites_bush.size(); ++i) {
+		  map_sprites_bush[i].render(texture_shader_, cameraToWorld);
+	  }
+
+	  //draw the map sprites (dirt)
+	  for (unsigned int i = 0; i < map_sprites_dirt.size(); ++i) {
+		  map_sprites_dirt[i].render(texture_shader_, cameraToWorld);
 	  }
 
 	  //draw the object sprites
@@ -724,6 +727,7 @@ namespace octet {
 
 	/*sprite bush_sprite;
 	sprite dirt_sprite;*/
+
 	int num_bush = 0;
 
 	void setup_visual_map() {
@@ -734,21 +738,22 @@ namespace octet {
 		for (int i = 0; i < map_height; ++i) {
 			for (int j = 0; j < map_width; ++j) {
 
-				//sprite temp;
+				
 				
 				if (map[i][j] == 1) {
 					sprites[bush_sprite].init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites.push_back(sprites[bush_sprite]);
+					map_sprites_bush.push_back(sprites[bush_sprite]);
+					num_bush++;
 					
 					
 					
 				}
 				else if (map[i][j] == 0) {
 					sprites[dirt_sprite].init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites.push_back(sprites[dirt_sprite]);
+					map_sprites_dirt.push_back(sprites[dirt_sprite]);
 					
 				}
-				//map_sprites.push_back(temp);
+				
 			}
 		}
 	}
@@ -778,12 +783,7 @@ namespace octet {
 			}
 		}
 
-	/*void mario_collide_mushroom(){
-		for (unsigned int i = 0; i < object_sprites.size(); ++i) {
-			if (object_sprites[i] )
-		}
 
-	}*/
 
 
   };
