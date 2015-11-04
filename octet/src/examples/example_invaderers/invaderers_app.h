@@ -538,11 +538,11 @@ namespace octet {
       }
 
       // set the border to yellow for clarity
-      GLuint yellow = resource_dict::get_texture_handle(GL_RGB, "#cbee16");
+ /*     GLuint yellow = resource_dict::get_texture_handle(GL_RGB, "#cbee16");
 	  sprites[first_border_sprite + 0].init(yellow, 0, -3, 6, 0.2f);
 	  sprites[first_border_sprite + 1].init(yellow, 0, 3, 6, 0.2f);
 	  sprites[first_border_sprite + 2].init(yellow, -3, 0, 0.2f, 6);
-	  sprites[first_border_sprite + 3].init(yellow, 3, 0, 0.2f, 6);
+	  sprites[first_border_sprite + 3].init(yellow, 3, 0, 0.2f, 6);*/
 
       // use the missile texture
       GLuint missile = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/missile.gif");
@@ -572,7 +572,7 @@ namespace octet {
       // sundry counters and game state.
       missiles_disabled = 0;
       bombs_disabled = 50;
-      invader_velocity = 0.01f;
+      invader_velocity = 0.02f;
       live_invaderers = num_invaderers;
       num_lives = 3;
       game_over = false;
@@ -595,14 +595,27 @@ namespace octet {
 
       move_bombs();
 
-      move_invaders(invader_velocity, 0);
+      move_invaders(0, 0);//move_invaders(invader_velocity, 0)
 
-      sprite &border = sprites[first_border_sprite+(invader_velocity < 0 ? 2 : 3)];
-      if (invaders_collide(border)) {
-        invader_velocity = -invader_velocity;
-        move_invaders(invader_velocity, -0.1f);
-      }
+	  for (int i = 0; i < 40; i=i+2){
+		  sprite &border = map_sprites_bush[bush_sprite + (invader_velocity < 0 ? (20 + i) : (19 + i))]; //inline if else
+		  if (invaders_collide(border)) {
+			  invader_velocity = -invader_velocity;
+			  move_invaders(invader_velocity, -0.1f);
+		  }
+	  }
 
+	/*  sprite &mario = sprites[ship_sprite];
+
+	  for (int j = 0; j != num_invaderers; ++j) {
+		  sprite &invaderer = sprites[first_invaderer_sprite + j];
+
+		  if (mario.is_above(invaderer,0.5f)){
+
+			  move_invaders(0, -0.001f);
+		  }
+
+	  }*/
 	 
 
 	
