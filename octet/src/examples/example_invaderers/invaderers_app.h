@@ -99,6 +99,33 @@ namespace octet {
       glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
 
+	void render(elio_shader &shader, mat4t &cameraToWorld) {
+		mat4t modelToProjection = mat4t::build_projection_matrix(modelToWorld, cameraToWorld);
+		shader.render(modelToProjection);
+
+		float vertices[] = {
+			-halfWidth, -halfHeight, 0,
+			halfWidth, -halfHeight, 0,
+			halfWidth, halfHeight, 0,
+			-halfWidth, halfHeight, 0,
+		};
+
+		glVertexAttribPointer(attribute_pos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)vertices);
+		glEnableVertexAttribArray(attribute_pos);
+
+		static const float uvs[] = {
+			0, 0,
+			1, 0,
+			1, 1,
+			0, 1,
+		};
+
+		glVertexAttribPointer(attribute_uv, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)uvs);
+		glEnableVertexAttribArray(attribute_uv);
+
+		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	}
+
 	// move the object
 	void translate(float x, float y) {
 		modelToWorld.translate(x, y, 0);
@@ -149,6 +176,7 @@ namespace octet {
 
     // shader to draw a textured triangle
     texture_shader texture_shader_;
+	elio_shader elio_shader_;
 
     enum {
 		num_sound_sources = 8,
@@ -161,9 +189,6 @@ namespace octet {
 
 	  // sprite definitions
 	  ship_sprite = 0,
-	  mushroom_sprite=0,
-	  dirt_sprite =0,
-	  bush_sprite=0,
 	  
       game_over_sprite,
 
@@ -284,7 +309,7 @@ namespace octet {
 
 		  for (int i = 0; i < num_bush; i++){
 
-			  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite+i]))) {
+			  if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 2])) || (sprites[ship_sprite].collides_with(map_sprites_bush[i]))) {
 
 				  sprites[ship_sprite].translate(-ship_speed, 0);
 			  }
@@ -301,7 +326,7 @@ namespace octet {
         sprites[ship_sprite].translate(+ship_speed, 0);
 
 		for (int i = 0; i < num_bush; i++) {
-		if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite + i]))) {
+		if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 3])) || (sprites[ship_sprite].collides_with(map_sprites_bush[i]))) {
 			sprites[ship_sprite].translate(-ship_speed, 0);
 		}
         }
@@ -311,7 +336,7 @@ namespace octet {
 		   sprites[ship_sprite].translate(0, +ship_speed);
 
 		   for (int i = 0; i < num_bush; i++) {
-			   if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite + i]))) {
+			   if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 1])) || (sprites[ship_sprite].collides_with(map_sprites_bush[i]))) {
 				   sprites[ship_sprite].translate(0, -ship_speed);
 			   }
 		   }
@@ -322,7 +347,7 @@ namespace octet {
 		   sprites[ship_sprite].translate(0, -ship_speed);
 
 		   for(int i = 0; i < num_bush; i++) {
-			   if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) || (sprites[ship_sprite].collides_with(map_sprites_bush[bush_sprite + i]))) {
+			   if ((sprites[ship_sprite].collides_with(sprites[first_border_sprite + 0])) || (sprites[ship_sprite].collides_with(map_sprites_bush[i]))) {
 				   sprites[ship_sprite].translate(0, +ship_speed);
 			   }
 		   }
@@ -382,24 +407,27 @@ namespace octet {
       const float missile_speed = 0.3f;
       for (int i = 0; i != num_missiles; ++i) {
         sprite &missile = sprites[first_missile_sprite+i];
-        if (missile.is_enabled()) {
-          missile.translate(0, missile_speed);
-          for (int j = 0; j != num_invaderers; ++j) {
-            sprite &invaderer = sprites[first_invaderer_sprite+j];
-            if (invaderer.is_enabled() && missile.collides_with(invaderer)) {
-              invaderer.is_enabled() = false;
-              invaderer.translate(20, 0);
-              missile.is_enabled() = false;
-              missile.translate(20, 0);
-              on_hit_invaderer();
+		if (missile.is_enabled()) {
+			missile.translate(0, missile_speed);
+			for (int j = 0; j != num_invaderers; ++j) {
+				sprite &invaderer = sprites[first_invaderer_sprite + j];
+				if (invaderer.is_enabled() && missile.collides_with(invaderer)) {
+					invaderer.is_enabled() = false;
+					invaderer.translate(20, 0);
+					missile.is_enabled() = false;
+					missile.translate(20, 0);
+					on_hit_invaderer();
 
-              goto next_missile;
-            }
-          }
-          if (missile.collides_with(sprites[first_border_sprite+1])) {
-            missile.is_enabled() = false;
-            missile.translate(20, 0);
-          }
+					goto next_missile;
+				}
+			}
+
+			for (unsigned int j = 0; j < map_sprites_bush.size(); ++j){
+				if (missile.collides_with(map_sprites_bush[j])) {
+					missile.is_enabled() = false;
+					missile.translate(20, 0);
+				}
+		}
         }
       next_missile:;
       }
@@ -409,20 +437,23 @@ namespace octet {
     void move_bombs() {
       const float bomb_speed = 0.2f;
       for (int i = 0; i != num_bombs; ++i) {
+		  
         sprite &bomb = sprites[first_bomb_sprite+i];
-        if (bomb.is_enabled()) {
-          bomb.translate(0, -bomb_speed);
-          if (bomb.collides_with(sprites[ship_sprite])) {
-            bomb.is_enabled() = false;
-            bomb.translate(20, 0);
-            bombs_disabled = 50;
-            on_hit_ship();
-            goto next_bomb;
-          }
-          if (bomb.collides_with(sprites[first_border_sprite+0])) {
-            bomb.is_enabled() = false;
-            bomb.translate(20, 0);
-          }
+		if (bomb.is_enabled()) {
+			bomb.translate(0, -bomb_speed);
+			if (bomb.collides_with(sprites[ship_sprite])) {
+				bomb.is_enabled() = false;
+				bomb.translate(20, 0);
+				bombs_disabled = 50;
+				on_hit_ship();
+				goto next_bomb;
+			}
+			for (unsigned int j = 0; j < map_sprites_bush.size(); ++j){
+				if (bomb.collides_with(map_sprites_bush[j])) {
+					bomb.is_enabled() = false;
+					bomb.translate(20, 0);
+				}
+			}
         }
       next_bomb:;
       }
@@ -439,15 +470,7 @@ namespace octet {
     }
 
 
-	// move the array of enemies (up and down) WORK ON THIS BECAUSE IT DOESN'T DO WHAT YOU WANT.
-	//void move_invaders2(float up, float down) {
-	//	for (int j = 0; j != num_invaderers; ++j) {
-	//		sprite &invaderer = sprites[first_invaderer_sprite + j];
-	//		if (invaderer.is_enabled()) {
-	//			invaderer.translate(0, -0.01f);
-	//		}
-	//	}
-	//}
+
 
     // check if any invaders hit the sides.
     bool invaders_collide(sprite &border) {
@@ -507,6 +530,7 @@ namespace octet {
 
       // set up the shader
       texture_shader_.init();
+	  elio_shader_.init();
 
 	  read_csv();
 	  read_csv2();
@@ -598,24 +622,25 @@ namespace octet {
       move_invaders(0, 0);//move_invaders(invader_velocity, 0)
 
 	  for (int i = 0; i < 40; i=i+2){
-		  sprite &border = map_sprites_bush[bush_sprite + (invader_velocity < 0 ? (20 + i) : (19 + i))]; //inline if else
+		  sprite &border = map_sprites_bush[(invader_velocity < 0 ? (20 + i) : (19 + i))]; //inline if else
 		  if (invaders_collide(border)) {
 			  invader_velocity = -invader_velocity;
 			  move_invaders(invader_velocity, -0.1f);
 		  }
 	  }
 
-	/*  sprite &mario = sprites[ship_sprite];
+	  sprite &mario = sprites[ship_sprite];
 
-	  for (int j = 0; j != num_invaderers; ++j) {
-		  sprite &invaderer = sprites[first_invaderer_sprite + j];
+	 // for (int j = 0; j != num_invaderers; ++j) {
+		  sprite &invaderer = sprites[first_invaderer_sprite + 4];
 
 		  if (mario.is_above(invaderer,0.5f)){
 
 			  move_invaders(0, -0.001f);
 		  }
+		  else { move_invaders(0, 0); }
 
-	  }*/
+	 // }
 	 
 
 	
@@ -662,7 +687,7 @@ namespace octet {
 
       // draw all the sprites
       for (int i = 0; i != num_sprites; ++i) {
-        sprites[i].render(texture_shader_, cameraToWorld);
+		  sprites[i].render(texture_shader_, cameraToWorld);
       }
 
       char score_text[32];
@@ -751,19 +776,20 @@ namespace octet {
 		for (int i = 0; i < map_height; ++i) {
 			for (int j = 0; j < map_width; ++j) {
 
-				
+				sprite s;
 				
 				if (map[i][j] == 1) {
-					sprites[bush_sprite].init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites_bush.push_back(sprites[bush_sprite]);
+					
+					s.init(bush, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					map_sprites_bush.push_back(s);
 					num_bush++;
 					
 					
 					
 				}
 				else if (map[i][j] == 0) {
-					sprites[dirt_sprite].init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					map_sprites_dirt.push_back(sprites[dirt_sprite]);
+					s.init(dirt, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					map_sprites_dirt.push_back(s);
 					
 				}
 				
@@ -784,17 +810,18 @@ namespace octet {
 				//sprite temp;
 
 				if (map2[i][j] == 1) {
-					sprites[mushroom_sprite].init(mushroom, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
-					object_sprites.push_back(sprites[mushroom_sprite]);
+					sprite s;
+					s.init(mushroom, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					object_sprites.push_back(s);
 					
 
 				}
 				
 
-				}
-			
 			}
+			
 		}
+	}
 
 
 
