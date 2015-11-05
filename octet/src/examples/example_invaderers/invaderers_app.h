@@ -271,6 +271,7 @@ namespace octet {
       score++;
       if (live_invaderers == 4) {
         invader_velocity *= 4;
+		
       } else if (live_invaderers == 0) {
         game_over = true;
         sprites[game_over_sprite].translate(-20, 0);
@@ -362,7 +363,7 @@ namespace octet {
         // find a missile
         for (int i = 0; i != num_missiles; ++i) {
           if (!sprites[first_missile_sprite+i].is_enabled()) {
-            sprites[first_missile_sprite+i].set_relative(sprites[ship_sprite], 0, 0.5f);
+            sprites[first_missile_sprite+i].set_relative(sprites[ship_sprite], 0, 0.1f);
             sprites[first_missile_sprite+i].is_enabled() = true;
             missiles_disabled = 5;
             ALuint source = get_sound_source();
@@ -535,6 +536,7 @@ namespace octet {
 	  read_csv();
 	  read_csv2();
 	  setup_visual_map();
+	 
 	  setup_object_map();
 
 	  myDirection = RIGHT;
@@ -551,7 +553,7 @@ namespace octet {
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
 
-      GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/bowser.gif");
+      GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/goomba.gif");
       for (int j = 0; j != num_rows; ++j) {
         for (int i = 0; i != num_cols; ++i) {
           assert(first_invaderer_sprite + i + j*num_cols <= last_invaderer_sprite);
@@ -575,6 +577,11 @@ namespace octet {
         sprites[first_missile_sprite+i].init(missile, 20, 0, 0.0625f, 0.25f);
         sprites[first_missile_sprite+i].is_enabled() = false;
       }
+
+	/*  for (int k = 0; k < object_sprites.size(); k++) // MIRCEA??
+	  {
+		  object_sprites[k].is_enabled() = false;
+	  }*/
 
       // use the bomb texture
       GLuint bomb = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/Fireball.gif");
@@ -683,6 +690,8 @@ namespace octet {
 	  //draw the object sprites
 	  for (unsigned int i = 0; i < object_sprites.size(); ++i) {
 		  object_sprites[i].render(texture_shader_, cameraToWorld);
+
+		  
 	  }
 
       // draw all the sprites
@@ -757,14 +766,7 @@ namespace octet {
 		}
 	}
 
-	
 
-
-	//GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
-	//sprites[ship_sprite].init(ship, 0, -2.5f, 0.25f, 0.25f);
-
-	/*sprite bush_sprite;
-	sprite dirt_sprite;*/
 
 	int num_bush = 0;
 
@@ -813,14 +815,17 @@ namespace octet {
 					sprite s;
 					s.init(mushroom, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
 					object_sprites.push_back(s);
-					
+				
 
+			
 				}
 				
 
 			}
 			
 		}
+
+
 	}
 
 
