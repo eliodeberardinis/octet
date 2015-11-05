@@ -192,7 +192,7 @@ namespace octet {
     enum {
 		num_sound_sources = 8,
 		num_rows = 1,
-		num_cols = 10,
+		num_cols = 5,
 		num_missiles = 2,
 		num_bombs = 2,
 		num_borders = 4,
@@ -291,6 +291,12 @@ namespace octet {
 
     // called when we are hit
     void on_hit_ship() {
+
+		if (mario_height < 0.5f){ --num_lives; }
+		if (num_lives == 0) {
+			game_over = true;
+			sprites[game_over_sprite].translate(-20, 0);
+		}
       
 		if (mario_height > 0.25f){
 			vec2 pos = sprites[ship_sprite].get_Position();
@@ -305,14 +311,12 @@ namespace octet {
 				sprites[ship_sprite].rotate(180, 0, 1, 0);
 			}
 		}
+
       ALuint source = get_sound_source();
       alSourcei(source, AL_BUFFER, bang);
       alSourcePlay(source);
 
-      if (--num_lives == 0) {
-        game_over = true;
-        sprites[game_over_sprite].translate(-20, 0);
-      }
+	 
     }
 	
     // use the keyboard to move the ship
@@ -388,8 +392,10 @@ namespace octet {
 			   object_sprites[i].is_enabled() = false;
 			   mario_height = 0.5f;
 			   mario_width = 0.5f;
+			   vec2 pos = sprites[ship_sprite].get_Position();
+
 			   GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
-			   sprites[ship_sprite].init(ship, x_mushroom, y_mushroom, mario_width, mario_height);
+			   sprites[ship_sprite].init(ship, pos.x(), pos.y(), mario_width, mario_height);
 			   if (myDirection != RIGHT){
 				   sprites[ship_sprite].rotate(180, 0, 1, 0);
 			   }
@@ -402,12 +408,29 @@ namespace octet {
 		   sprite &invaderer = sprites[first_invaderer_sprite + j];
 		   if (sprites[ship_sprite].collides_with(invaderer))
 		   {
-			   sprites[ship_sprite].translate(0, -15 * ship_speed);
-			   num_lives--;
+			   sprites[ship_sprite].translate(-8*ship_speed, -8 * ship_speed);
+
+			   if (mario_height < 0.5f){ num_lives--; }
+
 			   if (num_lives == 0) {
 				   game_over = true;
 				   sprites[game_over_sprite].translate(-20, 0);
 			   }
+
+			   if (mario_height > 0.25f){
+				   mario_height = 0.25f;
+				   mario_width = 0.25f;
+				   vec2 pos = sprites[ship_sprite].get_Position();
+
+				   GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/test_mario.gif");
+				   sprites[ship_sprite].init(ship, pos.x(), pos.y(), mario_width, mario_height);
+				   if (myDirection != RIGHT){
+					   sprites[ship_sprite].rotate(180, 0, 1, 0);
+				   }
+			   
+			   }
+
+			 
 		   }
 	   }
 
@@ -660,7 +683,7 @@ namespace octet {
       // sundry counters and game state.
       missiles_disabled = 0;
       bombs_disabled = 50;
-      invader_velocity = 0.02f;
+      invader_velocity = 0.001f;
       live_invaderers = num_invaderers;
       num_lives = 10;
       game_over = false;
@@ -858,9 +881,6 @@ namespace octet {
 		}
 	}
 
-	float x_mushroom;
-	float y_mushroom;
-
 	void setup_object_map() {
 
 
@@ -879,8 +899,7 @@ namespace octet {
 					//s.is_enabled() = false;
 					object_sprites.push_back(s);
 
-					x_mushroom = -3 + 0.15f + 0.3f*j;
-					y_mushroom = 3 - 0.15f - 0.3f*i;
+					
 
 				
 
