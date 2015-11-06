@@ -429,19 +429,19 @@ namespace octet {
 		   {
 			   
 			   sprites[ship_sprite].translate(0, -5 * ship_speed);
-			   object_sprites[second_block_sprite].is_enabled() = false;
+			   /*object_sprites[second_block_sprite].is_enabled() = false;*/
 			   object_sprites[mushroom_sprite].is_enabled() = true;
 			   
 			   
 		   }
 
-		   if (object_sprites[second_block_sprite].is_enabled() == false && mario_height > 0.25) {
+		   if (/*object_sprites[second_block_sprite].is_enabled() == false && */mario_height > 0.25f) {
 
 			   if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true)
 			   {
 
 				   sprites[ship_sprite].translate(0, -5 * ship_speed);
-				   object_sprites[first_block_sprite].is_enabled() = false;
+				   /*object_sprites[first_block_sprite].is_enabled() = false;*/
 				   object_sprites[flower_sprite].is_enabled() = true;
 
 
@@ -455,6 +455,17 @@ namespace octet {
 			   sprites[ship_sprite].translate(0, -5 * ship_speed);
 			   
 			 
+		   }
+
+	   //redraw the block if mario is small
+		   if (mario_height < 0.4f && object_sprites[first_block_sprite].is_enabled() == true)
+		   {
+			   object_sprites[second_block_sprite].is_enabled() = true;
+		   }
+
+		   if (mario_height > 0.25f){
+
+			   object_sprites[mushroom_sprite].is_enabled() = false;
 		   }
 
 
