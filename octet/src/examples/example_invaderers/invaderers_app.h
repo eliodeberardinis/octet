@@ -225,6 +225,9 @@ namespace octet {
 
     };
 
+	//Flower picked state
+	bool flower_picked;
+
     // timers for missiles and bombs
     int missiles_disabled;
     int bombs_disabled;
@@ -407,13 +410,17 @@ namespace octet {
 			   if (myDirection != RIGHT){
 				   sprites[ship_sprite].rotate(180, 0, 1, 0);
 			   }
+
+			   GLuint mushroom = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/mushroom.gif");
+			   object_sprites[mushroom_sprite].init(mushroom, x_init_mush, y_init_mush, 0.3f, 0.3f);
 		   }
 
-		   if (sprites[ship_sprite].collides_with(object_sprites[flower_sprite]) && object_sprites[flower_sprite].is_enabled() == true)
+		   if (sprites[ship_sprite].collides_with(object_sprites[flower_sprite]) && object_sprites[flower_sprite].is_enabled() == true && flower_picked==false)
 		   {
 			   object_sprites[flower_sprite].is_enabled() = false;
-			   
-			   vec2 pos = sprites[ship_sprite].get_Position();
+			   flower_picked = true;
+			   mario_height = 0.4f;
+			  vec2 pos = sprites[ship_sprite].get_Position();
 
 			   GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/fire_mario.gif");
 			   sprites[ship_sprite].init(ship, pos.x(), pos.y(), mario_width, mario_height);
@@ -425,7 +432,7 @@ namespace octet {
 
 	   //interaction with the blocks
 		   
-		   if (sprites[ship_sprite].collides_with(object_sprites[second_block_sprite]) && object_sprites[second_block_sprite].is_enabled() == true )
+		   if (sprites[ship_sprite].collides_with(object_sprites[second_block_sprite]) && object_sprites[second_block_sprite].is_enabled() == true && is_key_down(key_up))
 		   {
 			   
 			   sprites[ship_sprite].translate(0, -5 * ship_speed);
@@ -437,19 +444,26 @@ namespace octet {
 
 		   if (/*object_sprites[second_block_sprite].is_enabled() == false && */mario_height > 0.25f) {
 
-			   if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true)
+			   if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true && is_key_down(key_up))
 			   {
+				   if (flower_picked == false){
+					   sprites[ship_sprite].translate(0, -5 * ship_speed);
+					   /*object_sprites[first_block_sprite].is_enabled() = false;*/
+					   object_sprites[flower_sprite].is_enabled() = true;
 
-				   sprites[ship_sprite].translate(0, -5 * ship_speed);
-				   /*object_sprites[first_block_sprite].is_enabled() = false;*/
-				   object_sprites[flower_sprite].is_enabled() = true;
+				   }
 
-
+				   else {
+					   sprites[ship_sprite].translate(0, -5 * ship_speed);
+					   /*object_sprites[first_block_sprite].is_enabled() = false;*/
+					   
+				   
+				   }
 			   }
 
 		   }
 
-		   else  if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true)
+		   else  if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true && is_key_down(key_up))
 		   {
 
 			   sprites[ship_sprite].translate(0, -5 * ship_speed);
@@ -458,10 +472,10 @@ namespace octet {
 		   }
 
 	   //redraw the block if mario is small
-		   if (mario_height < 0.4f && object_sprites[first_block_sprite].is_enabled() == true)
+		  /* if (mario_height < 0.4f && object_sprites[first_block_sprite].is_enabled() == true)
 		   {
 			   object_sprites[second_block_sprite].is_enabled() = true;
-		   }
+		   }*/
 
 		   if (mario_height > 0.25f){
 
@@ -475,9 +489,28 @@ namespace octet {
 		   sprite &invaderer = sprites[first_invaderer_sprite + j];
 		   if (sprites[ship_sprite].collides_with(invaderer))
 		   {
-			   sprites[ship_sprite].translate(-8*ship_speed, -8 * ship_speed);
+			   
+			   flower_picked = false;
 
-			   if (mario_height < 0.4f){ num_lives--; }
+			   if (mario_height < 0.4f){ 
+				   
+				   num_lives--;
+				   object_sprites[flower_sprite].is_enabled() = false;
+
+				   GLuint mushroom = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/mushroom.gif");
+				   object_sprites[mushroom_sprite].init(mushroom, x_init_mush, y_init_mush, 0.3f, 0.3f);
+				   object_sprites[mushroom_sprite].is_enabled() = false;
+
+				   GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
+				   sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
+				   if (myDirection != RIGHT){
+					   sprites[ship_sprite].rotate(180, 0, 1, 0);
+				   }
+
+				   
+			   
+			   
+			   }
 
 			   if (num_lives == 0) {
 				   game_over = true;
@@ -487,6 +520,9 @@ namespace octet {
 			   if (mario_height > 0.25f){
 				   mario_height = 0.25f;
 				   mario_width = 0.25f;
+
+				   sprites[ship_sprite].translate(-4 * ship_speed, -4 * ship_speed);
+
 				   vec2 pos = sprites[ship_sprite].get_Position();
 
 				   GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
@@ -505,22 +541,25 @@ namespace octet {
 
     // fire button (space)
     void fire_missiles() {
-      if (missiles_disabled) {
-        --missiles_disabled;
-      } else if (is_key_going_down(' ')) {
-        // find a missile
-        for (int i = 0; i != num_missiles; ++i) {
-          if (!sprites[first_missile_sprite+i].is_enabled()) {
-            sprites[first_missile_sprite+i].set_relative(sprites[ship_sprite], 0.2f, 0);
-            sprites[first_missile_sprite+i].is_enabled() = true;
-            missiles_disabled = 5;
-            ALuint source = get_sound_source();
-            alSourcei(source, AL_BUFFER, whoosh);
-            alSourcePlay(source);
-            break;
-          }
-        }
-      }
+		if (flower_picked == true){
+			if (missiles_disabled) {
+				--missiles_disabled;
+			}
+			else if (is_key_going_down(' ')) {
+				// find a missile
+				for (int i = 0; i != num_missiles; ++i) {
+					if (!sprites[first_missile_sprite + i].is_enabled()) {
+						sprites[first_missile_sprite + i].set_relative(sprites[ship_sprite], 0.05f, 0);
+						sprites[first_missile_sprite + i].is_enabled() = true;
+						missiles_disabled = 5;
+						ALuint source = get_sound_source();
+						alSourcei(source, AL_BUFFER, whoosh);
+						alSourcePlay(source);
+						break;
+					}
+				}
+			}
+		}
     }
 
     // pick and invader and fire a bomb
@@ -718,7 +757,7 @@ namespace octet {
       font_texture = resource_dict::get_texture_handle(GL_RGBA, "assets/big_0.gif");
 
       GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
-      sprites[ship_sprite].init(ship, 0, -2.5f, mario_width, mario_height);
+      sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
 
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
@@ -767,6 +806,7 @@ namespace octet {
       alGenSources(num_sound_sources, sources);
 
       // sundry counters and game state.
+	  
       missiles_disabled = 0;
       bombs_disabled = 50;
       invader_velocity = 0.03f;
@@ -775,6 +815,7 @@ namespace octet {
       num_lives = 10;
       game_over = false;
       score = 0;
+	  flower_picked = false;
     }
 
     // called every frame to move things
@@ -785,7 +826,10 @@ namespace octet {
 
       move_ship();
 
-      fire_missiles();
+	 
+	  
+	 fire_missiles();
+	  
 
       //fire_bombs();
 
@@ -984,6 +1028,9 @@ namespace octet {
 		}
 	}
 
+	float x_init_mush;
+	float y_init_mush;
+
 	void setup_object_map() {
 
 
@@ -1000,6 +1047,8 @@ namespace octet {
 				if (map2[i][j] == 1) {
 
 					s.init(mushroom, -3 + 0.15f + 0.3f*j, 3 - 0.15f - 0.3f*i, 0.3f, 0.3f);
+					x_init_mush = -3 + 0.15f + 0.3f*j;
+					y_init_mush = 3 - 0.15f - 0.3f*i;
 					s.is_enabled() = false;
 					object_sprites.push_back(s);
 				}
