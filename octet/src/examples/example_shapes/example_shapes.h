@@ -37,9 +37,9 @@ namespace octet {
 	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
 
       mat.loadIdentity();
-	  mat.translate(2, 5, 0);
+	  mat.translate(2, 15, 0);
 	  /*btRigidBody* firstBox = NULL;*/
-	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
+	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, false);
 	  
 
 	/*  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
