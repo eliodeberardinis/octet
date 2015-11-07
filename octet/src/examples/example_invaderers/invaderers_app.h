@@ -252,6 +252,13 @@ namespace octet {
     // sounds
     ALuint whoosh;
     ALuint bang;
+	ALuint bump;
+	ALuint power_appears;
+	ALuint power_up;
+	ALuint power_down;
+	ALuint mario_die;
+	ALuint bowser_fire;
+
     unsigned cur_source;
     ALuint sources[num_sound_sources];
 
@@ -338,6 +345,11 @@ namespace octet {
 		}
 
 		else {
+
+			ALuint source = get_sound_source();
+			alSourcei(source, AL_BUFFER, mario_die);
+			alSourcePlay(source);
+
 			GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
 			sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
 
@@ -350,6 +362,11 @@ namespace octet {
 		if (mario_height > 0.25f){
 
 			flower_picked = false;
+
+			ALuint source = get_sound_source();
+			alSourcei(source, AL_BUFFER, power_down);
+			alSourcePlay(source);
+
 			vec2 pos = sprites[ship_sprite].get_Position();
 
 			mario_width = 0.25f;
@@ -363,9 +380,7 @@ namespace octet {
 			}
 		}
 
-      ALuint source = get_sound_source();
-      alSourcei(source, AL_BUFFER, bang);
-      alSourcePlay(source);
+     
 
 	 
     }
@@ -436,11 +451,15 @@ namespace octet {
 	   }
 
 	   //make an object disappear once is collected
-	  // for (unsigned int i = 0; i < object_sprites.size(); i++)
-	  // {
+	 
 		   if (sprites[ship_sprite].collides_with(object_sprites[mushroom_sprite]) && object_sprites[mushroom_sprite].is_enabled() == true)
 		   {
 			   object_sprites[mushroom_sprite].is_enabled() = false;
+
+			   ALuint source = get_sound_source();
+			   alSourcei(source, AL_BUFFER, power_up);
+			   alSourcePlay(source);
+
 			   mario_height = 0.4f;
 			   mario_width = 0.25f;
 			   vec2 pos = sprites[ship_sprite].get_Position();
@@ -459,7 +478,13 @@ namespace octet {
 		   {
 			   object_sprites[flower_sprite].is_enabled() = false;
 			   flower_picked = true;
+
+			   ALuint source = get_sound_source();
+			   alSourcei(source, AL_BUFFER, power_up);
+			   alSourcePlay(source);
+
 			   mario_height = 0.4f;
+			  
 			  vec2 pos = sprites[ship_sprite].get_Position();
 
 			   GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/fire_mario.gif");
@@ -468,34 +493,46 @@ namespace octet {
 				   sprites[ship_sprite].rotate(180, 0, 1, 0);
 			   }
 		   }
-	   //}
+	 
 
 	   //interaction with the blocks
 		   
-		   if (sprites[ship_sprite].collides_with(object_sprites[second_block_sprite]) && object_sprites[second_block_sprite].is_enabled() == true && is_key_down(key_up))
+		   if (sprites[ship_sprite].collides_with(object_sprites[second_block_sprite]) && is_key_down(key_up))
 		   {
 			   
 			   sprites[ship_sprite].translate(0, -5 * ship_speed);
-			   /*object_sprites[second_block_sprite].is_enabled() = false;*/
+			   
 			   object_sprites[mushroom_sprite].is_enabled() = true;
+
+			   ALuint source = get_sound_source();
+			   alSourcei(source, AL_BUFFER, bump);
+			   alSourcePlay(source);
 			   
 			   
 		   }
 
-		   if (/*object_sprites[second_block_sprite].is_enabled() == false && */mario_height > 0.25f) {
+		   if (mario_height > 0.25f) {
 
-			   if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true && is_key_down(key_up))
+			   if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && is_key_down(key_up))
 			   {
 				   if (flower_picked == false){
 					   sprites[ship_sprite].translate(0, -5 * ship_speed);
-					   /*object_sprites[first_block_sprite].is_enabled() = false;*/
+					  
 					   object_sprites[flower_sprite].is_enabled() = true;
+
+					   ALuint source = get_sound_source();
+					   alSourcei(source, AL_BUFFER, power_appears);
+					   alSourcePlay(source);
+					   
 
 				   }
 
 				   else {
 					   sprites[ship_sprite].translate(0, -5 * ship_speed);
 					   /*object_sprites[first_block_sprite].is_enabled() = false;*/
+					   ALuint source = get_sound_source();
+					   alSourcei(source, AL_BUFFER, bump);
+					   alSourcePlay(source);
 					   
 				   
 				   }
@@ -503,19 +540,18 @@ namespace octet {
 
 		   }
 
-		   else  if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && object_sprites[first_block_sprite].is_enabled() == true && is_key_down(key_up))
+		   else  if (sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) && is_key_down(key_up))
 		   {
 
 			   sprites[ship_sprite].translate(0, -5 * ship_speed);
+			   ALuint source = get_sound_source();
+			   alSourcei(source, AL_BUFFER, bump);
+			   alSourcePlay(source);
 			   
 			 
 		   }
 
-	   //redraw the block if mario is small
-		  /* if (mario_height < 0.4f && object_sprites[first_block_sprite].is_enabled() == true)
-		   {
-			   object_sprites[second_block_sprite].is_enabled() = true;
-		   }*/
+	   
 
 		   if (mario_height > 0.25f){
 
@@ -540,6 +576,10 @@ namespace octet {
 			   flower_picked = false;
 
 			   if (mario_height < 0.4f){ 
+
+				   ALuint source = get_sound_source();
+				   alSourcei(source, AL_BUFFER, mario_die);
+				   alSourcePlay(source);
 				   
 				   num_lives--;
 				   object_sprites[flower_sprite].is_enabled() = false;
@@ -574,6 +614,10 @@ namespace octet {
 				   mario_width = 0.25f;
 
 				   sprites[ship_sprite].translate(-4 * ship_speed, -4 * ship_speed);
+
+				   ALuint source = get_sound_source();
+				   alSourcei(source, AL_BUFFER, power_down);
+				   alSourcePlay(source);
 
 				   vec2 pos = sprites[ship_sprite].get_Position();
 
@@ -631,7 +675,7 @@ namespace octet {
                 sprites[first_bomb_sprite+i].is_enabled() = true;
                 bombs_disabled = 30;
                 ALuint source = get_sound_source();
-                alSourcei(source, AL_BUFFER, whoosh);
+                alSourcei(source, AL_BUFFER, bowser_fire);
                 alSourcePlay(source);
                 return;
               }
@@ -903,6 +947,13 @@ namespace octet {
       // sounds
       whoosh = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/sound_fireball.wav");
       bang = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/stomp.wav");
+	  bump = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bump.wav");
+	  power_appears = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/powerup_appears.wav");
+	  power_up = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/powerup.wav");
+	  power_down = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/power_down.wav");
+	  mario_die = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/mariodie.wav");
+	  bowser_fire = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bowserfire.wav");
+
       cur_source = 0;
       alGenSources(num_sound_sources, sources);
 
