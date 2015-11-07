@@ -194,8 +194,8 @@ namespace octet {
 		first_block_sprite,
 		mushroom_sprite,
 		second_block_sprite,
-		
-		
+
+
 
 		num_sound_sources = 8,
 		num_rows = 4,
@@ -205,9 +205,10 @@ namespace octet {
 		num_borders = 4,
 		num_invaderers = num_rows * num_cols,
 
-	  // sprite definitions
+		// sprite definitions
 	  ship_sprite = 0,
 	  bowser_sprite,
+	  peach_sprite,
 	  
       game_over_sprite,
 
@@ -318,21 +319,36 @@ namespace octet {
 		}
 		else if (boss_lives == 0) {
 			sprites[bowser_sprite].is_enabled() = false;
-			game_over = true;
-			sprites[game_over_sprite].translate(-20, 0);
+			sprites[peach_sprite].is_enabled() = true;
+			
 		}
 	}
 
     // called when we are hit
-    void on_hit_ship() {
+	void on_hit_ship() {
 
-		if (mario_height < 0.4f){ --num_lives; }
+		if (mario_height < 0.4f){
+		--num_lives; 
+		boss_lives = 20;
+		boss_velocity = 0.04f;
 		if (num_lives == 0) {
 			game_over = true;
 			sprites[game_over_sprite].translate(-20, 0);
 		}
-      
+
+		else {
+			GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
+			sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
+
+			if (myDirection != RIGHT){
+				sprites[ship_sprite].rotate(180, 0, 1, 0);
+			}
+		
+		}
+	}
 		if (mario_height > 0.25f){
+
+			flower_picked = false;
 			vec2 pos = sprites[ship_sprite].get_Position();
 
 			mario_width = 0.25f;
@@ -505,12 +521,19 @@ namespace octet {
 			   object_sprites[mushroom_sprite].is_enabled() = false;
 		   }
 
+		   //interaction with peach
+		   if (sprites[peach_sprite].is_enabled() && sprites[ship_sprite].collides_with(sprites[peach_sprite]))
+		   {
+			   game_over = true;
+			   sprites[game_over_sprite].translate(-20, 0);
+		   }
 
 	   //make mario hurt if it collides with an enemy
 	   for (unsigned int j = 0; j != num_invaderers; ++j)
 	   {
 		   sprite &invaderer = sprites[first_invaderer_sprite + j];
-		   if (sprites[ship_sprite].collides_with(invaderer))
+		   sprite &bowser = sprites[bowser_sprite];
+		   if (sprites[ship_sprite].collides_with(invaderer) || sprites[ship_sprite].collides_with(bowser))
 		   {
 			   
 			   flower_picked = false;
@@ -519,6 +542,11 @@ namespace octet {
 				   
 				   num_lives--;
 				   object_sprites[flower_sprite].is_enabled() = false;
+
+				   if (sprites[bowser_sprite].is_enabled()){
+					   boss_velocity = 0.04f;
+					   boss_lives = 20;
+				   }
 
 				   GLuint mushroom = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/mushroom.gif");
 				   object_sprites[mushroom_sprite].init(mushroom, x_init_mush, y_init_mush, 0.3f, 0.3f);
@@ -592,13 +620,13 @@ namespace octet {
       } else {
         // find an invaderer
         sprite &ship = sprites[ship_sprite];
-        for (int j = randomizer.get(0, num_invaderers); j < num_invaderers; ++j) {
-          sprite &invaderer = sprites[first_invaderer_sprite+j];
-          if (invaderer.is_enabled() && invaderer.is_above(ship, 0.3f)) {
+        //for (int j = randomizer.get(0, num_invaderers); j < num_invaderers; ++j) {
+          sprite &bowser = sprites[bowser_sprite];
+          if (bowser.is_enabled() /*&& invaderer.is_above(ship, 0.3f)*/) {
             // find a bomb
             for (int i = 0; i != num_bombs; ++i) {
               if (!sprites[first_bomb_sprite+i].is_enabled()) {
-                sprites[first_bomb_sprite+i].set_relative(invaderer, 0, -0.25f);
+                sprites[first_bomb_sprite+i].set_relative(bowser, -0.25, 0);
                 sprites[first_bomb_sprite+i].is_enabled() = true;
                 bombs_disabled = 30;
                 ALuint source = get_sound_source();
@@ -609,7 +637,7 @@ namespace octet {
             }
             return;
           }
-        }
+        //}
       }
     }
 
@@ -637,8 +665,6 @@ namespace octet {
 			if(sprites[bowser_sprite].is_enabled()) {
 				sprite &boss = sprites[bowser_sprite];
 				if (missile.collides_with(boss)) {
-					//boss.is_enabled() = false;
-					//invaderer.translate(20, 0);
 					missile.is_enabled() = false;
 					missile.translate(20, 0);
 					on_hit_boss();
@@ -660,12 +686,12 @@ namespace octet {
 
     // animate the bombs
     void move_bombs() {
-      const float bomb_speed = 0.2f;
+      const float bomb_speed = 0.1f;
       for (int i = 0; i != num_bombs; ++i) {
 		  
         sprite &bomb = sprites[first_bomb_sprite+i];
 		if (bomb.is_enabled()) {
-			bomb.translate(0, -bomb_speed);
+			bomb.translate(-bomb_speed, 0);
 			if (bomb.collides_with(sprites[ship_sprite])) {
 				bomb.is_enabled() = false;
 				bomb.translate(20, 0);
@@ -849,7 +875,7 @@ namespace octet {
       GLuint bomb = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/Fireball.gif");
       for (int i = 0; i != num_bombs; ++i) {
         // create bombs off-screen
-        sprites[first_bomb_sprite+i].init(bomb, 20, 0, 0.0625f, 0.25f);
+        sprites[first_bomb_sprite+i].init(bomb, 20, 0, 0.25, 0.10f);
         sprites[first_bomb_sprite+i].is_enabled() = false;
       }
 
@@ -859,6 +885,13 @@ namespace octet {
 		  // create boss off-screen
 	  sprites[bowser_sprite].init(bowser, 0, 1.5f, 0.50f, 0.50f);
 	  sprites[bowser_sprite].is_enabled() = false;
+
+	  // Create the princess and use princess texture
+	  GLuint peach = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/peach.gif");
+
+	  // create boss off-screen
+	  sprites[peach_sprite].init(peach, 1.5f, 1.5f, 0.55f, 0.55f);
+	  sprites[peach_sprite].is_enabled() = false;
 	  
 
 
@@ -900,11 +933,11 @@ namespace octet {
 	 fire_missiles();
 	  
 
-      //fire_bombs();
+      fire_bombs();
 
       move_missiles();
 
-      //move_bombs();
+      move_bombs();
 
       move_invaders(invader_velocity, 0);//move_invaders(invader_velocity, 0)
 
