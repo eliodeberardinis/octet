@@ -195,6 +195,7 @@ namespace octet {
 		mushroom_sprite,
 		second_block_sprite,
 		
+		
 
 		num_sound_sources = 8,
 		num_rows = 4,
@@ -206,6 +207,7 @@ namespace octet {
 
 	  // sprite definitions
 	  ship_sprite = 0,
+	  bowser_sprite,
 	  
       game_over_sprite,
 
@@ -235,6 +237,7 @@ namespace octet {
     // accounting for bad guys
     int live_invaderers;
     int num_lives;
+	int boss_lives;
 
     // game state
     bool game_over;
@@ -243,6 +246,7 @@ namespace octet {
     // speed of enemy
     float invader_velocity;
 	float mushroom_velocity;
+	float boss_velocity;
 
     // sounds
     ALuint whoosh;
@@ -295,10 +299,29 @@ namespace octet {
         invader_velocity *= 4;
 		
       } else if (live_invaderers == 0) {
-        game_over = true;
-        sprites[game_over_sprite].translate(-20, 0);
+		sprites[bowser_sprite].is_enabled() = true;
+        
       }
     }
+
+	//called when we hit the boss (come back here)
+	void on_hit_boss() {
+		ALuint source = get_sound_source();
+		alSourcei(source, AL_BUFFER, bang);
+		alSourcePlay(source);
+
+		boss_lives--;
+		score++;
+		if (boss_lives == 10) {
+			boss_velocity *= 3;
+
+		}
+		else if (boss_lives == 0) {
+			sprites[bowser_sprite].is_enabled() = false;
+			game_over = true;
+			sprites[game_over_sprite].translate(-20, 0);
+		}
+	}
 
     // called when we are hit
     void on_hit_ship() {
@@ -549,7 +572,7 @@ namespace octet {
 				// find a missile
 				for (int i = 0; i != num_missiles; ++i) {
 					if (!sprites[first_missile_sprite + i].is_enabled()) {
-						sprites[first_missile_sprite + i].set_relative(sprites[ship_sprite], 0.05f, 0);
+						sprites[first_missile_sprite + i].set_relative(sprites[ship_sprite], 0.02f, 0);
 						sprites[first_missile_sprite + i].is_enabled() = true;
 						missiles_disabled = 5;
 						ALuint source = get_sound_source();
@@ -595,6 +618,7 @@ namespace octet {
       const float missile_speed = 0.3f;
       for (int i = 0; i != num_missiles; ++i) {
         sprite &missile = sprites[first_missile_sprite+i];
+		
 		if (missile.is_enabled()) {
 			missile.translate(missile_speed, 0);		
 			for (int j = 0; j != num_invaderers; ++j) {
@@ -605,6 +629,19 @@ namespace octet {
 					missile.is_enabled() = false;
 					missile.translate(20, 0);
 					on_hit_invaderer();
+
+					goto next_missile;
+				}
+			}
+
+			if(sprites[bowser_sprite].is_enabled()) {
+				sprite &boss = sprites[bowser_sprite];
+				if (missile.collides_with(boss)) {
+					//boss.is_enabled() = false;
+					//invaderer.translate(20, 0);
+					missile.is_enabled() = false;
+					missile.translate(20, 0);
+					on_hit_boss();
 
 					goto next_missile;
 				}
@@ -657,6 +694,15 @@ namespace octet {
       }
     }
 
+	// move the Boss 
+	void move_boss(float dx, float dy) {
+		if (sprites[bowser_sprite].is_enabled()) {
+			sprite &bowser = sprites[bowser_sprite];
+			bowser.translate(dx, dy);
+			}
+		}
+	
+
 	// move the mushroom 
 	void move_mushroom(float dx, float dy) {
 			sprite &mushroom = object_sprites[mushroom_sprite];
@@ -687,6 +733,17 @@ namespace octet {
 				return true;
 			}
 		
+		return false;
+	}
+
+	// check if boss hits the side
+	bool boss_collide(sprite &border) {
+
+		sprite &bowser = sprites[bowser_sprite];
+		if (bowser.collides_with(border)) {
+			return true;
+		}
+
 		return false;
 	}
 
@@ -796,6 +853,16 @@ namespace octet {
         sprites[first_bomb_sprite+i].is_enabled() = false;
       }
 
+	  // Create the boss and use boss texture
+	  GLuint bowser = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/bowser.gif");
+	  
+		  // create boss off-screen
+	  sprites[bowser_sprite].init(bowser, 0, 1.5f, 0.50f, 0.50f);
+	  sprites[bowser_sprite].is_enabled() = false;
+	  
+
+
+
 	  GLuint tst = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
 	  test_sprite.init(tst, 0, 0, 0.3f, 0.3f);
 
@@ -809,10 +876,12 @@ namespace octet {
 	  
       missiles_disabled = 0;
       bombs_disabled = 50;
-      invader_velocity = 0.03f;
-	  mushroom_velocity = 0.01f;
+      invader_velocity = - 0.03f;
+	  mushroom_velocity = 0.02f;
+	  boss_velocity = 0.04f;
       live_invaderers = num_invaderers;
       num_lives = 10;
+	  boss_lives = 20;
       game_over = false;
       score = 0;
 	  flower_picked = false;
@@ -841,12 +910,19 @@ namespace octet {
 
 	  move_mushroom(mushroom_velocity, 0);
 
+	  move_boss(0, boss_velocity);
+
 	  //check if invaders collide
-	  for (unsigned int i = 0; i < map_sprites_bush.size(); i=i+2){
-		  sprite &border = map_sprites_bush[(invader_velocity < 0 ? (20 + i) : (19 + i))]; //inline if else
+	  for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
+		  sprite &border = map_sprites_bush[i]; //inline if else sprite &border = map_sprites_bush[(invader_velocity < 0 ? (20 + i) : (19 + i))];
 		  if (invaders_collide(border)) {
-			  invader_velocity = -invader_velocity;
+			  for (int i = 0; i != num_invaderers; ++i)
+			  {
+				  sprites[first_invaderer_sprite + i].rotate(180, 0, 1, 0);
+			  }
+			  
 			  move_invaders(invader_velocity, 0);
+			 
 		  }
 	  }
 
@@ -859,19 +935,19 @@ namespace octet {
 		  }
 	  }
 
-	  sprite &mario = sprites[ship_sprite];
+	  //check if boss collide
+	  for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
+		  sprite &border = map_sprites_bush[i]; //inline if else sprite &border = map_sprites_bush[(invader_velocity < 0 ? (20 + i) : (19 + i))];
+		  if (boss_collide(border)) {
 
-	 //// for (int j = 0; j != num_invaderers; ++j) {
-		//  sprite &invaderer = sprites[first_invaderer_sprite + 4];
+			  boss_velocity = -boss_velocity;
+			  
+			  
+			  move_boss(0, boss_velocity);
 
-		//  if (mario.is_above(invaderer,0.5f)){
-
-		//	  move_invaders(0, -0.001f);
-		//  }
-		//  else { move_invaders(0, 0); }
-
-	 //// }
-	 
+		  }
+	  }
+	
 
 	
 
@@ -922,6 +998,7 @@ namespace octet {
 
       // draw all the sprites
       for (int i = 0; i != num_sprites; ++i) {
+		  if (sprites[i].is_enabled())
 		  sprites[i].render(texture_shader_, cameraToWorld);
       }
 
