@@ -319,6 +319,7 @@ namespace octet {
 		}
 		else if (boss_lives == 0) {
 			sprites[bowser_sprite].is_enabled() = false;
+			sprites[bowser_sprite].translate(20, 0);
 			sprites[peach_sprite].is_enabled() = true;
 			
 		}
@@ -900,8 +901,8 @@ namespace octet {
 	  test_sprite.init(tst, 0, 0, 0.3f, 0.3f);
 
       // sounds
-      whoosh = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
-      bang = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
+      whoosh = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/sound_fireball.wav");
+      bang = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/stomp.wav");
       cur_source = 0;
       alGenSources(num_sound_sources, sources);
 
