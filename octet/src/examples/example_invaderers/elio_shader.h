@@ -19,7 +19,7 @@ namespace octet {
 
 					void main() { 
 						vec2 p = gl_FragCoord.xy / vec2(750, 750);
-						vec3 col = vec3(0.4, 0.8, 0.1) * p.y;
+						vec3 col = vec3(0.4, 0.8, 0.1) /** p.y*/;
 						gl_FragColor = vec4(col, 1.0); 
 					}
 				);

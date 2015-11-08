@@ -205,12 +205,13 @@ namespace octet {
 		num_borders = 4,
 		num_invaderers = num_rows * num_cols,
 
-		// sprite definitions
+	// sprite definitions
 	  ship_sprite = 0,
 	  bowser_sprite,
 	  peach_sprite,
 	  
       game_over_sprite,
+	  you_win_sprite,
 
       first_invaderer_sprite,
       last_invaderer_sprite = first_invaderer_sprite + num_invaderers - 1,
@@ -258,6 +259,9 @@ namespace octet {
 	ALuint power_down;
 	ALuint mario_die;
 	ALuint bowser_fire;
+	ALuint bowser_dies;
+	ALuint stage_clear;
+	ALuint gameover_;
 
     unsigned cur_source;
     ALuint sources[num_sound_sources];
@@ -307,27 +311,33 @@ namespace octet {
         invader_velocity *= 4;
 		
       } else if (live_invaderers == 0) {
+		sprites[bowser_sprite].translate(-17.6f,0.0f);
 		sprites[bowser_sprite].is_enabled() = true;
         
       }
     }
 
-	//called when we hit the boss (come back here)
+	//called when we hit the boss 
 	void on_hit_boss() {
 		ALuint source = get_sound_source();
 		alSourcei(source, AL_BUFFER, bang);
 		alSourcePlay(source);
 
 		boss_lives--;
-		score++;
+		
 		if (boss_lives == 10) {
 			boss_velocity *= 3;
 
 		}
 		else if (boss_lives == 0) {
+			ALuint source = get_sound_source();
+			alSourcei(source, AL_BUFFER, bowser_dies);
+			alSourcePlay(source);
+
 			sprites[bowser_sprite].is_enabled() = false;
 			sprites[bowser_sprite].translate(20, 0);
 			sprites[peach_sprite].is_enabled() = true;
+			score = score + 20;
 			
 		}
 	}
@@ -337,18 +347,26 @@ namespace octet {
 
 		if (mario_height < 0.4f){
 		--num_lives; 
+		--score;
 		boss_lives = 20;
 		boss_velocity = 0.04f;
 		if (num_lives == 0) {
 			game_over = true;
+
+			ALuint source = get_sound_source();
+			alSourcei(source, AL_BUFFER, gameover_);
+			alSourcePlay(source);
+
 			sprites[game_over_sprite].translate(-20, 0);
 		}
 
 		else {
 
-			ALuint source = get_sound_source();
-			alSourcei(source, AL_BUFFER, mario_die);
-			alSourcePlay(source);
+			if (num_lives > 1){
+				ALuint source = get_sound_source();
+				alSourcei(source, AL_BUFFER, mario_die);
+				alSourcePlay(source);
+			}
 
 			GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
 			sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
@@ -406,7 +424,9 @@ namespace octet {
 
 		  for (int i = 0; i < num_bush; i++){
 
-			  if (sprites[ship_sprite].collides_with(map_sprites_bush[i])) {
+			  if (sprites[ship_sprite].collides_with(map_sprites_bush[i]) || 
+				  sprites[ship_sprite].collides_with(object_sprites[first_block_sprite])|| 
+				  sprites[ship_sprite].collides_with(object_sprites[second_block_sprite])) {
 
 				  sprites[ship_sprite].translate(-ship_speed, 0);
 			  }
@@ -423,7 +443,9 @@ namespace octet {
         sprites[ship_sprite].translate(+ship_speed, 0);
 
 		for (int i = 0; i < num_bush; i++) {
-		if (sprites[ship_sprite].collides_with(map_sprites_bush[i])) {
+			if (sprites[ship_sprite].collides_with(map_sprites_bush[i]) ||
+				sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) ||
+				sprites[ship_sprite].collides_with(object_sprites[second_block_sprite])) {
 			sprites[ship_sprite].translate(-ship_speed, 0);
 		}
         }
@@ -444,7 +466,9 @@ namespace octet {
 		   sprites[ship_sprite].translate(0, -ship_speed);
 
 		   for(int i = 0; i < num_bush; i++) {
-			   if (sprites[ship_sprite].collides_with(map_sprites_bush[i])) {
+			   if (sprites[ship_sprite].collides_with(map_sprites_bush[i]) ||
+				   sprites[ship_sprite].collides_with(object_sprites[first_block_sprite]) ||
+				   sprites[ship_sprite].collides_with(object_sprites[second_block_sprite])) {
 				   sprites[ship_sprite].translate(0, +ship_speed);
 			   }
 		   }
@@ -561,8 +585,14 @@ namespace octet {
 		   //interaction with peach
 		   if (sprites[peach_sprite].is_enabled() && sprites[ship_sprite].collides_with(sprites[peach_sprite]))
 		   {
+			   ALuint source = get_sound_source();
+			   alSourcei(source, AL_BUFFER, stage_clear);
+			   alSourcePlay(source);
+
+			   
 			   game_over = true;
-			   sprites[game_over_sprite].translate(-20, 0);
+			   sprites[you_win_sprite].translate(-20, 0);
+			  
 		   }
 
 	   //make mario hurt if it collides with an enemy
@@ -577,11 +607,14 @@ namespace octet {
 
 			   if (mario_height < 0.4f){ 
 
-				   ALuint source = get_sound_source();
-				   alSourcei(source, AL_BUFFER, mario_die);
-				   alSourcePlay(source);
+				   if (num_lives > 1) {
+					   ALuint source = get_sound_source();
+					   alSourcei(source, AL_BUFFER, mario_die);
+					   alSourcePlay(source);
+				   }
 				   
-				   num_lives--;
+				   --num_lives;
+				   --score;
 				   object_sprites[flower_sprite].is_enabled() = false;
 
 				   if (sprites[bowser_sprite].is_enabled()){
@@ -605,6 +638,11 @@ namespace octet {
 			   }
 
 			   if (num_lives == 0) {
+
+				   ALuint source = get_sound_source();
+				   alSourcei(source, AL_BUFFER, gameover_);
+				   alSourcePlay(source);
+
 				   game_over = true;
 				   sprites[game_over_sprite].translate(-20, 0);
 			   }
@@ -613,7 +651,11 @@ namespace octet {
 				   mario_height = 0.25f;
 				   mario_width = 0.25f;
 
-				   sprites[ship_sprite].translate(-4 * ship_speed, -4 * ship_speed);
+				   if (sprites[bowser_sprite].is_enabled())
+				   {
+					   sprites[ship_sprite].translate(-10 * ship_speed, 0);
+				   }
+				   else { sprites[ship_sprite].translate(0, -4 * ship_speed); }
 
 				   ALuint source = get_sound_source();
 				   alSourcei(source, AL_BUFFER, power_down);
@@ -890,6 +932,9 @@ namespace octet {
       GLuint GameOver = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/GameOver.gif");
       sprites[game_over_sprite].init(GameOver, 20, 0, 3, 1.5f);
 
+	  GLuint YouWin = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/youwon.gif");
+	  sprites[you_win_sprite].init(YouWin, 20, 0, 3, 1.5f);
+
       GLuint invaderer = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/goomba.gif");
       for (int j = 0; j != num_rows; ++j) {
         for (int i = 0; i != num_cols; ++i) {
@@ -927,14 +972,14 @@ namespace octet {
 	  // Create the boss and use boss texture
 	  GLuint bowser = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/bowser.gif");
 	  
-		  // create boss off-screen
-	  sprites[bowser_sprite].init(bowser, 0, 1.5f, 0.50f, 0.50f);
+	  // create boss off-screen
+	  sprites[bowser_sprite].init(bowser, 20, 1.5f, 0.50f, 0.50f);
 	  sprites[bowser_sprite].is_enabled() = false;
 
 	  // Create the princess and use princess texture
 	  GLuint peach = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/peach.gif");
 
-	  // create boss off-screen
+	  // create peach off-screen
 	  sprites[peach_sprite].init(peach, 1.5f, 1.5f, 0.55f, 0.55f);
 	  sprites[peach_sprite].is_enabled() = false;
 	  
@@ -953,6 +998,9 @@ namespace octet {
 	  power_down = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/power_down.wav");
 	  mario_die = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/mariodie.wav");
 	  bowser_fire = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bowserfire.wav");
+	  bowser_dies = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bowser_dies.wav");
+	  stage_clear = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/stage_clear.wav");
+	  gameover_ = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/gameover.wav");
 
       cur_source = 0;
       alGenSources(num_sound_sources, sources);
@@ -966,7 +1014,7 @@ namespace octet {
 	  boss_velocity = 0.04f;
       live_invaderers = num_invaderers;
       num_lives = 10;
-	  boss_lives = 20;
+	  boss_lives = 1;
       game_over = false;
       score = 0;
 	  flower_picked = false;
@@ -1054,6 +1102,8 @@ namespace octet {
       glClearColor(0, 0, 0, 1);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	  
+
       // don't allow Z buffer depth testing (closer objects are always drawn in front of far ones)
       glDisable(GL_DEPTH_TEST);
 
@@ -1068,7 +1118,7 @@ namespace octet {
 
 	  //draw the map sprites (dirt)
 	  for (unsigned int i = 0; i < map_sprites_dirt.size(); ++i) {
-		  map_sprites_dirt[i].render(texture_shader_, cameraToWorld);
+		  map_sprites_dirt[i].render(elio_shader_, cameraToWorld);
 	  }
 
 	  //draw the object sprites (mushroom)
@@ -1161,7 +1211,7 @@ namespace octet {
 
 	void setup_visual_map() {
 		
-		GLuint bush = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_grass.gif");
+		GLuint bush = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_brick.gif");
 		GLuint dirt = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/tile_dirt.gif");
 
 		for (int i = 0; i < map_height; ++i) {
