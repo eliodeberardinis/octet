@@ -440,6 +440,83 @@ namespace octet {
 		  }
 	  }
 
+	  //called when we are hit
+	  void on_hit_ship() {
+
+		  flower_picked = false;
+
+		  //Executed when mario is small. If he gets hit, he loses a life
+		  if (mario_height < 0.4f){
+
+			  object_sprites[flower_sprite].is_enabled() = false;
+
+			  --num_lives;
+			  --score;
+			  boss_lives = 20;
+			  boss_velocity = 0.04f;
+
+			  if (num_lives == 0) {
+				  game_over = true;
+
+				  // sound effect for game over
+				  ALuint source = get_sound_source();
+				  alSourcei(source, AL_BUFFER, gameover_);
+				  alSourcePlay(source);
+
+				  sprites[game_over_sprite].translate(-20, 0);
+			  }
+
+			  else {
+
+				  //sound effect when mario dies
+				  ALuint source = get_sound_source();
+				  alSourcei(source, AL_BUFFER, mario_die);
+				  alSourcePlay(source);
+			  }
+
+			  //re-initialize the mushroom
+			  GLuint mushroom = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/mushroom.gif");
+			  object_sprites[mushroom_sprite].init(mushroom, x_init_mush, y_init_mush, 0.3f, 0.3f);
+			  object_sprites[mushroom_sprite].is_enabled() = false;
+
+			  //Re-draws mario at the bottom left of the screen after he dies
+			  GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
+			  sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
+
+			  if (myDirection != RIGHT){
+				  sprites[ship_sprite].rotate(180, 0, 1, 0);
+			  }
+		  }
+
+
+		  //Executed when mario is big (Has obtained mushroom or fire flower) if he gets hit he shrinks back to his original size without loosing a life
+		  else if (mario_height > 0.25f){
+
+			  //re-sets the flower state to "not-picked'
+			  flower_picked = false;
+
+			  //sound effect when mario shrinks
+			  ALuint source = get_sound_source();
+			  alSourcei(source, AL_BUFFER, power_down);
+			  alSourcePlay(source);
+
+			  //gets the position of mario in the moment he is hit
+			  vec2 pos = sprites[ship_sprite].get_Position();
+
+			  //re-scales mario
+			  mario_width = 0.25f;
+			  mario_height = 0.25f;
+
+			  //re-draws mario in the position he is when he is hit but re-scaled
+			  GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
+			  sprites[ship_sprite].init(ship, pos.x(), pos.y(), mario_width, mario_height);
+
+			  if (myDirection != RIGHT){
+				  sprites[ship_sprite].rotate(180, 0, 1, 0);
+			  }
+		  }
+	  }
+
 	  // called when we hit an enemy
 	  void on_hit_invaderer() {
 		  ALuint source = get_sound_source();
@@ -485,82 +562,29 @@ namespace octet {
 		  }
 	  }
 
-	  //called when we are hit
-	  void on_hit_ship() {
+	  void collide_with_enemy(){
+		  const float ship_speed = 0.05f;
+		  for (unsigned int j = 0; j != num_invaderers; ++j)
+		  {
+			  sprite &invaderer = sprites[first_invaderer_sprite + j];
+			  sprite &bowser = sprites[bowser_sprite];
+			  if (sprites[ship_sprite].collides_with(invaderer) || sprites[ship_sprite].collides_with(bowser))
+			  {
 
-		  flower_picked = false;
 
-		  //Executed when mario is small. If he gets hit, he loses a life
-		  if (mario_height < 0.4f){
+				  if (sprites[bowser_sprite].is_enabled())
+				  {
+					  sprites[ship_sprite].translate(-10 * ship_speed, 0);
+				  }
+				  /* else { sprites[ship_sprite].translate(0, -4 * ship_speed); }*///not sure!!!
 
-			  object_sprites[flower_sprite].is_enabled() = false;
-
-			  --num_lives;
-			  --score;
-			  boss_lives = 20;
-			  boss_velocity = 0.04f;
-
-			  if (num_lives == 0) {
-				  game_over = true;
-
-				  // sound effect for game over
-				  ALuint source = get_sound_source();
-				  alSourcei(source, AL_BUFFER, gameover_);
-				  alSourcePlay(source);
-
-				  sprites[game_over_sprite].translate(-20, 0);
-			  }
-
-			  else {
-
-				  //sound effect when mario dies
-				  ALuint source = get_sound_source();
-				  alSourcei(source, AL_BUFFER, mario_die);
-				  alSourcePlay(source);
-			  }
-			  
-			  //re-initialize the mushroom
-			  GLuint mushroom = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/mushroom.gif");
-			  object_sprites[mushroom_sprite].init(mushroom, x_init_mush, y_init_mush, 0.3f, 0.3f);
-			  object_sprites[mushroom_sprite].is_enabled() = false;
-
-			  //Re-draws mario at the bottom left of the screen after he dies
-			  GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
-			  sprites[ship_sprite].init(ship, -2.5f, -2.5f, mario_width, mario_height);
-
-			  if (myDirection != RIGHT){
-				  sprites[ship_sprite].rotate(180, 0, 1, 0);
+				  on_hit_ship();
 			  }
 		  }
 
-		 
-		//Executed when mario is big (Has obtained mushroom or fire flower) if he gets hit he shrinks back to his original size without loosing a life
-		else if (mario_height > 0.25f){
 
-			//re-sets the flower state to "not-picked'
-			flower_picked = false;
 
-			//sound effect when mario shrinks
-			ALuint source = get_sound_source();
-			alSourcei(source, AL_BUFFER, power_down);
-			alSourcePlay(source);
-
-			//gets the position of mario in the moment he is hit
-			vec2 pos = sprites[ship_sprite].get_Position();
-			
-			//re-scales mario
-			mario_width = 0.25f;
-			mario_height = 0.25f;
-
-			//re-draws mario in the position he is when he is hit but re-scaled
-			GLuint ship = resource_dict::get_texture_handle(GL_RGBA, "assets/invaderers/big_mario.gif");
-			sprites[ship_sprite].init(ship, pos.x(), pos.y(), mario_width, mario_height);
-
-			if (myDirection != RIGHT){
-				sprites[ship_sprite].rotate(180, 0, 1, 0);
-			}
-		}
-    }
+	  }
 
 	  //use the keyboard to move the ship
       void move_ship() {
@@ -642,7 +666,7 @@ namespace octet {
 		blocks_pressed();
 
 		//Collisions with enemies
-		enemy_collide();
+		collide_with_enemy();
 
 		//interaction with peach
 		princess_met();
@@ -887,30 +911,6 @@ namespace octet {
 
 	}
 
-	  void enemy_collide(){
-		const float ship_speed = 0.05f;
-		for (unsigned int j = 0; j != num_invaderers; ++j)
-		{
-			sprite &invaderer = sprites[first_invaderer_sprite + j];
-			sprite &bowser = sprites[bowser_sprite];
-			if (sprites[ship_sprite].collides_with(invaderer) || sprites[ship_sprite].collides_with(bowser))
-			{
-
-
-				if (sprites[bowser_sprite].is_enabled())
-				{
-					sprites[ship_sprite].translate(-10 * ship_speed, 0);
-				}
-				/* else { sprites[ship_sprite].translate(0, -4 * ship_speed); }*///not sure!!!
-
-				on_hit_ship();
-			}
-		}
-	
-
-	
-	}
-
 	  //Interactions with blocks containing objects
 	  void blocks_pressed(){
 		const float ship_speed = 0.05f;
@@ -1021,12 +1021,12 @@ namespace octet {
 
   public:
 
-    // this is called when we construct the class
-    invaderers_app(int argc, char **argv) : app(argc, argv), font(512, 256, "assets/big.fnt") {
+      // this is called when we construct the class
+      invaderers_app(int argc, char **argv) : app(argc, argv), font(512, 256, "assets/big.fnt") {
     }
 
-    // this is called once OpenGL is initialized
-    void app_init() {
+      // this is called once OpenGL is initialized
+      void app_init() {
 
       // set up the shaders
       texture_shader_.init();
@@ -1128,32 +1128,32 @@ namespace octet {
 	  background_color = vec4(0.4f, 0.8f, 0.1f, 1.0f);
     }
 
-    // called every frame to move things
-    void simulate() {
-      if (game_over) {
+      // called every frame to move things
+      void simulate() {
+       if (game_over) {
         return;
       }
 
-      move_ship();
+       move_ship();
 
-	  fire_missiles();
+	   fire_missiles();
 	  
-      fire_bombs();
+       fire_bombs();
 
-      move_missiles();
+       move_missiles();
 
-      move_bombs();
+       move_bombs();
 
-      move_invaders(invader_velocity, 0);
+       move_invaders(invader_velocity, 0);
 
-	  move_mushroom(mushroom_velocity, 0);
+	   move_mushroom(mushroom_velocity, 0);
 
-	  move_boss(0, boss_velocity);
+	   move_boss(0, boss_velocity);
 
-	  //check if invaders collide with borders
-	  for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
+	   //check if invaders collide with borders
+	   for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
 		  sprite &border = map_sprites_bush[i];
-		  if (invaders_collide(border)) {
+		   if (invaders_collide(border)) {
 			  for (int i = 0; i != num_invaderers; ++i)
 			  {
 				  sprites[first_invaderer_sprite + i].rotate(180, 0, 1, 0);
@@ -1161,29 +1161,28 @@ namespace octet {
 			  
 			  move_invaders(invader_velocity, 0);
 			 
-		  }
-	   }
+		   }
+	    }
 
-	  //check if mushroom collides
-	  for (unsigned int i = 0; i < map_sprites_bush.size(); i = i + 2){
-		  sprite &border = map_sprites_bush[(mushroom_velocity < 0 ? (20+i) : (19+i))]; //inline if else
-		  if (mushroom_collide(border)) {
+	   //check if mushroom collides
+	   for (unsigned int i = 0; i < map_sprites_bush.size(); i = i + 2){
+		   sprite &border = map_sprites_bush[(mushroom_velocity < 0 ? (20+i) : (19+i))]; //inline if else
+		   if (mushroom_collide(border)) {
 			  mushroom_velocity = -mushroom_velocity;
 			  move_invaders(mushroom_velocity, 0);
-		  }
-	   }
+		   }
+	    }
 
-	  //check if boss collides
-	  for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
-		  sprite &border = map_sprites_bush[i]; //inline if else sprite &border = map_sprites_bush[(invader_velocity < 0 ? (20 + i) : (19 + i))];
-		  if (boss_collide(border)) {
+	   //check if boss collides
+	   for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
+		  sprite &border = map_sprites_bush[i]; 
+		   if (boss_collide(border)) {
 
 			  boss_velocity = -boss_velocity;
 			  move_boss(0, boss_velocity);
 
 		   }
 	    }
-	
    }
 
     // this is called to draw the world
