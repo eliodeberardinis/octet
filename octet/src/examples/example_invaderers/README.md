@@ -46,11 +46,11 @@ Mircea for helping with CSV file, shader implementation and solving many small p
 
 Tin-Tin for helping with get_position function.
 
-DEMO VIDEO:
+##DEMO VIDEO:
 
 https://youtu.be/mHgXu78f3hg
 
-Images:
+##Images:
 
 ![Alt text](https://github.com/eliodeberardinis/octet/blob/try_border_grass/octet/assets/invaderers/Game_Screen_1.png?raw=true"Screen 1")
 
