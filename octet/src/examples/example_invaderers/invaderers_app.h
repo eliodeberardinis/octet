@@ -9,13 +9,14 @@
 //
 // Level: 1 + Boss Fight
 //
-// Demonstrates: (Change this)
+// Demonstrates: 
 //   Basic framework app
 //   Shaders
 //   Basic Matrices
 //   Simple game mechanics
 //   Texture loaded from GIF file
 //   Audio
+//   CSV file use for borders and objects placing
 //
 
 
@@ -41,7 +42,7 @@ namespace octet {
       enabled = true;
     }
 
-	//Gets a position
+	//Gets the position of a sprite
 	vec2 get_Position() 
 	{
 		return modelToWorld.row(3).xy();
@@ -554,6 +555,8 @@ namespace octet {
 			  alSourcei(source, AL_BUFFER, bowser_dies);
 			  alSourcePlay(source);
 
+			  background_color = vec4(1.0f, 0.4f, 0.7f, 1.0f);
+
 			  sprites[bowser_sprite].is_enabled() = false;
 			  sprites[bowser_sprite].translate(20, 0);
 			  sprites[peach_sprite].is_enabled() = true;
@@ -576,8 +579,6 @@ namespace octet {
 				  {
 					  sprites[ship_sprite].translate(-10 * ship_speed, 0);
 				  }
-				  /* else { sprites[ship_sprite].translate(0, -4 * ship_speed); }*///not sure!!!
-
 				  on_hit_ship();
 			  }
 		  }
@@ -1166,7 +1167,7 @@ namespace octet {
 
 	   //check if mushroom collides
 	   for (unsigned int i = 0; i < map_sprites_bush.size(); i = i + 2){
-		   sprite &border = map_sprites_bush[(mushroom_velocity < 0 ? (20+i) : (19+i))]; //inline if else
+		   sprite &border = map_sprites_bush[(mushroom_velocity < 0 ? (20+i) : (19+i))];
 		   if (mushroom_collide(border)) {
 			  mushroom_velocity = -mushroom_velocity;
 			  move_invaders(mushroom_velocity, 0);
@@ -1185,8 +1186,8 @@ namespace octet {
 	    }
    }
 
-    // this is called to draw the world
-    void draw_world(int x, int y, int w, int h) {
+     // this is called to draw the world
+      void draw_world(int x, int y, int w, int h) {
       
 	  simulate();
 
@@ -1240,5 +1241,5 @@ namespace octet {
       alListener3f(AL_POSITION, cpos.x(), cpos.y(), cpos.z());
     }
 
-   };
+     };
 }
