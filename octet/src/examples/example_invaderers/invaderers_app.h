@@ -200,7 +200,7 @@ namespace octet {
 		num_sound_sources = 8,
 		num_rows = 4,
 		num_cols = 5,
-		num_missiles = 2,
+		num_missiles = 1,
 		num_bombs = 2,
 		num_borders = 4,
 		num_invaderers = num_rows * num_cols,
@@ -766,6 +766,13 @@ namespace octet {
 					missile.translate(20, 0);
 				}
 		}
+			//make missile disappear if they collide with bomb (not sure)
+			/*for (unsigned int j = 0; j != num_bombs; ++j){
+				if (missile.collides_with(sprites[first_bomb_sprite +j])) {
+					missile.is_enabled() = false;
+					missile.translate(20, 0);
+				}
+			}*/
         }
       next_missile:;
       }
@@ -790,6 +797,16 @@ namespace octet {
 				if (bomb.collides_with(map_sprites_bush[j])) {
 					bomb.is_enabled() = false;
 					bomb.translate(20, 0);
+				}
+			}
+			// make bomb disappear if they collide with missile (not sure)
+			for (unsigned int j = 0; j !=num_missiles; ++j){
+				sprite &missile = sprites[first_missile_sprite + j];
+				if (bomb.collides_with(missile)) {
+					bomb.is_enabled() = false;
+					bomb.translate(20, 0);
+					missile.is_enabled() = false;
+					missile.translate(20, 0);
 				}
 			}
         }
@@ -1014,7 +1031,7 @@ namespace octet {
 	  boss_velocity = 0.04f;
       live_invaderers = num_invaderers;
       num_lives = 10;
-	  boss_lives = 1;
+	  boss_lives = 20;
       game_over = false;
       score = 0;
 	  flower_picked = false;
