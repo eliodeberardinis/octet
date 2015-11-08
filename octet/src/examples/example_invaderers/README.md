@@ -1,6 +1,6 @@
-SUPER MARIO 2D
+#SUPER MARIO 2D
 
-INTRODUCTION
+##INTRODUCTION
 
 The project started from “Example_Invaderers” in OCTET that was modified to become a simple 2D game inspired by Nintendo’s Super Mario Bros.
 The game is in 2 levels (level 1 and boss battle) with the same layout. Mario can move in all four directions like in the classic “Legend of Zelda” game for the NES. In the first level Mario has to avoid 20  Goombas enemies arranged in rows of five across the screen and moving fast left and right. Mario has to collect the mushroom and then the fire-flower from the mystery blocks in order to be able to shoot and destroy the goombas. Once all the goombas are destroyed Bowser appears shooting fireballs and moving Up and Down. The same mechanic repeats and once Mario has hit Bowser 20 times, defeating him , Princess Peach appears and once she is re-united with Mario the game ends. 
