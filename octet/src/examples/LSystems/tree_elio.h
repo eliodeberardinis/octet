@@ -18,7 +18,7 @@ namespace octet {
 				
 			}
 			
-				int cursor = 0;
+			unsigned int cursor = 0;
 
 			    // get variables
 				for (; cursor < clean_data.size(); ++cursor) {
