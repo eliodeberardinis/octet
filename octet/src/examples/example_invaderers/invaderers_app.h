@@ -1166,8 +1166,8 @@ namespace octet {
 	    }
 
 	   //check if mushroom collides
-	   for (unsigned int i = 0; i < map_sprites_bush.size(); i = i + 2){
-		   sprite &border = map_sprites_bush[(mushroom_velocity < 0 ? (20+i) : (19+i))];
+	   for (unsigned int i = 0; i < map_sprites_bush.size(); i++){
+		   sprite &border = map_sprites_bush[i]; 
 		   if (mushroom_collide(border)) {
 			  mushroom_velocity = -mushroom_velocity;
 			  move_invaders(mushroom_velocity, 0);
