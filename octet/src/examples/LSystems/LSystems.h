@@ -55,9 +55,9 @@ namespace octet {
 			//meshes = new std::vector<mesh_cylinder>();
 
 			rulesEngine.setAxiom("F");
-			rulesEngine.addRule("F", "FF-[-F+F+F]+[+F-F-F]", 1);//rulesEngine.addRule("F", "C0F/F-[C1-F+F]+[C2+F-F]", 1);
-			/*rulesEngine.addRule("X", "C0F*F++[C1+F/F]+[C2-FF]", 0.30f);
-			rulesEngine.addRule("X", "C0F**F", 0.70f);*/
+			rulesEngine.addRule("F", "C0F/F-[C1-F+F]+[C2+F-F]", 1);
+			rulesEngine.addRule("X", "C0F*F++[C1+F/F]+[C2-FF]", 0.30f);
+			rulesEngine.addRule("X", "C0F**F", 0.70f);
 			//rulesEngine.addRule("]", "L]", 1); //add intermediate leaves
 
 			////rulesEngine.addRule("FF", "F*", 0.5f);
