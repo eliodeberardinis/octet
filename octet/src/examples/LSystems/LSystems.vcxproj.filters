@@ -431,6 +431,21 @@
     <ClInclude Include="tree_elio.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="RulesEngine.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Tree.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeLeaf.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeNode.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TreeSegment.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resources\mesh_builder.inl">

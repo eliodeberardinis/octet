@@ -11,19 +11,24 @@
 
 #include "../../octet.h"
 
+#include <thread>
+
+
+#include "Tree.h"
+#include "RulesEngine.h"
 #include "LSystems.h"
+
 
 /// Create a box with octet
 int main(int argc, char **argv) {
-  // set up the platform.
-  octet::app::init_all(argc, argv);
+	// set up the platform.
+	octet::app::init_all(argc, argv);
 
-  // our application.
-  octet::LSystems app(argc, argv);
-  app.init();
+	// our application.
+	octet::Lsystem app(argc, argv);
+	app.init();
 
-  // open windows
-  octet::app::run_all_apps();
+	// open windows
+	octet::app::run_all_apps();
 }
-
 
