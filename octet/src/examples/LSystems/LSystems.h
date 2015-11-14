@@ -36,7 +36,7 @@ namespace octet {
 
 		const float PI = 3.14159265f;
 		const float SEGMENT_LENGTH = 0.5f;
-		float SEGMENT_WIDTH = 0.1f;
+		float SEGMENT_WIDTH = 0.05f;
 
 		ref<visual_scene> app_scene;
 
