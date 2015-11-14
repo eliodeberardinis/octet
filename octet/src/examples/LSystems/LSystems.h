@@ -86,6 +86,17 @@ namespace octet {
 
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 2.0f));
 			}
+
+			if (is_key_down(key_up))
+			{
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -0.15f));
+			}
+			if (is_key_down(key_down))
+			{
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 0.15f));
+			}
+
+
 		}
 
 		vec3 draw_segment(vec3 start_pos, float angle) {
@@ -120,10 +131,10 @@ namespace octet {
 			float angle = 0.0f;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
-					angle += 45.0f;
+					angle += 22.5f;
 				}
 				else if (axiom[i] == '-') {
-					angle -= 45.0f;
+					angle -= 22.5f;
 				}
 				else if (axiom[i] == '[') {
 					node n = node(pos, angle);
