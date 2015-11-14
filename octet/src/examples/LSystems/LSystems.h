@@ -59,7 +59,7 @@ namespace octet {
 			app_scene->create_default_camera_and_lights();
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.0f, 1.0f));
 
-			material_ = new material(vec4(0.8f, 0.4f, 0.2f, 1.0f));
+			material_ = new material(vec4(0.18f, 0.79f, 0.45f, 1.0f));
 
 			create_geometry();
 		}
@@ -89,11 +89,11 @@ namespace octet {
 
 			if (is_key_down(key_up))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -0.15f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -0.30f));
 			}
 			if (is_key_down(key_down))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 0.15f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 0.30f));
 			}
 
 
