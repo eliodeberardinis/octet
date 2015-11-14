@@ -9,7 +9,7 @@
 
 
 namespace octet {
-	class LSystems : public app {
+	class lsystems : public app {
 
 		class node {
 			vec3 pos;
@@ -36,7 +36,7 @@ namespace octet {
 
 		const float PI = 3.14159265f;
 		const float SEGMENT_LENGTH = 0.5f;
-		const float SEGMENT_WIDTH = 0.1f;
+		float SEGMENT_WIDTH = 0.1f;
 
 		ref<visual_scene> app_scene;
 
@@ -44,11 +44,12 @@ namespace octet {
 
 		dynarray<node> node_stack;
 
-		random rand_generator;
 		float tree_max_y = 0.0f;
 
+		material *material_;
+
 	public:
-		LSystems(int argc, char **argv) : app(argc, argv) {
+		lsystems(int argc, char **argv) : app(argc, argv) {
 		}
 
 		void app_init() {
@@ -58,8 +59,9 @@ namespace octet {
 			app_scene->create_default_camera_and_lights();
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.0f, 1.0f));
 
+			material_ = new material(vec4(0.8f, 0.4f, 0.2f, 1.0f));
+
 			create_geometry();
-			rand_generator = rand();
 		}
 
 		void draw_world(int x, int y, int w, int h) {
@@ -79,9 +81,10 @@ namespace octet {
 				app_scene = new visual_scene();
 				app_scene->create_default_camera_and_lights();
 
+				tree_max_y = 0.0f;
 				create_geometry();
 
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, tree_max_y / 2.0f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 2.0f));
 			}
 		}
 
@@ -100,15 +103,13 @@ namespace octet {
 
 			mat4t mtw;
 			mtw.loadIdentity();
-			vec4 color = vec4(rand_generator.get(0.5f, 1.0f), rand_generator.get(0.5f, 1.0f), rand_generator.get(0.5f, 1.0f), 1.0f);
+			mtw.translate(mid_pos);
+			mtw.rotate(angle, 0.0f, 0.0f, 1.0f);
 			mesh_box *box = new mesh_box(vec3(SEGMENT_WIDTH, SEGMENT_LENGTH, SEGMENT_WIDTH), mtw);
 
 			scene_node *node = new scene_node();
 			app_scene->add_child(node);
-			app_scene->add_mesh_instance(new mesh_instance(node, box, new material(color)));
-
-			node->translate(mid_pos);
-			node->rotate(angle, vec3(0.0f, 0.0f, 1.0f));
+			app_scene->add_mesh_instance(new mesh_instance(node, box, material_));
 
 			return end_pos;
 		}
@@ -119,10 +120,10 @@ namespace octet {
 			float angle = 0.0f;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
-					angle += 22.5f;
+					angle += 45.0f;
 				}
 				else if (axiom[i] == '-') {
-					angle -= 22.5f;
+					angle -= 45.0f;
 				}
 				else if (axiom[i] == '[') {
 					node n = node(pos, angle);
@@ -138,7 +139,6 @@ namespace octet {
 					pos = draw_segment(pos, angle);
 				}
 			}
-
 		}
 
 	};

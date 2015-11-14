@@ -16,7 +16,7 @@ namespace octet {
 				}
 			}
 
-			unsigned int cursor = 0;
+			int cursor = 0;
 			// get variables
 			for (; cursor < clean_data.size(); ++cursor) {
 				char current_char = clean_data[cursor];
