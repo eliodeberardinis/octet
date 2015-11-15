@@ -68,9 +68,14 @@ namespace octet {
 		}
 
 		void draw_world(int x, int y, int w, int h) {
+
+	
 			handle_input();
 
 			app_scene->begin_render(w, h);
+
+			//glClearColor(0, 0, 0, 1);
+			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // changed directly in visual scene (is there another way?)
 
 			app_scene->update(1.0f / 30.0f);
 
