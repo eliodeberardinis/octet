@@ -47,6 +47,7 @@ namespace octet {
 		float tree_max_y = 0.0f;
 
 		material *material_;
+		material *material2;
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -59,7 +60,9 @@ namespace octet {
 			app_scene->create_default_camera_and_lights();
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.0f, 1.0f));
 
-			material_ = new material(vec4(0.18f, 0.79f, 0.45f, 1.0f));
+			
+			material_ = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));
+			material2 = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); 
 
 			create_geometry();
 		}
@@ -74,9 +77,12 @@ namespace octet {
 			app_scene->render((float)w / h);
 		}
 
+		int n = 0;
+
 		void handle_input() {
 			if (is_key_going_down(key_space)) {
 				t.iterate();
+				++n;
 
 				app_scene = new visual_scene();
 				app_scene->create_default_camera_and_lights();
@@ -120,7 +126,13 @@ namespace octet {
 
 			scene_node *node = new scene_node();
 			app_scene->add_child(node);
-			app_scene->add_mesh_instance(new mesh_instance(node, box, material_));
+
+			if (n < 4){
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_));
+			}
+			else {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material2)); 
+			}
 
 			return end_pos;
 		}
