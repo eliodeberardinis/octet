@@ -61,8 +61,8 @@ namespace octet {
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.0f, 1.0f));
 
 			
-			material_ = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));
-			material2 = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); 
+			material_ = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown
+			material2 = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); //green
 
 			create_geometry();
 		}
