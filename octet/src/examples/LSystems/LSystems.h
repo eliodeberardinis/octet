@@ -83,6 +83,7 @@ namespace octet {
 		}
 
 		int n = 0;
+		float far_plane = 500.0f;
 
 		void handle_input() {
 			if (is_key_going_down(key_space)) {
@@ -92,19 +93,23 @@ namespace octet {
 				app_scene = new visual_scene();
 				app_scene->create_default_camera_and_lights();
 
+				//setting the far plane further away so the tree doesn't disappear when zooming out
+				app_scene->get_camera_instance(0)->set_far_plane(far_plane);
+
 				tree_max_y = 0.0f;
 				create_geometry();
 
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 2.0f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 0.0f));
+				/*app_scene->get_camera_instance(0)->get_yscale();*/
 			}
 
 			if (is_key_down(key_up))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -0.30f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -0.50f));
 			}
 			if (is_key_down(key_down))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 0.30f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 0.50f));
 			}
 
 
