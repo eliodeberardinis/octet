@@ -56,7 +56,7 @@ namespace octet {
 		}
 
 		void app_init() {
-			t.read_file(current_example);
+			t.read_file(current_example);//START FROM HERE, IMPLEMENT FILE SWITCHING
 
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
