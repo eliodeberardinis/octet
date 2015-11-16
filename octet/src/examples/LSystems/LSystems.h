@@ -46,8 +46,8 @@ namespace octet {
 
 		float tree_max_y = 0.0f;
 
-		material *material_;
-		material *material2;
+		material *material_wood;
+		material *material_leaf;
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -61,15 +61,14 @@ namespace octet {
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.0f, 1.0f));
 
 			
-			material_ = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown
-			material2 = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); //green
+			material_wood = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown wood
+			material_leaf = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); //green leaf
 
 			create_geometry();
 		}
 
 		void draw_world(int x, int y, int w, int h) {
 
-	
 			handle_input();
 
 			app_scene->begin_render(w, h);
@@ -90,17 +89,7 @@ namespace octet {
 				t.iterate();
 				++n;
 
-				app_scene = new visual_scene();
-				app_scene->create_default_camera_and_lights();
-
-				//setting the far plane further away so the tree doesn't disappear when zooming out
-				app_scene->get_camera_instance(0)->set_far_plane(far_plane);
-
-				tree_max_y = 0.0f;
-				create_geometry();
-
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 0.0f));
-				/*app_scene->get_camera_instance(0)->get_yscale();*/
+				draw_again();
 			}
 
 			if (is_key_down(key_up))
@@ -113,6 +102,21 @@ namespace octet {
 			}
 
 
+		}
+
+		void draw_again(){
+
+			app_scene = new visual_scene();
+			app_scene->create_default_camera_and_lights();
+
+			//setting the far plane further away so the tree doesn't disappear when zooming out
+			app_scene->get_camera_instance(0)->set_far_plane(far_plane);
+
+			tree_max_y = 0.0f;
+			create_geometry();
+
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 0.0f));
+		
 		}
 
 		vec3 draw_segment(vec3 start_pos, float angle) {
@@ -138,10 +142,10 @@ namespace octet {
 			app_scene->add_child(node);
 
 			if (n < 4){
-				app_scene->add_mesh_instance(new mesh_instance(node, box, material_));
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_wood));
 			}
 			else {
-				app_scene->add_mesh_instance(new mesh_instance(node, box, material2)); 
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_leaf)); 
 			}
 
 			return end_pos;
