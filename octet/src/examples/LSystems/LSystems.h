@@ -49,7 +49,7 @@ namespace octet {
 		material *material_wood;
 		material *material_leaf;
 
-		int current_example = 1;
+		int current_example = 3;
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -159,10 +159,29 @@ namespace octet {
 			float angle = 0.0f;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
-					angle += 22.5f;//22.5
+	
+					switch (current_example)
+					{
+					case 1: angle += 25.7f;
+						    break;
+
+					case 2: angle += 20.0f;
+						    break;
+					case 3: angle += 22.5f;
+						    break;
+					}
 				}
 				else if (axiom[i] == '-') {
-					angle -= 22.5f;//22.5
+					switch (current_example)
+					{
+					case 1: angle -= 25.7f;
+						break;
+
+					case 2: angle -= 20.0f;
+						break;
+					case 3: angle -= 22.5f;
+						break;
+					}
 				}
 				else if (axiom[i] == '[') {
 					node n = node(pos, angle);
