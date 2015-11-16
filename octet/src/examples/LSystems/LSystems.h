@@ -49,14 +49,14 @@ namespace octet {
 		material *material_wood;
 		material *material_leaf;
 
-		int current_example = 3;
+		int current_example = 3;//create a function to change this. 
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
 		}
 
 		void app_init() {
-			t.read_file(current_example);//START FROM HERE, IMPLEMENT FILE SWITCHING
+			t.read_file(current_example);
 
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
@@ -93,6 +93,23 @@ namespace octet {
 
 				draw_again();
 			}
+
+		/*	if (is_key_going_down(key_right)) { // change current_example (NOT WORKING!!!)
+				++current_example;
+				t.read_file(current_example);
+				
+				draw_again();
+
+			}
+
+			if (is_key_going_down(key_left)) {
+				--current_example;
+				t.read_file(current_example);
+
+				draw_again();
+
+			}*/
+
 
 			if (is_key_down(key_up))
 			{
