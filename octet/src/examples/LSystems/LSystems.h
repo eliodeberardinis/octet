@@ -36,7 +36,7 @@ namespace octet {
 
 		const float PI = 3.14159265f;
 		const float SEGMENT_LENGTH = 0.5f;
-		float SEGMENT_WIDTH = 0.05f;
+		float SEGMENT_WIDTH = 0.1f;
 
 		ref<visual_scene> app_scene;
 
@@ -49,12 +49,14 @@ namespace octet {
 		material *material_wood;
 		material *material_leaf;
 
+		int current_example = 1;
+
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
 		}
 
 		void app_init() {
-			t.read_file("assets/lsystems/lsystem.txt");
+			t.read_file(current_example);
 
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
@@ -157,10 +159,10 @@ namespace octet {
 			float angle = 0.0f;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
-					angle += 22.5f;
+					angle += 22.5f;//22.5
 				}
 				else if (axiom[i] == '-') {
-					angle -= 22.5f;
+					angle -= 22.5f;//22.5
 				}
 				else if (axiom[i] == '[') {
 					node n = node(pos, angle);
