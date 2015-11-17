@@ -99,25 +99,32 @@ namespace octet {
 			}
 
 			if (is_key_going_down(key_right)) {
-				if (current_example < MAX_example)
+				
+				if (current_example == MAX_example)
 				{
-					++current_example;
+					current_example = min_example;
+				}
+				else { ++current_example; }
 					t.read_file(current_example);
 
 					draw_again();
 					std::cout << "\ncurrent example: " << current_example << "\n";// check
-				}
+				
 			}
 
 			if (is_key_going_down(key_left)) {
-				if (current_example > min_example)
+				
+				if (current_example == min_example)
 				{
-					--current_example;
+					current_example = MAX_example;
+				}
+				else { --current_example; }
+
 					t.read_file(current_example);
 
 					draw_again();
 					std::cout << "\ncurrent example: " << current_example << "\n";//check
-				}
+				
 
 			}
 
