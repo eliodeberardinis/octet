@@ -49,7 +49,7 @@ namespace octet {
 		material *material_wood;
 		material *material_leaf;
 
-		int current_example = 3;//create a function to change this. 
+		int current_example = 1;//create a function to change this. 
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -84,6 +84,9 @@ namespace octet {
 		}
 
 		int n = 0;
+		const int min_example=1;
+		const int MAX_example=3;
+
 		float far_plane = 500.0f;
 
 		void handle_input() {
@@ -95,22 +98,26 @@ namespace octet {
 				draw_again();
 			}
 
-			if (is_key_going_down(key_right)) { //NOT WORKING!!!!
-				++current_example;
-				t.read_file(current_example);
-				
-				draw_again();
-				std::cout << "\ncurrent example: " << current_example<<"\n";// check
+			if (is_key_going_down(key_right)) {
+				if (current_example < MAX_example)
+				{
+					++current_example;
+					t.read_file(current_example);
 
+					draw_again();
+					std::cout << "\ncurrent example: " << current_example << "\n";// check
+				}
 			}
 
 			if (is_key_going_down(key_left)) {
-				--current_example;
-				t.read_file(current_example);
+				if (current_example > min_example)
+				{
+					--current_example;
+					t.read_file(current_example);
 
-				draw_again();
-				std::cout << "\ncurrent example: " << current_example<<"\n";//check
-				
+					draw_again();
+					std::cout << "\ncurrent example: " << current_example << "\n";//check
+				}
 
 			}
 
