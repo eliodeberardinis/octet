@@ -49,6 +49,7 @@ namespace octet {
 		material *material_wood;
 		material *material_leaf;
 		material *material_leaf2;
+		material *material_white;
 
 		int current_example = 1;//create a function to change this. 
 
@@ -66,7 +67,8 @@ namespace octet {
 			
 			material_wood = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown wood
 			material_leaf = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); //green leaf
-			material_leaf2 = new material(vec4(0.0f, 0.55f, 0.0f, 1.0f)); //green leaf
+			material_leaf2 = new material(vec4(0.0f, 0.55f, 0.0f, 1.0f)); //light green leaf
+			material_white = new material(vec4(1.0f, 1.0f, 1.0f, 1.0f)); //white
 
 			create_geometry();
 		}
@@ -87,7 +89,7 @@ namespace octet {
 
 		int n = 1;
 		const int min_example=1;
-		const int MAX_example=6;
+		const int MAX_example=7;
 
 		float far_plane = 500.0f;
 
@@ -97,7 +99,7 @@ namespace octet {
 				draw_again();
 			}
 
-			if (is_key_going_down(key_right)) {
+			if (is_key_going_down(key_lmb)) {
 				
 				if (current_example == MAX_example)
 				{
@@ -111,7 +113,7 @@ namespace octet {
 				
 			}
 
-			if (is_key_going_down(key_left)) {
+			if (is_key_going_down(key_rmb)) {
 				
 				if (current_example == min_example)
 				{
@@ -130,11 +132,19 @@ namespace octet {
 
 			if (is_key_down(key_up))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -0.50f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
 			}
 			if (is_key_down(key_down))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 0.50f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
+			}
+			if (is_key_down(key_left))
+			{
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(1.50f, 0, 0.0f));
+			}
+			if (is_key_down(key_right))
+			{
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(-1.50f, 0, 0.0f));
 			}
 
 
@@ -187,6 +197,10 @@ namespace octet {
 				app_scene->add_mesh_instance(new mesh_instance(node, box, material_leaf2));
 			}
 
+			if (n == 4) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_white));
+			}
+
 			return end_pos;
 		}
 
@@ -213,6 +227,8 @@ namespace octet {
 						    break;
 					case 6: angle += 22.5f;
 						    break;
+					case 7: angle += 60.0f;
+						break;
 					}
 				}
 				else if (axiom[i] == '-') {
@@ -232,6 +248,8 @@ namespace octet {
 					case 5: angle -= 25.7f;
 						break;
 					case 6: angle -= 22.5f;
+						break;
+					case 7: angle -= 60.0f;
 						break;
 					}
 				}
@@ -258,6 +276,11 @@ namespace octet {
 				else if (axiom[i] == 'C') {
 					//SEGMENT_WIDTH = 0.1f;
 					n = 3;
+
+				}
+				else if (axiom[i] == 'D') {
+					//SEGMENT_WIDTH = 0.1f;
+					n = 4;
 
 				}
 				else if (axiom[i] == 'F') {
