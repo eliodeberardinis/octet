@@ -87,7 +87,7 @@ namespace octet {
 
 		int n = 1;
 		const int min_example=1;
-		const int MAX_example=3;
+		const int MAX_example=6;
 
 		float far_plane = 500.0f;
 
@@ -207,6 +207,12 @@ namespace octet {
 						    break;
 					case 3: angle += 22.5f;
 						    break;
+					case 4: angle += 20.0f;
+						    break;
+					case 5: angle += 25.7f;
+						    break;
+					case 6: angle += 22.5f;
+						    break;
 					}
 				}
 				else if (axiom[i] == '-') {
@@ -217,10 +223,15 @@ namespace octet {
 					{
 					case 1: angle -= 25.7f;
 						break;
-
 					case 2: angle -= 20.0f;
 						break;
 					case 3: angle -= 22.5f;
+						break;
+					case 4: angle -= 20.0f;
+						break;
+					case 5: angle -= 25.7f;
+						break;
+					case 6: angle -= 22.5f;
 						break;
 					}
 				}
@@ -235,18 +246,25 @@ namespace octet {
 					pos = n.get_pos();
 				}
 				else if (axiom[i] == 'A') {
+					
 					n = 1;
 					
 				}
 				else if (axiom[i] == 'B') {
+					//SEGMENT_WIDTH = 0.1f;
 					n = 2;
 
 				}
 				else if (axiom[i] == 'C') {
+					//SEGMENT_WIDTH = 0.1f;
 					n = 3;
 
 				}
 				else if (axiom[i] == 'F') {
+
+					//if (angle == 0.0f && pos.x() <= 0.0f && pos.x()>-0.001f && pos.y() <= (tree_max_y / 2.0f) /*&& n==1*/){
+					//	SEGMENT_WIDTH = 0.2f;
+					//}
 					pos = draw_segment(pos, angle);
 				}
 			}

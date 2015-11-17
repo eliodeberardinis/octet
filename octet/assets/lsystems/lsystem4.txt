@@ -1,6 +1,5 @@
-X;
-F;
+X,F;
 +,-,[,];
 X;
-X->F[+X]F[-X]+X
-F->FF
+X->BF[+X]F[-X]+X;
+F->AFF;
