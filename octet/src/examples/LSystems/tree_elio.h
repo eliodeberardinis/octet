@@ -9,6 +9,12 @@ namespace octet {
 		// store data from text file in variables
 		void read_lsystem_data(dynarray<uint8_t> file_content) {
 
+			variables.reset();
+			constants.reset();
+			//initial_axiom.reset();
+			axiom.reset();
+			rules.clear();
+
 			dynarray<uint8_t> clean_data;
 			for each(uint8_t c in file_content) {
 				if (c != ' ' && c != '\n' && c != '\r') {

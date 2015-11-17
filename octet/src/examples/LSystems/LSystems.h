@@ -90,15 +90,17 @@ namespace octet {
 			if (is_key_going_down(key_space)) {
 				t.iterate();
 				++n;
+				
 
 				draw_again();
 			}
 
-		/*	if (is_key_going_down(key_right)) { // change current_example (NOT WORKING!!!)
+			if (is_key_going_down(key_right)) { //NOT WORKING!!!!
 				++current_example;
 				t.read_file(current_example);
 				
 				draw_again();
+				std::cout << "\ncurrent example: " << current_example<<"\n";// check
 
 			}
 
@@ -107,8 +109,10 @@ namespace octet {
 				t.read_file(current_example);
 
 				draw_again();
+				std::cout << "\ncurrent example: " << current_example<<"\n";//check
+				
 
-			}*/
+			}
 
 
 			if (is_key_down(key_up))
@@ -176,7 +180,8 @@ namespace octet {
 			float angle = 0.0f;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
-	
+
+					//std::cout << "\Angle: " << angle << "\n";//check
 					switch (current_example)
 					{
 					case 1: angle += 25.7f;
@@ -189,6 +194,9 @@ namespace octet {
 					}
 				}
 				else if (axiom[i] == '-') {
+
+					//std::cout << "\Angle: " << angle << "\n";//check
+
 					switch (current_example)
 					{
 					case 1: angle -= 25.7f;
