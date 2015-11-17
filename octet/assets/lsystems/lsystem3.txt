@@ -1,4 +1,4 @@
-F;
+F,A,B;
 +,-,[,];
 F;
-F->FF-[-F+F+F]+[+F-F-F];
+F->AFF-[B-F+F+F]+[C+F-F-F];

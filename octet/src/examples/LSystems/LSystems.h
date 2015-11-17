@@ -36,7 +36,7 @@ namespace octet {
 
 		const float PI = 3.14159265f;
 		const float SEGMENT_LENGTH = 0.5f;
-		float SEGMENT_WIDTH = 0.1f;
+		float SEGMENT_WIDTH = 0.08f;
 
 		ref<visual_scene> app_scene;
 
@@ -48,6 +48,7 @@ namespace octet {
 
 		material *material_wood;
 		material *material_leaf;
+		material *material_leaf2;
 
 		int current_example = 1;//create a function to change this. 
 
@@ -65,6 +66,7 @@ namespace octet {
 			
 			material_wood = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown wood
 			material_leaf = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); //green leaf
+			material_leaf2 = new material(vec4(0.0f, 0.55f, 0.0f, 1.0f)); //green leaf
 
 			create_geometry();
 		}
@@ -83,7 +85,7 @@ namespace octet {
 			app_scene->render((float)w / h);
 		}
 
-		int n = 0;
+		int n = 1;
 		const int min_example=1;
 		const int MAX_example=3;
 
@@ -92,9 +94,6 @@ namespace octet {
 		void handle_input() {
 			if (is_key_going_down(key_space)) {
 				t.iterate();
-				++n;
-				
-
 				draw_again();
 			}
 
@@ -178,11 +177,14 @@ namespace octet {
 			scene_node *node = new scene_node();
 			app_scene->add_child(node);
 
-			if (n < 4){
+			if (n == 1){
 				app_scene->add_mesh_instance(new mesh_instance(node, box, material_wood));
 			}
-			else {
+			if (n==2) {
 				app_scene->add_mesh_instance(new mesh_instance(node, box, material_leaf)); 
+			}
+			if (n == 3) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_leaf2));
 			}
 
 			return end_pos;
@@ -231,6 +233,18 @@ namespace octet {
 					node_stack.pop_back();
 					angle = n.get_angle();
 					pos = n.get_pos();
+				}
+				else if (axiom[i] == 'A') {
+					n = 1;
+					
+				}
+				else if (axiom[i] == 'B') {
+					n = 2;
+
+				}
+				else if (axiom[i] == 'C') {
+					n = 3;
+
 				}
 				else if (axiom[i] == 'F') {
 					pos = draw_segment(pos, angle);
