@@ -190,11 +190,16 @@ namespace octet {
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
 			}
 
+			//Rotation
 			if (is_key_down(key_delete))
 			{
-				app_scene->get_camera_instance(0)->get_node()->rotate(1.5f,2);
+				
+				for (unsigned int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
+					mesh_instance *mi = app_scene->get_mesh_instance(i);
+					mi->get_node()->rotate(2.0f, vec3(0, 1, 0));
+				}
 			}
-
+			
 
 		}
 
@@ -312,6 +317,7 @@ namespace octet {
 					pos = n.get_pos();
 				}
 				else if (axiom[i] == 'A') {
+					//SEGMENT_WIDTH = 0.2f;
 					
 					n = 1;
 					
