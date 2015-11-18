@@ -121,25 +121,6 @@ namespace octet {
 			}
 		}
 
-		void de_evolve() {
-			dynarray<char> new_axiom;
-			for (unsigned int i = 0; i < axiom.size(); ++i) {
-				if (is_char_in_array(axiom[i], variables)) {
-					for (unsigned int j = 0; j < rules[axiom[i]].size(); ++j) {
-						new_axiom.push_back(rules[axiom[i]][j]);
-					}
-				}
-				else {
-					new_axiom.push_back(axiom[i]);
-				}
-			}
-
-			axiom.resize(new_axiom.size());
-			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
-				axiom[i] = new_axiom[i];
-			}
-		}
-
 		dynarray<char> get_axiom() {
 			return axiom;
 		}

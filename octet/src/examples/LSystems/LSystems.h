@@ -88,7 +88,7 @@ namespace octet {
 		}
 
 		int n = 1;
-		int current_iteration=1;
+		unsigned int current_iteration = 0;
 		const int min_example=1;
 		const int MAX_example=7;
 
@@ -98,22 +98,40 @@ namespace octet {
 
 			//to evolve the system
 			if (is_key_going_down(key_space)) {
+				++current_iteration;
 				t.evolve();
 				draw_again();
-				current_iteration++;
+				std::cout << "current iteration: " << current_iteration<<"\n";
+				
 			}
 
-			if (is_key_going_down(key_delete)) {
+			// devolve the system
+			if (is_key_going_down(key_backspace) && current_iteration > 0) {
 
-				//t.read_text_file(current_example);
-				for (int i = 1; i < current_iteration; i++){
-					t.de_evolve();
-					draw_again();
+				if (current_iteration > 1){
+
+					t.read_text_file(current_example);
+
+					for (unsigned int i = 1; i <= current_iteration - 1; i++){
+						t.evolve();
+						draw_again();
+					}
+					current_iteration--;
+					std::cout << "current iteration: " << current_iteration << "\n";
 				}
-				current_iteration--;
+
+				else if (current_iteration <= 1){
+						t.read_text_file(current_example);
+						draw_again();
+						current_iteration--;
+						std::cout << "current iteration read zero: " << current_iteration << "\n";
+					   }
+				
 			}
 
 			if (is_key_going_down(key_lmb)) {
+
+				current_iteration = 0;
 				
 				if (current_example == MAX_example)
 				{
@@ -128,6 +146,8 @@ namespace octet {
 			}
 
 			if (is_key_going_down(key_rmb)) {
+
+				current_iteration = 0;
 				
 				if (current_example == min_example)
 				{
