@@ -229,7 +229,7 @@ namespace octet {
 			}
 
 			//Rotation of the model
-			if (is_key_down(key_delete))
+			if (is_key_going_down(key_delete))
 			{
 				
 				for (int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
