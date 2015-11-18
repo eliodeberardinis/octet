@@ -65,7 +65,7 @@ namespace octet {
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.0f, 1.0f));
 
 			
-			material_wood = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown wood
+			material_wood = new material(vec4(0.39f, 0.20f, 0.0f, 1.0f));//brown wood
 			material_leaf = new material(vec4(0.0f, 0.30f, 0.0f, 1.0f)); //green leaf
 			material_leaf2 = new material(vec4(0.0f, 0.45f, 0.0f, 1.0f)); //light green leaf
 			material_white = new material(vec4(1.0f, 1.0f, 1.0f, 1.0f)); //white
@@ -141,7 +141,7 @@ namespace octet {
 					t.read_text_file(current_example);
 
 					draw_again();
-					std::cout << "\ncurrent example: " << current_example << "\n";// check
+					std::cout << "\nCurrent example: " << current_example << "\n";// check
 				
 			}
 
@@ -190,10 +190,10 @@ namespace octet {
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
 			}
 
-			/*if (is_key_down(key_alt))
+			if (is_key_down(key_delete))
 			{
-				app_scene->get_camera_instance(0)->get_node()->rotate(0.1f,2);
-			}*/
+				app_scene->get_camera_instance(0)->get_node()->rotate(1.5f,2);
+			}
 
 
 		}
