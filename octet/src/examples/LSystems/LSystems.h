@@ -13,16 +13,16 @@ namespace octet {
 
 		class node {
 			vec3 pos;
-			float angle;
+			float angle1;
 		public:
 			node() {
 				pos = vec3(0.0f, 0.0f, 0.0f);
-				angle = 0.0f;
+				angle1 = 0.0f;
 			}
 
 			node(vec3 pos_, float angle_) {
 				pos = pos_;
-				angle = angle_;
+				angle1 = angle_;
 			}
 
 			vec3& get_pos() {
@@ -30,7 +30,7 @@ namespace octet {
 			}
 
 			float& get_angle() {
-				return angle;
+				return angle1;
 			}
 		};
 
@@ -123,6 +123,7 @@ namespace octet {
 				t.evolve();
 				draw_again();
 				std::cout << "current iteration: " << current_iteration<<"\n";
+				
 				
 			}
 			else if (is_key_going_down(key_space) && current_iteration >= MAX_iteration)
@@ -229,7 +230,7 @@ namespace octet {
 			}
 
 			//Rotation of the model
-			if (is_key_going_down(key_delete))
+			if (is_key_down(key_delete))
 			{
 				
 				for (int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
@@ -331,10 +332,11 @@ namespace octet {
 			return end_pos;
 		}
 
-		float angle_start = 0.0f;
+		
 		float angle_increment = 0.0f;
 
 		void create_geometry() {
+			float angle = 0.0f;
 			dynarray<char> axiom = t.get_axiom();
 			vec3 pos = vec3(0.0f, 0.0f, 0.0f);
 			
@@ -344,19 +346,19 @@ namespace octet {
 					
 					switch (current_example)
 					{
-					case 1: angle_start += (25.7f + angle_increment);
+					case 1: angle += (25.7f + angle_increment);
 						    break;
-					case 2: angle_start += (20.0f + angle_increment);
+					case 2: angle += (20.0f + angle_increment);
 						    break;
-					case 3: angle_start += (22.5f + angle_increment);
+					case 3: angle+= (22.5f + angle_increment);
 						    break;
-					case 4: angle_start += (20.0f + angle_increment);
+					case 4: angle += (20.0f + angle_increment);
 						    break;
-					case 5: angle_start += (25.7f +angle_increment);
+					case 5: angle += (25.7f + angle_increment);
  					        break;
-					case 6: angle_start += (22.5f +angle_increment);
+					case 6: angle += (22.5f + angle_increment);
 						    break;
-					case 7: angle_start += (60.0f +angle_increment);
+					case 7: angle += (60.0f + angle_increment);
 						    break;
 					}
 
@@ -366,31 +368,31 @@ namespace octet {
 
 					switch (current_example)
 					{
-					case 1: angle_start -= (25.7f + angle_increment);
+					case 1: angle -= (25.7f + angle_increment);
 						    break;
-					case 2: angle_start -= (20.0f + angle_increment);
+					case 2: angle -= (20.0f + angle_increment);
 						    break;
-					case 3: angle_start -= (22.5f + angle_increment);
+					case 3: angle -= (22.5f + angle_increment);
 						    break;
-					case 4: angle_start -= (20.0f + angle_increment);
+					case 4: angle -= (20.0f + angle_increment);
 						    break;
-					case 5: angle_start -= (25.7f + angle_increment);
+					case 5: angle -= (25.7f + angle_increment);
 						    break;
-					case 6: angle_start -= (22.5f + angle_increment);
+					case 6: angle -= (22.5f + angle_increment);
 						    break;
-					case 7: angle_start -= (60.0f + angle_increment);
+					case 7: angle -= (60.0f + angle_increment);
 						    break;
 					}
 				}
 				else if (axiom[i] == '[') {
-					node n = node(pos, angle_start);
-					node_stack.push_back(n);
+					node nod = node(pos, angle);
+					node_stack.push_back(nod);
 				}
 				else if (axiom[i] == ']') {
-					node n = node_stack[node_stack.size() - 1];
+					node nod = node_stack[node_stack.size() - 1];
 					node_stack.pop_back();
-					angle_start = n.get_angle();
-					pos = n.get_pos();
+					angle = nod.get_angle();
+					pos = nod.get_pos();
 				}
 				else if (axiom[i] == 'A') {
 					//SEGMENT_WIDTH = 0.2f;
@@ -418,7 +420,7 @@ namespace octet {
 					//if (angle == 0.0f && pos.x() <= 0.0f && pos.x()>-0.001f && pos.y() <= (tree_max_y / 2.0f) /*&& n==1*/){
 					//	SEGMENT_WIDTH = 0.2f;
 					//}
-					pos = draw_segment(pos, angle_start);
+					pos = draw_segment(pos, angle);
 				}
 			}
 		}
