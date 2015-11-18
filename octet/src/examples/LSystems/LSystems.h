@@ -53,6 +53,13 @@ namespace octet {
 
 		int current_example = 1;//create a function to change this. 
 
+		int n = 1; // index for material/color to use
+		unsigned int current_iteration = 0;
+		const int min_example = 1;
+		const int MAX_example = 7;
+		unsigned int MAX_iteration = 10;
+		float far_plane = 500.0f;
+
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
 		}
@@ -75,33 +82,52 @@ namespace octet {
 
 		void draw_world(int x, int y, int w, int h) {
 
+			set_MAX_iteration();
 			handle_input();
-
 			app_scene->begin_render(w, h);
-
-			//glClearColor(0, 0, 0, 1);
-			//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // changed directly in visual scene (is there another way?)
 
 			app_scene->update(1.0f / 30.0f);
 
 			app_scene->render((float)w / h);
 		}
 
-		int n = 1;
-		unsigned int current_iteration = 0;
-		const int min_example=1;
-		const int MAX_example=7;
+		void set_MAX_iteration(){
+		
+			switch (current_example)
+			{
+			case 1: MAX_iteration = 5;
+				    break;
+			case 2: MAX_iteration = 5;
+				    break;
+			case 3: MAX_iteration = 4;
+				    break;
+			case 4: MAX_iteration = 7;
+				    break;
+			case 5: MAX_iteration = 7;
+				    break;
+			case 6: MAX_iteration = 5;
+				    break;
+			case 7: MAX_iteration = 5;
+				    break;
+			}
 
-		float far_plane = 500.0f;
+		
+		}
 
+	
 		void handle_input() {
 
-			//to evolve the system
-			if (is_key_going_down(key_space)) {
+			//evolve the system
+			if (is_key_going_down(key_space) && current_iteration < MAX_iteration) {
 				++current_iteration;
 				t.evolve();
 				draw_again();
 				std::cout << "current iteration: " << current_iteration<<"\n";
+				
+			}
+			else if (is_key_going_down(key_space) && current_iteration >= MAX_iteration)
+			{
+				std::cout << "\nMaximum number of iterations reached!";
 				
 			}
 
@@ -132,12 +158,14 @@ namespace octet {
 			if (is_key_going_down(key_lmb)) {
 
 				current_iteration = 0;
+				angle_increment = 0.0f;
 				
 				if (current_example == MAX_example)
 				{
 					current_example = min_example;
 				}
 				else { ++current_example; }
+
 					t.read_text_file(current_example);
 
 					draw_again();
@@ -148,6 +176,7 @@ namespace octet {
 			if (is_key_going_down(key_rmb)) {
 
 				current_iteration = 0;
+				angle_increment = 0.0f;
 				
 				if (current_example == min_example)
 				{
@@ -163,44 +192,83 @@ namespace octet {
 
 			}
 
-
+			//Zoom in
 			if (is_key_down(key_shift))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
 			}
+
+			//Zoom out
 			if (is_key_down(key_ctrl))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
 			}
+
+			//Move camera left
 			if (is_key_down(key_left))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(-0.5f, 0, 0.0f));
 			}
+
+			//Move camera right
 			if (is_key_down(key_right))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.5f, 0, 0.0f));
 			}
 
+			//Move camera up
 			if (is_key_down(key_up))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.5f, 0.0f));
 			}
+
+			//Move camera down
 			if (is_key_down(key_down))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
 			}
 
-			//Rotation
+			//Rotation of the model
 			if (is_key_down(key_delete))
 			{
 				
-				for (unsigned int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
+				for (int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
 					mesh_instance *mi = app_scene->get_mesh_instance(i);
 					mi->get_node()->rotate(2.0f, vec3(0, 1, 0));
 				}
 			}
-			
 
+			//increase angle
+			if (is_key_down(key_esc) && current_iteration > 0 && current_iteration <= MAX_iteration-1) {
+
+				if (current_iteration >= 1){
+
+					t.read_text_file(current_example);
+					angle_increment += 1.5f;
+
+					for (unsigned int i = 1; i <= current_iteration; i++){
+						t.evolve();
+						draw_again();
+					}
+				}
+
+			}
+
+			//decrese angle
+			if (is_key_down(key_tab) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
+
+				if (current_iteration >= 1){
+
+					t.read_text_file(current_example);
+					angle_increment -= 1.5f;
+
+					for (unsigned int i = 1; i <= current_iteration; i++){
+						t.evolve();
+						draw_again();
+					}
+				}
+
+			}
 		}
 
 		void draw_again(){
@@ -218,14 +286,14 @@ namespace octet {
 		
 		}
 
-		vec3 draw_segment(vec3 start_pos, float angle) {
+		vec3 draw_segment(vec3 start_pos, float _angle) {
 			vec3 mid_pos;
 			vec3 end_pos;
 
-			mid_pos.x() = start_pos.x() + SEGMENT_LENGTH * cos((angle + 90.0f) * PI / 180.0f);
-			mid_pos.y() = start_pos.y() + SEGMENT_LENGTH * sin((angle + 90.0f) * PI / 180.0f);
-			end_pos.x() = start_pos.x() + SEGMENT_LENGTH * 2.0f * cos((90.0f + angle) * PI / 180.0f);
-			end_pos.y() = start_pos.y() + SEGMENT_LENGTH * 2.0f * sin((90.0f + angle) * PI / 180.0f);
+			mid_pos.x() = start_pos.x() + SEGMENT_LENGTH * cos((_angle + 90.0f) * PI / 180.0f);
+			mid_pos.y() = start_pos.y() + SEGMENT_LENGTH * sin((_angle + 90.0f) * PI / 180.0f);
+			end_pos.x() = start_pos.x() + SEGMENT_LENGTH * 2.0f * cos((90.0f + _angle) * PI / 180.0f);
+			end_pos.y() = start_pos.y() + SEGMENT_LENGTH * 2.0f * sin((90.0f + _angle) * PI / 180.0f);
 
 			if (tree_max_y < end_pos.y()) {
 				tree_max_y = end_pos.y();
@@ -234,7 +302,7 @@ namespace octet {
 			mat4t mtw;
 			mtw.loadIdentity();
 			mtw.translate(mid_pos);
-			mtw.rotate(angle, 0.0f, 0.0f, 1.0f);
+			mtw.rotate(_angle, 0.0f, 0.0f, 1.0f);
 
 			mat4t mtw2;
 			mtw2.loadIdentity();
@@ -263,63 +331,65 @@ namespace octet {
 			return end_pos;
 		}
 
+		float angle_start = 0.0f;
+		float angle_increment = 0.0f;
+
 		void create_geometry() {
 			dynarray<char> axiom = t.get_axiom();
 			vec3 pos = vec3(0.0f, 0.0f, 0.0f);
-			float angle = 0.0f;
+			
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
 
-					//std::cout << "\Angle: " << angle << "\n";//check
+					
 					switch (current_example)
 					{
-					case 1: angle += 25.7f;
+					case 1: angle_start += (25.7f + angle_increment);
 						    break;
-
-					case 2: angle += 20.0f;
+					case 2: angle_start += (20.0f + angle_increment);
 						    break;
-					case 3: angle += 22.5f;
+					case 3: angle_start += (22.5f + angle_increment);
 						    break;
-					case 4: angle += 20.0f;
+					case 4: angle_start += (20.0f + angle_increment);
 						    break;
-					case 5: angle += 25.7f;
+					case 5: angle_start += (25.7f +angle_increment);
+ 					        break;
+					case 6: angle_start += (22.5f +angle_increment);
 						    break;
-					case 6: angle += 22.5f;
+					case 7: angle_start += (60.0f +angle_increment);
 						    break;
-					case 7: angle += 60.0f;
-						break;
 					}
+
+
 				}
 				else if (axiom[i] == '-') {
 
-					//std::cout << "\Angle: " << angle << "\n";//check
-
 					switch (current_example)
 					{
-					case 1: angle -= 25.7f;
-						break;
-					case 2: angle -= 20.0f;
-						break;
-					case 3: angle -= 22.5f;
-						break;
-					case 4: angle -= 20.0f;
-						break;
-					case 5: angle -= 25.7f;
-						break;
-					case 6: angle -= 22.5f;
-						break;
-					case 7: angle -= 60.0f;
-						break;
+					case 1: angle_start -= (25.7f + angle_increment);
+						    break;
+					case 2: angle_start -= (20.0f + angle_increment);
+						    break;
+					case 3: angle_start -= (22.5f + angle_increment);
+						    break;
+					case 4: angle_start -= (20.0f + angle_increment);
+						    break;
+					case 5: angle_start -= (25.7f + angle_increment);
+						    break;
+					case 6: angle_start -= (22.5f + angle_increment);
+						    break;
+					case 7: angle_start -= (60.0f + angle_increment);
+						    break;
 					}
 				}
 				else if (axiom[i] == '[') {
-					node n = node(pos, angle);
+					node n = node(pos, angle_start);
 					node_stack.push_back(n);
 				}
 				else if (axiom[i] == ']') {
 					node n = node_stack[node_stack.size() - 1];
 					node_stack.pop_back();
-					angle = n.get_angle();
+					angle_start = n.get_angle();
 					pos = n.get_pos();
 				}
 				else if (axiom[i] == 'A') {
@@ -348,7 +418,7 @@ namespace octet {
 					//if (angle == 0.0f && pos.x() <= 0.0f && pos.x()>-0.001f && pos.y() <= (tree_max_y / 2.0f) /*&& n==1*/){
 					//	SEGMENT_WIDTH = 0.2f;
 					//}
-					pos = draw_segment(pos, angle);
+					pos = draw_segment(pos, angle_start);
 				}
 			}
 		}
