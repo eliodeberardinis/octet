@@ -235,7 +235,13 @@ namespace octet {
 			mtw.loadIdentity();
 			mtw.translate(mid_pos);
 			mtw.rotate(angle, 0.0f, 0.0f, 1.0f);
-			mesh_box *box = new mesh_box(vec3(SEGMENT_WIDTH, SEGMENT_LENGTH, SEGMENT_WIDTH), mtw);
+
+			mat4t mtw2;
+			mtw2.loadIdentity();
+			mtw2.rotate(90, 1, 0, 0);
+
+			//mesh_box *box = new mesh_box(vec3(SEGMENT_WIDTH, SEGMENT_LENGTH, SEGMENT_WIDTH), mtw);
+			mesh_cylinder *box = new mesh_cylinder(zcylinder(vec3(0),SEGMENT_WIDTH,SEGMENT_LENGTH), mtw2*mtw);
 
 			scene_node *node = new scene_node();
 			app_scene->add_child(node);
