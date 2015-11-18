@@ -58,7 +58,7 @@ namespace octet {
 		}
 
 		void app_init() {
-			t.read_file(current_example);
+			t.read_text_file(current_example);
 
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
@@ -66,8 +66,8 @@ namespace octet {
 
 			
 			material_wood = new material(vec4(0.59f, 0.29f, 0.0f, 1.0f));//brown wood
-			material_leaf = new material(vec4(0.0f, 0.4f, 0.0f, 1.0f)); //green leaf
-			material_leaf2 = new material(vec4(0.0f, 0.55f, 0.0f, 1.0f)); //light green leaf
+			material_leaf = new material(vec4(0.0f, 0.30f, 0.0f, 1.0f)); //green leaf
+			material_leaf2 = new material(vec4(0.0f, 0.45f, 0.0f, 1.0f)); //light green leaf
 			material_white = new material(vec4(1.0f, 1.0f, 1.0f, 1.0f)); //white
 
 			create_geometry();
@@ -88,15 +88,29 @@ namespace octet {
 		}
 
 		int n = 1;
+		int current_iteration=1;
 		const int min_example=1;
 		const int MAX_example=7;
 
 		float far_plane = 500.0f;
 
 		void handle_input() {
+
+			//to evolve the system
 			if (is_key_going_down(key_space)) {
-				t.iterate();
+				t.evolve();
 				draw_again();
+				current_iteration++;
+			}
+
+			if (is_key_going_down(key_delete)) {
+
+				//t.read_text_file(current_example);
+				for (int i = 1; i < current_iteration; i++){
+					t.de_evolve();
+					draw_again();
+				}
+				current_iteration--;
 			}
 
 			if (is_key_going_down(key_lmb)) {
@@ -106,7 +120,7 @@ namespace octet {
 					current_example = min_example;
 				}
 				else { ++current_example; }
-					t.read_file(current_example);
+					t.read_text_file(current_example);
 
 					draw_again();
 					std::cout << "\ncurrent example: " << current_example << "\n";// check
@@ -121,7 +135,7 @@ namespace octet {
 				}
 				else { --current_example; }
 
-					t.read_file(current_example);
+					t.read_text_file(current_example);
 
 					draw_again();
 					std::cout << "\ncurrent example: " << current_example << "\n";//check
@@ -130,22 +144,36 @@ namespace octet {
 			}
 
 
-			if (is_key_down(key_up))
+			if (is_key_down(key_shift))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
 			}
-			if (is_key_down(key_down))
+			if (is_key_down(key_ctrl))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
 			}
 			if (is_key_down(key_left))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(1.50f, 0, 0.0f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(-0.5f, 0, 0.0f));
 			}
 			if (is_key_down(key_right))
 			{
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(-1.50f, 0, 0.0f));
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.5f, 0, 0.0f));
 			}
+
+			if (is_key_down(key_up))
+			{
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.5f, 0.0f));
+			}
+			if (is_key_down(key_down))
+			{
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
+			}
+
+			/*if (is_key_down(key_alt))
+			{
+				app_scene->get_camera_instance(0)->get_node()->rotate(0.1f,2);
+			}*/
 
 
 		}

@@ -6,26 +6,26 @@ namespace octet {
 		dynarray<char> axiom;
 		hash_map<char, dynarray<char>> rules;
 
-		// store data from text file in variables
-		void read_lsystem_data(dynarray<uint8_t> file_content) {
+		// store data from text file in arrays of variables
+		void read_data(dynarray<uint8_t> file_) {
 
 			variables.reset();
 			constants.reset();
-			//initial_axiom.reset();
 			axiom.reset();
 			rules.clear();
 
-			dynarray<uint8_t> clean_data;
-			for each(uint8_t c in file_content) {
+			dynarray<uint8_t> _data;
+			for each(uint8_t c in file_) {
 				if (c != ' ' && c != '\n' && c != '\r') {
-					clean_data.push_back(c);
+					_data.push_back(c);
 				}
 			}
 
 			unsigned int cursor = 0;
+
 			// get variables
-			for (; cursor < clean_data.size(); ++cursor) {
-				char current_char = clean_data[cursor];
+			for (; cursor < _data.size(); ++cursor) {
+				char current_char = _data[cursor];
 				if (current_char == ';') {
 					break;
 				}
@@ -39,8 +39,8 @@ namespace octet {
 			++cursor;
 
 			// get constants
-			for (; cursor < clean_data.size(); ++cursor) {
-				char current_char = clean_data[cursor];
+			for (; cursor < _data.size(); ++cursor) {
+				char current_char = _data[cursor];
 				if (current_char == ';') {
 					break;
 				}
@@ -54,8 +54,8 @@ namespace octet {
 			++cursor;
 
 			// get axiom
-			for (; cursor < clean_data.size(); ++cursor) {
-				char current_char = clean_data[cursor];
+			for (; cursor < _data.size(); ++cursor) {
+				char current_char = _data[cursor];
 				if (current_char == ';') {
 					break;
 				}
@@ -66,12 +66,12 @@ namespace octet {
 			++cursor;
 
 			// get rules
-			while (cursor < clean_data.size()) {
-				char key = clean_data[cursor];
+			while (cursor < _data.size()) {
+				char key = _data[cursor];
 				cursor += 3;
 
-				for (; cursor < clean_data.size(); ++cursor) {
-					char current_char = clean_data[cursor];
+				for (; cursor < _data.size(); ++cursor) {
+					char current_char = _data[cursor];
 					if (current_char == ';') {
 						break;
 					}
@@ -83,9 +83,9 @@ namespace octet {
 			}
 		}
 
-		bool is_char_in_array(char c, dynarray<char> arr) {
+		bool is_char_in_array(char ch, dynarray<char> arr) {
 			for (unsigned int i = 0; i < arr.size(); ++i) {
-				if (arr[i] == c) {
+				if (arr[i] == ch) {
 					return true;
 				}
 			}
@@ -94,15 +94,15 @@ namespace octet {
 
 	public:
 
-		void read_file(int example_number) {
+		void read_text_file(int example_number) {
 			dynarray<uint8_t> file_content;
 			std::string file_name = "assets/lsystems/lsystem" + std::to_string(example_number) + ".txt";
 			app_utils::get_url(file_content, file_name.c_str());
 
-			read_lsystem_data(file_content);
+			read_data(file_content);
 		}
 
-		void iterate() {
+		void evolve() {
 			dynarray<char> new_axiom;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (is_char_in_array(axiom[i], variables)) {
@@ -117,7 +117,25 @@ namespace octet {
 
 			axiom.resize(new_axiom.size());
 			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
-				//printf("%c", new_axiom[i]);
+				axiom[i] = new_axiom[i];
+			}
+		}
+
+		void de_evolve() {
+			dynarray<char> new_axiom;
+			for (unsigned int i = 0; i < axiom.size(); ++i) {
+				if (is_char_in_array(axiom[i], variables)) {
+					for (unsigned int j = 0; j < rules[axiom[i]].size(); ++j) {
+						new_axiom.push_back(rules[axiom[i]][j]);
+					}
+				}
+				else {
+					new_axiom.push_back(axiom[i]);
+				}
+			}
+
+			axiom.resize(new_axiom.size());
+			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
 				axiom[i] = new_axiom[i];
 			}
 		}
