@@ -74,8 +74,8 @@ namespace octet {
 			
 			material_wood = new material(vec4(0.39f, 0.20f, 0.0f, 1.0f));//brown wood
 			material_leaf = new material(vec4(0.0f, 0.30f, 0.0f, 1.0f)); //green leaf
-			material_leaf2 = new material(vec4(0.0f, 0.45f, 0.0f, 1.0f)); //light green leaf
-			material_white = new material(vec4(1.0f, 1.0f, 1.0f, 1.0f)); //white
+			material_leaf2 = new material(vec4(0.0f, 0.45f, 0.0f, 1.0f));//light green leaf
+			material_white = new material(vec4(0.0f, 0.0f, 0.0f, 1.0f)); //black
 
 			create_geometry();
 		}
@@ -155,7 +155,7 @@ namespace octet {
 					   }
 				
 			}
-
+			//change example: next example (mouse left click)
 			if (is_key_going_down(key_lmb)) {
 
 				current_iteration = 0;
@@ -174,6 +174,7 @@ namespace octet {
 				
 			}
 
+			//change example: go the previous example (mouse right click)
 			if (is_key_going_down(key_rmb)) {
 
 				current_iteration = 0;

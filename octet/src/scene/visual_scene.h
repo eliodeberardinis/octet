@@ -396,7 +396,7 @@ namespace octet { namespace scene {
     }
 
     /// set up OpenGL state
-    void begin_render(int vx, int vy, vec4_in clear_color=vec4(0.0f, 0.0f, 0.0f, 1.0f)) { //changed background to white
+    void begin_render(int vx, int vy, vec4_in clear_color=vec4(0.87f, 0.87f, 0.87f, 1.0f)) { //changed background to grey
       /// set a viewport - includes whole window area
       glViewport(0, 0, vx, vy);
 
