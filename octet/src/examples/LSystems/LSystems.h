@@ -122,6 +122,7 @@ namespace octet {
 				++current_iteration;
 				t.evolve();
 				draw_again();
+				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 20.0f));
 				std::cout << "current iteration: " << current_iteration<<"\n";
 				
 				
