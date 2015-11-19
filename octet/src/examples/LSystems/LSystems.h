@@ -118,7 +118,10 @@ namespace octet {
 		
 		}
 
-	
+		float zoom_increment = 0.0f;
+		float x_increment = 0.0f;
+		float y_increment = 0.0f;
+
 		void handle_input() {
 
 			//evolve the system
@@ -126,12 +129,15 @@ namespace octet {
 				++current_iteration;
 				t.evolve();
 				draw_again();
-				if (current_example != 7 && current_example != 2 &&current_iteration > 3){ //optimize!!!!!!!
+
+				if (current_example != 7 && current_example != 2 && current_iteration > 3){ //optimize!!!!!!!
 
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 40.0f));
+					zoom_increment += 40.0f;
 				}
-				if (current_example == 7 && current_iteration >= 3){
+				if (current_example == 7 && current_iteration >= 4){
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(-10.0f, 0, 20.0f));
+					zoom_increment += 20.0f;
 				}
 				std::cout << "current iteration: " << current_iteration<<"\n";
 				
@@ -154,6 +160,17 @@ namespace octet {
 						t.evolve();
 						draw_again();
 					}
+
+					if (current_example != 7 && current_example != 2 && current_iteration > 3){ //optimize!!!!!!!
+
+						app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -40.0f));
+						zoom_increment -= 40.0f;
+					}
+					if (current_example == 7 && current_iteration >= 4){
+						app_scene->get_camera_instance(0)->get_node()->translate(vec3(10.0f, 0, -20.0f));
+						zoom_increment -= 20.0f;
+					}
+
 					current_iteration--;
 					std::cout << "current iteration: " << current_iteration << "\n";
 				}
@@ -172,6 +189,9 @@ namespace octet {
 				current_iteration = 0;
 				angle_increment = 0.0f;
 				SEGMENT_WIDTH = 0.1f;
+				zoom_increment = 0.0f;
+				x_increment = 0.0f;
+				y_increment = 0.0f;
 				
 				if (current_example == MAX_example)
 				{
@@ -192,6 +212,9 @@ namespace octet {
 				current_iteration = 0;
 				angle_increment = 0.0f;
 				SEGMENT_WIDTH = 0.1f;
+				zoom_increment = 0.0f;
+				x_increment = 0.0f;
+				y_increment = 0.0f;
 				
 				if (current_example == min_example)
 				{
@@ -211,36 +234,42 @@ namespace octet {
 			if (is_key_down(key_shift))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
+				zoom_increment -= 1.50f;
 			}
 
 			//Zoom out
 			if (is_key_down(key_ctrl))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
+				zoom_increment += 1.50f;
 			}
 
 			//Move camera left
 			if (is_key_down(key_left))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(-0.5f, 0, 0.0f));
+				x_increment -= 0.5f;
 			}
 
 			//Move camera right
 			if (is_key_down(key_right))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.5f, 0, 0.0f));
+				x_increment += 0.5f;
 			}
 
 			//Move camera up
 			if (is_key_down(key_up))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.5f, 0.0f));
+				y_increment += 0.5f;
 			}
 
 			//Move camera down
 			if (is_key_down(key_down))
 			{
 				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
+				y_increment -= 0.5f;
 			}
 
 			//Rotation of the model
@@ -350,7 +379,7 @@ namespace octet {
 			tree_max_y = 0.0f;
 			create_geometry();
 
-			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, tree_max_y / 2.0f, 0.0f));
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(x_increment, (tree_max_y / 2.0f) + y_increment, zoom_increment));
 		
 		}
 
