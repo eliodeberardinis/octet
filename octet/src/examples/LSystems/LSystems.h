@@ -122,7 +122,13 @@ namespace octet {
 				++current_iteration;
 				t.evolve();
 				draw_again();
-				app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 20.0f));
+				if (current_example != 7 && current_example != 2 &&current_iteration > 3){ //optimize!!!!!!!
+
+					app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 40.0f));
+				}
+				if (current_example == 7 && current_iteration >= 3){
+					app_scene->get_camera_instance(0)->get_node()->translate(vec3(-10.0f, 0, 20.0f));
+				}
 				std::cout << "current iteration: " << current_iteration<<"\n";
 				
 				
@@ -161,6 +167,7 @@ namespace octet {
 
 				current_iteration = 0;
 				angle_increment = 0.0f;
+				SEGMENT_WIDTH = 0.1f;
 				
 				if (current_example == MAX_example)
 				{
@@ -180,6 +187,7 @@ namespace octet {
 
 				current_iteration = 0;
 				angle_increment = 0.0f;
+				SEGMENT_WIDTH = 0.1f;
 				
 				if (current_example == min_example)
 				{
@@ -272,6 +280,39 @@ namespace octet {
 				}
 
 			}
+
+			//increase radius
+			if (is_key_down(key_f1) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
+
+				if (current_iteration >= 1){
+
+					t.read_text_file(current_example);
+					SEGMENT_WIDTH += 0.1f;
+
+					for (unsigned int i = 1; i <= current_iteration; i++){
+						t.evolve();
+						draw_again();
+					}
+				}
+
+			}
+
+			//increase radius
+			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
+
+				if (current_iteration >= 1){
+
+					t.read_text_file(current_example);
+					SEGMENT_WIDTH -= 0.1f;//add protection against negative
+
+					for (unsigned int i = 1; i <= current_iteration; i++){
+						t.evolve();
+						draw_again();
+					}
+				}
+
+			}
+
 		}
 
 		void draw_again(){
