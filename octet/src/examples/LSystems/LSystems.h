@@ -50,8 +50,10 @@ namespace octet {
 		material *material_leaf;
 		material *material_leaf2;
 		material *material_white;
+		material *material_autumn1;
+		material *material_autumn2;
 
-		int current_example = 1;//create a function to change this. 
+		int current_example = 1; 
 
 		int n = 1; // index for material/color to use
 		unsigned int current_iteration = 0;
@@ -76,6 +78,8 @@ namespace octet {
 			material_leaf = new material(vec4(0.0f, 0.30f, 0.0f, 1.0f)); //green leaf
 			material_leaf2 = new material(vec4(0.0f, 0.45f, 0.0f, 1.0f));//light green leaf
 			material_white = new material(vec4(0.0f, 0.0f, 0.0f, 1.0f)); //black
+			material_autumn1 = new material(vec4(0.63f, 0.08f, 0.08f, 1.0f)); //dark red
+			material_autumn2 = new material(vec4(0.95f, 0.09f, 0.09f, 1.0f)); //light red
 
 			create_geometry();
 		}
@@ -303,7 +307,27 @@ namespace octet {
 				if (current_iteration >= 1){
 
 					t.read_text_file(current_example);
-					SEGMENT_WIDTH -= 0.1f;//add protection against negative
+					SEGMENT_WIDTH -= 0.1f;
+
+					for (unsigned int i = 1; i <= current_iteration; i++){
+						t.evolve();
+						draw_again();
+					}
+				}
+
+			}
+
+			//change color
+			if (is_key_going_down(key_f3) && current_iteration > 0 /*&& current_iteration <= MAX_iteration - 1*/) {
+
+				if (current_iteration >= 1){
+
+					t.read_text_file(current_example);
+					if (color_index == false)
+					{
+						color_index = true;
+					}
+					else{ color_index = false; }
 
 					for (unsigned int i = 1; i <= current_iteration; i++){
 						t.evolve();
@@ -371,12 +395,19 @@ namespace octet {
 			if (n == 4) {
 				app_scene->add_mesh_instance(new mesh_instance(node, box, material_white));
 			}
+			if (n == 5) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_autumn1));
+			}
+			if (n == 6) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_autumn2));
+			}
 
 			return end_pos;
 		}
 
 		
 		float angle_increment = 0.0f;
+		bool color_index = false;
 
 		void create_geometry() {
 			float angle = 0.0f;
@@ -438,23 +469,35 @@ namespace octet {
 					pos = nod.get_pos();
 				}
 				else if (axiom[i] == 'A') {
-					//SEGMENT_WIDTH = 0.2f;
+					
 					
 					n = 1;
 					
 				}
 				else if (axiom[i] == 'B') {
-					//SEGMENT_WIDTH = 0.1f;
-					n = 2;
+
+					if (color_index == false){
+						n = 2;
+					}
+					else if (color_index==true)
+					{
+						n = 5;
+					}
 
 				}
 				else if (axiom[i] == 'C') {
-					//SEGMENT_WIDTH = 0.1f;
-					n = 3;
+					
+					if (color_index == false){
+						n = 3;
+					}
+					else if (color_index == true)
+					{
+						n = 6;
+					}
 
 				}
 				else if (axiom[i] == 'D') {
-					//SEGMENT_WIDTH = 0.1f;
+					
 					n = 4;
 
 				}
