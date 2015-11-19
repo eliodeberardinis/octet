@@ -305,7 +305,7 @@ namespace octet {
 			}
 
 			//increase radius
-			if (is_key_down(key_f1) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
+			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
 
 				if (current_iteration >= 1){
 
@@ -321,7 +321,7 @@ namespace octet {
 			}
 
 			//decrease radius
-			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
+			if (is_key_down(key_f1) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
 
 				if (current_iteration >= 1){
 
