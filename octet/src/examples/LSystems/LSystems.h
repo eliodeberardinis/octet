@@ -186,12 +186,7 @@ namespace octet {
 			//change example: next example (mouse left click)
 			if (is_key_going_down(key_lmb)) {
 
-				current_iteration = 0;
-				angle_increment = 0.0f;
-				SEGMENT_WIDTH = 0.1f;
-				zoom_increment = 0.0f;
-				x_increment = 0.0f;
-				y_increment = 0.0f;
+				reset_variables();
 				
 				if (current_example == MAX_example)
 				{
@@ -209,12 +204,7 @@ namespace octet {
 			//change example: go the previous example (mouse right click)
 			if (is_key_going_down(key_rmb)) {
 
-				current_iteration = 0;
-				angle_increment = 0.0f;
-				SEGMENT_WIDTH = 0.1f;
-				zoom_increment = 0.0f;
-				x_increment = 0.0f;
-				y_increment = 0.0f;
+				reset_variables();
 				
 				if (current_example == min_example)
 				{
@@ -330,7 +320,7 @@ namespace octet {
 
 			}
 
-			//increase radius
+			//decrease radius
 			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
 
 				if (current_iteration >= 1){
@@ -366,6 +356,17 @@ namespace octet {
 
 			}
 
+		}
+
+		void reset_variables(){
+		
+			current_iteration = 0;
+			angle_increment = 0.0f;
+			SEGMENT_WIDTH = 0.1f;
+			zoom_increment = 0.0f;
+			x_increment = 0.0f;
+			y_increment = 0.0f;
+		
 		}
 
 		void draw_again(){
