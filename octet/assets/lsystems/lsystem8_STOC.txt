@@ -2,3 +2,5 @@ F;
 +,-,[,];
 F;
 F->AF[B+F]AF[B-F]AF;
+F->F[+F]F;
+F->F[-F]F;

@@ -62,7 +62,7 @@ namespace octet {
 		int n = 1; // index for material/color to use
 		unsigned int current_iteration = 0;
 		const int min_example = 1;
-		const int MAX_example = 7;
+		const int MAX_example = 8;
 		unsigned int MAX_iteration = 10;
 		float far_plane = 500.0f;
 		float angle_increment = 0.0f;
@@ -127,6 +127,8 @@ namespace octet {
 			case 6: MAX_iteration = 5;
 				    break;
 			case 7: MAX_iteration = 5;
+				    break;
+			case 8: MAX_iteration = 5;
 				    break;
 			}
 
@@ -460,10 +462,12 @@ namespace octet {
 		}
 
 
+
 		void create_geometry() {
 			float angle = 0.0f;
 			dynarray<char> axiom = t.get_axiom();
 			vec3 pos = vec3(0.0f, 0.0f, 0.0f);
+
 			
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (axiom[i] == '+') {
@@ -475,7 +479,7 @@ namespace octet {
 						    break;
 					case 2: angle += (20.0f + angle_increment);
 						    break;
-					case 3: angle+= (22.5f + angle_increment);
+					case 3: angle += (22.5f + angle_increment);
 						    break;
 					case 4: angle += (20.0f + angle_increment);
 						    break;
@@ -485,11 +489,14 @@ namespace octet {
 						    break;
 					case 7: angle += (60.0f + angle_increment);
 						    break;
+					case 8: angle += (25.7f + angle_increment);
+						    break;
 					}
 
 
 				}
 				else if (axiom[i] == '-') {
+
 
 					switch (current_example)
 					{
@@ -506,6 +513,8 @@ namespace octet {
 					case 6: angle -= (22.5f + angle_increment);
 						    break;
 					case 7: angle -= (60.0f + angle_increment);
+						    break;
+					case 8: angle -= (25.7f + angle_increment);
 						    break;
 					}
 				}

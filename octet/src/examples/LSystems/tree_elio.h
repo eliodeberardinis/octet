@@ -9,6 +9,8 @@ namespace octet {
 		// store data from text file in arrays of variables
 		void read_data(dynarray<uint8_t> file_) {
 
+			//srand(time(NULL));
+
 			variables.reset();
 			constants.reset();
 			axiom.reset();
@@ -68,6 +70,29 @@ namespace octet {
 			// get rules
 			while (cursor < _data.size()) {
 				char key = _data[cursor];
+
+				/*float random = (float)((rand() % 10)*0.1) *3;
+				int i = 0;
+				for (i = 1; i < 3; i++)
+				{
+					if (random < i) break;					
+				}
+
+				switch (i)
+				{
+				case 1:
+					cursor += 3;
+					break;
+				case 2:
+					cursor += 18;
+
+					break;
+				case 3:
+					cursor += 28;
+
+					break;
+				}*/
+
 				cursor += 3;
 
 				for (; cursor < _data.size(); ++cursor) {

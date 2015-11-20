@@ -8,7 +8,7 @@
 //
 
 #define OCTET_BULLET 1
-
+#include <math.h>
 #include "../../octet.h"
 
 #include "LSystems.h"
