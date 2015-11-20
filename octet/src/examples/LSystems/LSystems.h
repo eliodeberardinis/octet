@@ -49,9 +49,13 @@ namespace octet {
 		material *material_wood;
 		material *material_leaf;
 		material *material_leaf2;
-		material *material_white;
+		material *material_black;
 		material *material_autumn1;
 		material *material_autumn2;
+		material *material_spring1;
+		material *material_spring2;
+		material *material_snow;
+		material *material_dark_snow;
 
 		int current_example = 1; 
 
@@ -61,6 +65,11 @@ namespace octet {
 		const int MAX_example = 7;
 		unsigned int MAX_iteration = 10;
 		float far_plane = 500.0f;
+		float angle_increment = 0.0f;
+		int color_index = 1;
+		float zoom_increment = 0.0f;
+		float x_increment = 0.0f;
+		float y_increment = 0.0f;
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -77,9 +86,15 @@ namespace octet {
 			material_wood = new material(vec4(0.39f, 0.20f, 0.0f, 1.0f));//brown wood
 			material_leaf = new material(vec4(0.0f, 0.30f, 0.0f, 1.0f)); //green leaf
 			material_leaf2 = new material(vec4(0.0f, 0.45f, 0.0f, 1.0f));//light green leaf
-			material_white = new material(vec4(0.0f, 0.0f, 0.0f, 1.0f)); //black
+			material_black = new material(vec4(0.0f, 0.0f, 0.0f, 1.0f)); //black
 			material_autumn1 = new material(vec4(0.63f, 0.08f, 0.08f, 1.0f)); //dark red
 			material_autumn2 = new material(vec4(0.95f, 0.09f, 0.09f, 1.0f)); //light red
+			material_spring1 = new material(vec4(0.99f, 0.2f, 0.59f, 1.0f));//dark pink
+			material_spring2 = new material(vec4(0.99f, 0.4f, 0.69f, 1.0f));//light pink
+			material_snow = new material(vec4(1.0f, 1.0f, 1.0f, 1.0f));//white
+			material_dark_snow = new material(vec4(0.875f, 0.875f, 0.875f, 1.0f));//grey-ish
+
+
 
 			create_geometry();
 		}
@@ -118,9 +133,6 @@ namespace octet {
 		
 		}
 
-		float zoom_increment = 0.0f;
-		float x_increment = 0.0f;
-		float y_increment = 0.0f;
 
 		void handle_input() {
 
@@ -135,7 +147,7 @@ namespace octet {
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 40.0f));
 					zoom_increment += 40.0f;
 				}
-				if (current_example == 7 && current_iteration >= 4){
+				if (current_example == 7 && current_iteration >= 3){
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(-10.0f, 0, 20.0f));
 					zoom_increment += 20.0f;
 				}
@@ -166,7 +178,7 @@ namespace octet {
 						app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -40.0f));
 						zoom_increment -= 40.0f;
 					}
-					if (current_example == 7 && current_iteration >= 4){
+					if (current_example == 7 && current_iteration >= 3){
 						app_scene->get_camera_instance(0)->get_node()->translate(vec3(10.0f, 0, -20.0f));
 						zoom_increment -= 20.0f;
 					}
@@ -280,7 +292,7 @@ namespace octet {
 					t.read_text_file(current_example);
 					angle_increment += 1.5f;
 
-					for (unsigned int i = 1; i <= current_iteration; i++){
+					for (unsigned int i = 1; i <= current_iteration; ++i){
 						t.evolve();
 						draw_again();
 					}
@@ -296,7 +308,7 @@ namespace octet {
 					t.read_text_file(current_example);
 					angle_increment -= 1.5f;
 
-					for (unsigned int i = 1; i <= current_iteration; i++){
+					for (unsigned int i = 1; i <= current_iteration; ++i){
 						t.evolve();
 						draw_again();
 					}
@@ -312,7 +324,7 @@ namespace octet {
 					t.read_text_file(current_example);
 					SEGMENT_WIDTH += 0.1f;
 
-					for (unsigned int i = 1; i <= current_iteration; i++){
+					for (unsigned int i = 1; i <= current_iteration; ++i){
 						t.evolve();
 						draw_again();
 					}
@@ -328,7 +340,7 @@ namespace octet {
 					t.read_text_file(current_example);
 					SEGMENT_WIDTH -= 0.1f;
 
-					for (unsigned int i = 1; i <= current_iteration; i++){
+					for (unsigned int i = 1; i <= current_iteration; ++i){
 						t.evolve();
 						draw_again();
 					}
@@ -342,11 +354,11 @@ namespace octet {
 				if (current_iteration >= 1){
 
 					t.read_text_file(current_example);
-					if (color_index == false)
+					if (color_index == 4)
 					{
-						color_index = true;
+						color_index = 1;
 					}
-					else{ color_index = false; }
+					else { color_index++; }
 
 					for (unsigned int i = 1; i <= current_iteration; i++){
 						t.evolve();
@@ -423,7 +435,7 @@ namespace octet {
 			}
 
 			if (n == 4) {
-				app_scene->add_mesh_instance(new mesh_instance(node, box, material_white));
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_black));
 			}
 			if (n == 5) {
 				app_scene->add_mesh_instance(new mesh_instance(node, box, material_autumn1));
@@ -431,13 +443,22 @@ namespace octet {
 			if (n == 6) {
 				app_scene->add_mesh_instance(new mesh_instance(node, box, material_autumn2));
 			}
+			if (n == 7) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_spring1));
+			}
+			if (n == 8) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_spring2));
+			}
+			if (n == 9) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_snow));
+			}
+			if (n == 10) {
+				app_scene->add_mesh_instance(new mesh_instance(node, box, material_dark_snow));
+			}
 
 			return end_pos;
 		}
 
-		
-		float angle_increment = 0.0f;
-		bool color_index = false;
 
 		void create_geometry() {
 			float angle = 0.0f;
@@ -506,23 +527,42 @@ namespace octet {
 				}
 				else if (axiom[i] == 'B') {
 
-					if (color_index == false){
+					if (color_index == 1){
 						n = 2;
 					}
-					else if (color_index==true)
+					else if (color_index==2)
 					{
 						n = 5;
+					}
+
+					else if (color_index == 3)
+					{
+						n = 7;
+					}
+					else if (color_index == 4)
+					{
+						n = 9;
 					}
 
 				}
 				else if (axiom[i] == 'C') {
 					
-					if (color_index == false){
+					if (color_index == 1){
 						n = 3;
 					}
-					else if (color_index == true)
+					else if (color_index == 2)
 					{
 						n = 6;
+					}
+
+					else if (color_index == 3)
+					{
+						n = 8;
+					}
+
+					else if (color_index == 3)
+					{
+						n = 10;
 					}
 
 				}
@@ -533,9 +573,6 @@ namespace octet {
 				}
 				else if (axiom[i] == 'F') {
 
-					//if (angle == 0.0f && pos.x() <= 0.0f && pos.x()>-0.001f && pos.y() <= (tree_max_y / 2.0f) /*&& n==1*/){
-					//	SEGMENT_WIDTH = 0.2f;
-					//}
 					pos = draw_segment(pos, angle);
 				}
 			}
