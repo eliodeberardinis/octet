@@ -248,6 +248,7 @@ namespace octet {
 				}
 				
 			}
+
 			//change example: next example (mouse left click)
 			if (is_key_going_down(key_lmb)) {
 
@@ -388,7 +389,7 @@ namespace octet {
 			}
 
 			//increase radius
-			if (is_key_down(key_f2) && current_iteration > 0 /*&& current_iteration <= MAX_iteration - 1*/) {
+			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
 
 				if (current_iteration >= 1){
 
@@ -412,7 +413,7 @@ namespace octet {
 			}
 
 			//decrease radius
-			if (is_key_down(key_f1) && current_iteration > 0 /*&& current_iteration <= MAX_iteration - 1*/ && SEGMENT_WIDTH > 0.1f) {
+			if (is_key_down(key_f1) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
 
 				if (current_iteration >= 1){
 
@@ -436,7 +437,7 @@ namespace octet {
 			}
 
 			//change color
-			if (is_key_going_down(key_f3)) {
+			if (is_key_going_down(key_f3) && current_example!=7) {
 
 				//Add Season printed to console !!!!
 				t.read_text_file(current_example);
@@ -474,6 +475,7 @@ namespace octet {
 			auto_scale = false;
 			rotation_amount = 0.0f;
 			rotation_on = false;
+			n = 1;
 
 			t.reset_stoc();
 		
@@ -524,7 +526,7 @@ namespace octet {
 			mtw2.loadIdentity();
 			mtw2.rotate(90, 1, 0, 0);
 			
-			//Maybe Hotkey using rectangles or cylinders??? 
+			//Maybe Hotkey to choose rectangles or cylinders??? 
 			//mesh_box *box = new mesh_box(vec3(SEGMENT_WIDTH, SEGMENT_LENGTH, SEGMENT_WIDTH), mtw);//Recatangles
 			mesh_cylinder *box = new mesh_cylinder(zcylinder(vec3(0),SEGMENT_WIDTH,SEGMENT_LENGTH), mtw2*mtw);//Cylinders
 
