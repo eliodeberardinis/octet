@@ -135,16 +135,36 @@ namespace octet {
 		
 		}
 
+		bool is_stoc(){
+		
+			if (current_example <= 7)
+			{
+				return false;
+			}
+
+			else {
+				return true;
+			}
+		
+		}
+
 
 		void handle_input() {
 
 			//evolve the system
 			if (is_key_going_down(key_space) && current_iteration < MAX_iteration) {
 				++current_iteration;
-				t.evolve();
+				if (is_stoc())
+				{
+					t.evolve_stoc();
+				}
+
+				else {
+					t.evolve();
+				}
 				draw_again();
 
-				if (current_example != 7 && current_example != 2 && current_iteration > 3){ //optimize!!!!!!!
+				if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ //optimize!!!!!!!
 
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 40.0f));
 					zoom_increment += 40.0f;
@@ -171,11 +191,19 @@ namespace octet {
 					t.read_text_file(current_example);
 
 					for (unsigned int i = 1; i <= current_iteration - 1; i++){
-						t.evolve();
+
+						if (is_stoc())
+						{
+							t.evolve_stoc();
+						}
+
+						else {
+							t.evolve();
+						}
 						draw_again();
 					}
 
-					if (current_example != 7 && current_example != 2 && current_iteration > 3){ //optimize!!!!!!!
+					if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ //optimize!!!!!!!
 
 						app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -40.0f));
 						zoom_increment -= 40.0f;
@@ -295,7 +323,14 @@ namespace octet {
 					angle_increment += 1.5f;
 
 					for (unsigned int i = 1; i <= current_iteration; ++i){
-						t.evolve();
+						if (is_stoc())
+						{
+							t.evolve_stoc();
+						}
+
+						else {
+							t.evolve();
+						}
 						draw_again();
 					}
 				}
@@ -311,7 +346,14 @@ namespace octet {
 					angle_increment -= 1.5f;
 
 					for (unsigned int i = 1; i <= current_iteration; ++i){
-						t.evolve();
+						if (is_stoc())
+						{
+							t.evolve_stoc();
+						}
+
+						else {
+							t.evolve();
+						}
 						draw_again();
 					}
 				}
@@ -327,7 +369,14 @@ namespace octet {
 					SEGMENT_WIDTH += 0.1f;
 
 					for (unsigned int i = 1; i <= current_iteration; ++i){
-						t.evolve();
+						if (is_stoc())
+						{
+							t.evolve_stoc();
+						}
+
+						else {
+							t.evolve();
+						}
 						draw_again();
 					}
 				}
@@ -343,7 +392,14 @@ namespace octet {
 					SEGMENT_WIDTH -= 0.1f;
 
 					for (unsigned int i = 1; i <= current_iteration; ++i){
-						t.evolve();
+						if (is_stoc())
+						{
+							t.evolve_stoc();
+						}
+
+						else {
+							t.evolve();
+						}
 						draw_again();
 					}
 				}
@@ -351,7 +407,7 @@ namespace octet {
 			}
 
 			//change color
-			if (is_key_going_down(key_f3) && current_iteration > 0 /*&& current_iteration <= MAX_iteration - 1*/) {
+			if (is_key_going_down(key_f3) && current_iteration > 0 ) {
 
 				if (current_iteration >= 1){
 
@@ -363,7 +419,14 @@ namespace octet {
 					else { color_index++; }
 
 					for (unsigned int i = 1; i <= current_iteration; i++){
-						t.evolve();
+						if (is_stoc())
+						{
+							t.evolve_stoc();
+						}
+
+						else {
+							t.evolve();
+						}
 						draw_again();
 					}
 				}

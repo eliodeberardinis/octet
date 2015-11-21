@@ -1,4 +1,6 @@
 F;
 +,-,[,];
 F;
-F->AF[B+F]AF[B-F]AF;
+X->AF[B+F]AF[B-F]AF;
+Y->AF[B+F]AF;
+Z->AF[B-F]AF;

@@ -70,29 +70,6 @@ namespace octet {
 			// get rules
 			while (cursor < _data.size()) {
 				char key = _data[cursor];
-
-				/*float random = (float)((rand() % 10)*0.1) *3;
-				int i = 0;
-				for (i = 1; i < 3; i++)
-				{
-					if (random < i) break;					
-				}
-
-				switch (i)
-				{
-				case 1:
-					cursor += 3;
-					break;
-				case 2:
-					cursor += 18;
-
-					break;
-				case 3:
-					cursor += 28;
-
-					break;
-				}*/
-
 				cursor += 3;
 
 				for (; cursor < _data.size(); ++cursor) {
@@ -129,10 +106,56 @@ namespace octet {
 
 		void evolve() {
 			dynarray<char> new_axiom;
+
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 				if (is_char_in_array(axiom[i], variables)) {
 					for (unsigned int j = 0; j < rules[axiom[i]].size(); ++j) {
 						new_axiom.push_back(rules[axiom[i]][j]);
+					}
+				}
+				else {
+					new_axiom.push_back(axiom[i]);
+				}
+			}
+
+			axiom.resize(new_axiom.size());
+			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
+				axiom[i] = new_axiom[i];
+			}
+		}
+
+		void evolve_stoc() {
+
+			srand(time(NULL));
+
+			char rule_type;
+
+			float random = (float)((rand() % 10)*0.1) * 3;
+			int i = 0;
+			for (i = 1; i < 3; i++)
+			{
+				if (random < i) break;
+			}
+
+			switch (i)
+			{
+			case 1:
+				rule_type = 'X';
+				break;
+			case 2:
+				rule_type = 'Y';
+				break;
+			case 3:
+				rule_type = 'Z';
+
+				break;
+			}
+
+			dynarray<char> new_axiom;
+			for (unsigned int i = 0; i < axiom.size(); ++i) {
+				if (is_char_in_array(axiom[i], variables)) {
+					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) {
+						new_axiom.push_back(rules[rule_type][j]);
 					}
 				}
 				else {
