@@ -126,11 +126,11 @@ namespace octet {
 
 		void evolve_stoc() {
 
-			srand(time(NULL));
+			srand(time(NULL));//ADD this or not?? or change it??
 
 			char rule_type;
 
-			float random = (float)((rand() % 10)*0.1) * 3;
+			float random = (float)((rand() % 10)*0.1) * 3;// WARNING loss of data int to float
 			int i = 0;
 			for (i = 1; i < 3; i++)
 			{
