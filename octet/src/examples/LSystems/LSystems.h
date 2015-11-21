@@ -205,7 +205,7 @@ namespace octet {
 
 						if (is_stoc())
 						{
-							t.evolve_stoc();
+							t.devolve_stoc(i);
 						}
 
 						else {
@@ -469,6 +469,8 @@ namespace octet {
 			auto_scale = false;
 			rotation_amount = 0.0f;
 			rotation_on = false;
+
+			t.reset_stoc();
 		
 		}
 

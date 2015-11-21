@@ -5,16 +5,18 @@ namespace octet {
 		dynarray<char> constants;
 		dynarray<char> axiom;
 		hash_map<char, dynarray<char>> rules;
+		dynarray<unsigned int> seeds;
+		dynarray<char> rule_type_stoc;
+		
 
 		// store data from text file in arrays of variables
 		void read_data(dynarray<uint8_t> file_) {
-
-			//srand(time(NULL));
 
 			variables.reset();
 			constants.reset();
 			axiom.reset();
 			rules.clear();
+			
 
 			dynarray<uint8_t> _data;
 			for each(uint8_t c in file_) {
@@ -126,7 +128,83 @@ namespace octet {
 
 		void evolve_stoc() {
 
-			srand(static_cast<unsigned int>(time(NULL)));//ADD this or not??
+			unsigned int seed = static_cast<unsigned int>(time(NULL));
+			seeds.push_back(seed);
+			srand(seed);//ADD this or not??
+
+			char rule_type;
+
+			float random = (float)((rand() % 10)*0.1) * 3;
+			int i = 0;
+			for (i = 1; i <= 3; i++)
+			{
+				if (random < i) break;
+			}
+
+			switch (i)
+			{
+			case 1:
+				rule_type = 'X';
+				break;
+			case 2:
+				rule_type = 'Y';
+				break;
+			case 3:
+				rule_type = 'Z';
+
+				break;
+			}
+
+			rule_type_stoc.push_back(rule_type);
+
+			dynarray<char> new_axiom;
+			for (unsigned int i = 0; i < axiom.size(); ++i) {
+				if (is_char_in_array(axiom[i], variables)) {
+					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) {
+						new_axiom.push_back(rules[rule_type][j]);
+					}
+				}
+				else {
+					new_axiom.push_back(axiom[i]);
+				}
+			}
+
+			axiom.resize(new_axiom.size());
+			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
+				axiom[i] = new_axiom[i];
+			}
+		}
+
+		
+		//devolving the system using the rules saved in evolve
+		void devolve_stoc(unsigned int iteration) {
+
+			char rule_type;
+			rule_type = rule_type_stoc[iteration-1];
+
+			dynarray<char> new_axiom;
+			for (unsigned int i = 0; i < axiom.size(); ++i) {
+				if (is_char_in_array(axiom[i], variables)) {
+					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) {
+						new_axiom.push_back(rules[rule_type][j]);
+					}
+				}
+				else {
+					new_axiom.push_back(axiom[i]);
+				}
+			}
+
+			axiom.resize(new_axiom.size());
+			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
+				axiom[i] = new_axiom[i];
+			}
+		}
+
+		//Devolving the system using the same seeds saved in evolve
+		void devolve_stoc_2(unsigned int iteration) {
+
+			unsigned int seed = seeds[iteration - 1];
+			srand(seed);//ADD this or not??
 
 			char rule_type;
 
@@ -167,6 +245,14 @@ namespace octet {
 			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
 				axiom[i] = new_axiom[i];
 			}
+		}
+
+		
+		void reset_stoc(){
+
+			seeds.reset();
+			rule_type_stoc.reset();
+
 		}
 
 		dynarray<char> get_axiom() {
