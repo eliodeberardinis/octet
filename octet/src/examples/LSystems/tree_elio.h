@@ -198,6 +198,7 @@ namespace octet {
 			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
 				axiom[i] = new_axiom[i];
 			}
+			
 		}
 
 		//Devolving the system using the same seeds saved in evolve
@@ -253,6 +254,13 @@ namespace octet {
 			seeds.reset();
 			rule_type_stoc.reset();
 
+		}
+
+		void decrese_stoc_array() {
+
+			seeds.resize(seeds.size() - 1);
+
+			rule_type_stoc.resize(rule_type_stoc.size() - 1);
 		}
 
 		dynarray<char> get_axiom() {

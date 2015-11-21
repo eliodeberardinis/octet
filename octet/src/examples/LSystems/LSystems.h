@@ -219,6 +219,12 @@ namespace octet {
 						}
 
 						draw_again();
+
+					}
+
+					if (is_stoc()){
+
+						t.decrese_stoc_array();
 					}
 
 					if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ //optimize!!!!!!!
@@ -239,6 +245,10 @@ namespace octet {
 						t.read_text_file(current_example);
 						draw_again();
 						current_iteration--;
+						if (is_stoc()){
+
+							t.decrese_stoc_array();
+						}
 						std::cout << "current iteration read zero: " << current_iteration << "\n";
 					   }
 				
