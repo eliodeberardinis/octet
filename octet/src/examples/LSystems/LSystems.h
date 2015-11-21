@@ -99,7 +99,6 @@ namespace octet {
 			material_dark_snow = new material(vec4(0.875f, 0.875f, 0.875f, 1.0f));//grey-ish
 
 
-
 			create_geometry();
 		}
 
@@ -175,7 +174,7 @@ namespace octet {
 
 				draw_again();
 
-				if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ //optimize!!!!!!!
+				if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ 
 
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 40.0f));
 					zoom_increment += 40.0f;
@@ -222,11 +221,6 @@ namespace octet {
 
 					}
 
-					if (is_stoc()){
-
-						t.decrese_stoc_array();
-					}
-
 					if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ //optimize!!!!!!!
 
 						app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -40.0f));
@@ -245,12 +239,13 @@ namespace octet {
 						t.read_text_file(current_example);
 						draw_again();
 						current_iteration--;
-						if (is_stoc()){
-
-							t.decrese_stoc_array();
-						}
 						std::cout << "current iteration read zero: " << current_iteration << "\n";
 					   }
+
+				if (is_stoc()){
+
+					t.decrese_stoc_array();
+				}
 				
 			}
 			//change example: next example (mouse left click)
