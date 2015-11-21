@@ -71,6 +71,9 @@ namespace octet {
 		float x_increment = 0.0f;
 		float y_increment = 0.0f;
 		bool auto_scale = false;
+		float rotation_amount = 0.0f;
+		bool rotation_on = false;
+
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -322,6 +325,8 @@ namespace octet {
 			//Rotation of the model
 			if (is_key_down(key_delete))
 			{
+				rotation_amount += 2.0f;
+				rotation_on = true;
 				
 				for (int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
 					mesh_instance *mi = app_scene->get_mesh_instance(i);
@@ -348,6 +353,7 @@ namespace octet {
 						}
 						draw_again();
 					}
+
 				}
 
 			}
@@ -371,6 +377,7 @@ namespace octet {
 						}
 						draw_again();
 					}
+					
 				}
 
 			}
@@ -394,6 +401,7 @@ namespace octet {
 						}
 						draw_again();
 					}
+
 				}
 
 			}
@@ -417,33 +425,33 @@ namespace octet {
 						}
 						draw_again();
 					}
+
 				}
 
 			}
 
 			//change color
-			if (is_key_going_down(key_f3) && current_iteration > 0 ) {
+			if (is_key_going_down(key_f3)) {
 
-				if (current_iteration >= 1){
+				//Add Season printed to console !!!!
+				t.read_text_file(current_example);
+				if (color_index == 4)
+				{
+					color_index = 1;
+				}
+				else { color_index++; }
 
-					t.read_text_file(current_example);
-					if (color_index == 4)
+				for (unsigned int i = 1; i <= current_iteration; i++){
+					if (is_stoc())
 					{
-						color_index = 1;
+						t.evolve_stoc();
 					}
-					else { color_index++; }
 
-					for (unsigned int i = 1; i <= current_iteration; i++){
-						if (is_stoc())
-						{
-							t.evolve_stoc();
-						}
-
-						else {
-							t.evolve();
-						}
-						draw_again();
+					else {
+						t.evolve();
 					}
+					draw_again();
+
 				}
 
 			}
@@ -458,6 +466,9 @@ namespace octet {
 			zoom_increment = 0.0f;
 			x_increment = 0.0f;
 			y_increment = 0.0f;
+			auto_scale = false;
+			rotation_amount = 0.0f;
+			rotation_on = false;
 		
 		}
 
@@ -473,6 +484,14 @@ namespace octet {
 			create_geometry();
 
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(x_increment, (tree_max_y / 2.0f) + y_increment, zoom_increment));
+
+			//account for rotation
+			if (rotation_on){
+				for (int i = 0; i < app_scene->get_num_mesh_instances(); ++i) {
+					mesh_instance *mi = app_scene->get_mesh_instance(i);
+					mi->get_node()->rotate(rotation_amount, vec3(0, 1, 0));
+				}
+			}
 		
 		}
 
