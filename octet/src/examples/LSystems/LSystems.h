@@ -345,7 +345,7 @@ namespace octet {
 					for (unsigned int i = 1; i <= current_iteration; ++i){
 						if (is_stoc())
 						{
-							t.evolve_stoc();
+							t.devolve_stoc(i);
 						}
 
 						else {
@@ -369,7 +369,7 @@ namespace octet {
 					for (unsigned int i = 1; i <= current_iteration; ++i){
 						if (is_stoc())
 						{
-							t.evolve_stoc();
+							t.devolve_stoc(i);
 						}
 
 						else {
@@ -393,7 +393,7 @@ namespace octet {
 					for (unsigned int i = 1; i <= current_iteration; ++i){
 						if (is_stoc())
 						{
-							t.evolve_stoc();
+							t.devolve_stoc(i);
 						}
 
 						else {
@@ -417,7 +417,7 @@ namespace octet {
 					for (unsigned int i = 1; i <= current_iteration; ++i){
 						if (is_stoc())
 						{
-							t.evolve_stoc();
+							t.devolve_stoc(i);
 						}
 
 						else {
@@ -444,7 +444,7 @@ namespace octet {
 				for (unsigned int i = 1; i <= current_iteration; i++){
 					if (is_stoc())
 					{
-						t.evolve_stoc();
+						t.devolve_stoc(i);
 					}
 
 					else {

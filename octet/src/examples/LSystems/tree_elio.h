@@ -130,7 +130,7 @@ namespace octet {
 
 			unsigned int seed = static_cast<unsigned int>(time(NULL));
 			seeds.push_back(seed);
-			srand(seed);//ADD this or not??
+			srand(seed);
 
 			char rule_type;
 
@@ -204,7 +204,7 @@ namespace octet {
 		void devolve_stoc_2(unsigned int iteration) {
 
 			unsigned int seed = seeds[iteration - 1];
-			srand(seed);//ADD this or not??
+			srand(seed);
 
 			char rule_type;
 
