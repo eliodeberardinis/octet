@@ -70,6 +70,7 @@ namespace octet {
 		float zoom_increment = 0.0f;
 		float x_increment = 0.0f;
 		float y_increment = 0.0f;
+		bool auto_scale = false;
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
@@ -162,6 +163,13 @@ namespace octet {
 				else {
 					t.evolve();
 				}
+
+				if ((current_example == 4 || current_example == 5) && current_iteration == MAX_iteration && SEGMENT_WIDTH < 0.2)
+				{
+					SEGMENT_WIDTH += 0.1f;
+					auto_scale = true;
+				}
+
 				draw_again();
 
 				if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ //optimize!!!!!!!
@@ -200,6 +208,13 @@ namespace octet {
 						else {
 							t.evolve();
 						}
+
+						if (auto_scale)
+						{
+							SEGMENT_WIDTH -= 0.1f;
+							auto_scale = false;
+						}
+
 						draw_again();
 					}
 
@@ -361,7 +376,7 @@ namespace octet {
 			}
 
 			//increase radius
-			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
+			if (is_key_down(key_f2) && current_iteration > 0 /*&& current_iteration <= MAX_iteration - 1*/) {
 
 				if (current_iteration >= 1){
 
@@ -384,7 +399,7 @@ namespace octet {
 			}
 
 			//decrease radius
-			if (is_key_down(key_f1) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
+			if (is_key_down(key_f1) && current_iteration > 0 /*&& current_iteration <= MAX_iteration - 1*/ && SEGMENT_WIDTH > 0.1f) {
 
 				if (current_iteration >= 1){
 
@@ -482,9 +497,10 @@ namespace octet {
 			mat4t mtw2;
 			mtw2.loadIdentity();
 			mtw2.rotate(90, 1, 0, 0);
-
-			//mesh_box *box = new mesh_box(vec3(SEGMENT_WIDTH, SEGMENT_LENGTH, SEGMENT_WIDTH), mtw);
-			mesh_cylinder *box = new mesh_cylinder(zcylinder(vec3(0),SEGMENT_WIDTH,SEGMENT_LENGTH), mtw2*mtw);
+			
+			//Maybe Hotkey using rectangles or cylinders??? 
+			//mesh_box *box = new mesh_box(vec3(SEGMENT_WIDTH, SEGMENT_LENGTH, SEGMENT_WIDTH), mtw);//Recatangles
+			mesh_cylinder *box = new mesh_cylinder(zcylinder(vec3(0),SEGMENT_WIDTH,SEGMENT_LENGTH), mtw2*mtw);//Cylinders
 
 			scene_node *node = new scene_node();
 			app_scene->add_child(node);
