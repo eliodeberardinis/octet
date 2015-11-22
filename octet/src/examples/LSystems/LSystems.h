@@ -219,7 +219,7 @@ namespace octet {
 			//If the maximum evolution has been reached prints a warning message
 			else if (is_key_going_down(key_space) && current_iteration >= MAX_iteration)
 			{
-				std::cout << "\nMaximum number of iterations reached!";
+				std::cout << "\nMaximum number of iterations reached!\n";
 				
 			}
 
