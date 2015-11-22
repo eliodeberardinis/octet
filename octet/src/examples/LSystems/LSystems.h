@@ -35,7 +35,6 @@ namespace octet {
 			}
 		};
 
-		
 		ref<visual_scene> app_scene;
 
 		//Declaration of an object of the class "Tree" present in tree_elio.h file to access the contained functions
@@ -97,6 +96,9 @@ namespace octet {
 			//Checks if the first example is Deterministic or Stochastic
 			is_stoc();
 
+			//Prints instructions for the user
+			print_instruction();
+
 			//Initializes the scene and camera position
 			app_scene = new visual_scene();
 			app_scene->create_default_camera_and_lights();
@@ -129,6 +131,21 @@ namespace octet {
 			app_scene->update(1.0f / 30.0f);
 
 			app_scene->render((float)w / h);
+		}
+
+		//Print instructions to the console after initialization
+		void print_instruction(){
+
+			std::cout << "-------Welcome to L-Systems Generator-------\n";
+			std::cout << "\nHotkeys Details: \n\n";
+			std::cout << "- Spacebar/Backspase: Evolve/Devolve the system\n";
+			std::cout << "- Esc/Tab: Increase/Decrease the angle between branches\n";
+			std::cout << "- f2/f1: Increase/Decrease the thickness of the branches\n";
+			std::cout << "- f3: Change season (Summer, Fall, Spring, Winter)\n";
+			std::cout << "- delete: Rotate the model\n";
+			std::cout << "- Shift/Ctrl: Zoom in/Zoom out\n\n";
+			std::cout << "Current example: 1\n";
+		
 		}
 
 		//Sets the Max iteration for each example 
@@ -213,7 +230,7 @@ namespace octet {
 				}
 
 				//Print current Iteration to the console
-				std::cout << "current iteration: " << current_iteration<<"\n";	
+				std::cout << "\nCurrent iteration: " << current_iteration<<"\n";	
 			}
 
 			//If the maximum evolution has been reached prints a warning message
@@ -267,14 +284,14 @@ namespace octet {
 					}
 
 					current_iteration--;
-					std::cout << "current iteration: " << current_iteration << "\n";
+					std::cout << "\nCurrent iteration: " << current_iteration << "\n";
 				}
 
 				else if (current_iteration <= 1){
 						t.read_text_file(current_example);
 						draw_again();
 						current_iteration--;
-						std::cout << "current iteration: " << current_iteration << "\n";
+						std::cout << "\nCurrent iteration: " << current_iteration << "\n";
 					   }
 
 				//If the system is stochastic this deletes the last element in the array containing the information on the rule to use
@@ -317,7 +334,7 @@ namespace octet {
 					t.read_text_file(current_example);
 
 					draw_again();
-					std::cout << "\ncurrent example: " << current_example << "\n";//check
+					std::cout << "\nCurrent example: " << current_example << "\n";//check
 			}
 
 			//Zoom in
@@ -430,6 +447,18 @@ namespace octet {
 				else { season++; }
 
 				re_draw();
+
+				switch (season)
+				{
+				case 1: std::cout << "\nSeason: Summer";
+					break;
+				case 2: std::cout << "\nSeason: Autumn";
+					break;
+				case 3: std::cout << "\nSeason: Spring";
+					break;
+				case 4: std::cout << "\nSeason: Winter";
+					break;
+				}
 			}
 		}
 
