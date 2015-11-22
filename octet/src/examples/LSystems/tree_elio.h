@@ -1,6 +1,7 @@
 namespace octet {
 	class tree : public resource {
 
+		//Declaration of arrays/hash-maps to store the data read from the files
 		dynarray<char> variables;
 		dynarray<char> constants;
 		dynarray<char> axiom;
@@ -9,7 +10,7 @@ namespace octet {
 		dynarray<char> rule_type_stoc;
 		
 
-		// store data from text file in arrays of variables
+		// Store data read from text file in the relevant arrays 
 		void read_data(dynarray<uint8_t> file_) {
 
 			variables.reset();
@@ -27,7 +28,7 @@ namespace octet {
 
 			unsigned int cursor = 0;
 
-			// get variables
+			// Get variables (F,X,A,B)
 			for (; cursor < _data.size(); ++cursor) {
 				char current_char = _data[cursor];
 				if (current_char == ';') {
@@ -42,7 +43,7 @@ namespace octet {
 			}
 			++cursor;
 
-			// get constants
+			// Get constants (+,-,[,])
 			for (; cursor < _data.size(); ++cursor) {
 				char current_char = _data[cursor];
 				if (current_char == ';') {
@@ -57,7 +58,7 @@ namespace octet {
 			}
 			++cursor;
 
-			// get axiom
+			// Get axiom
 			for (; cursor < _data.size(); ++cursor) {
 				char current_char = _data[cursor];
 				if (current_char == ';') {
@@ -69,7 +70,7 @@ namespace octet {
 			}
 			++cursor;
 
-			// get rules
+			// Get rules
 			while (cursor < _data.size()) {
 				char key = _data[cursor];
 				cursor += 3;
@@ -87,6 +88,7 @@ namespace octet {
 			}
 		}
 
+		//Checks if a character is in an array
 		bool is_char_in_array(char ch, dynarray<char> arr) {
 			for (unsigned int i = 0; i < arr.size(); ++i) {
 				if (arr[i] == ch) {
@@ -98,6 +100,7 @@ namespace octet {
 
 	public:
 
+		//Reads the content of the specified file
 		void read_text_file(int example_number) {
 			dynarray<uint8_t> file_content;
 			std::string file_name = "assets/lsystems/lsystem" + std::to_string(example_number) + ".txt";
@@ -106,6 +109,7 @@ namespace octet {
 			read_data(file_content);
 		}
 
+		//Used to expand the rule that will be read by create_geometry at each iteration (Deterministic L-Systems)
 		void evolve() {
 			dynarray<char> new_axiom;
 
@@ -126,14 +130,21 @@ namespace octet {
 			}
 		}
 
+		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems)
 		void evolve_stoc() {
 
+			//Generate the seed using the current time
 			unsigned int seed = static_cast<unsigned int>(time(NULL));
+
+			//Save the seed in an array (for use in devolve_stoc2 function)
 			seeds.push_back(seed);
+
+			//Seeding the random funciton
 			srand(seed);
 
 			char rule_type;
 
+			//Generating the random variable to choose wich rule tu use with equal probability
 			float random = (float)((rand() % 10)*0.1) * 3;
 			int i = 0;
 			for (i = 1; i <= 3; i++)
@@ -155,6 +166,7 @@ namespace octet {
 				break;
 			}
 
+			//Saving the rule type in an array (for use in devolve_stoc function)
 			rule_type_stoc.push_back(rule_type);
 
 			dynarray<char> new_axiom;
@@ -175,8 +187,7 @@ namespace octet {
 			}
 		}
 
-		
-		//devolving the system using the rules saved in evolve
+		//Re-draws the stochastic system using the rule_type array saved in evolve_stoc() (Method used)
 		void devolve_stoc(unsigned int iteration) {
 
 			char rule_type;
@@ -201,7 +212,7 @@ namespace octet {
 			
 		}
 
-		//Devolving the system using the same seeds saved in evolve
+		//Re-draws the stochastic system using the seeds array saved in evolve_stoc() (Alternative method, NOT used))
 		void devolve_stoc_2(unsigned int iteration) {
 
 			unsigned int seed = seeds[iteration - 1];
@@ -248,7 +259,7 @@ namespace octet {
 			}
 		}
 
-		
+		//Clears the arrays containing the rule_type and seeds
 		void reset_stoc(){
 
 			seeds.reset();
@@ -256,6 +267,7 @@ namespace octet {
 
 		}
 
+		//Deletes the last element of the arrays containing the rule_type or seeds and rezises them
 		void decrese_stoc_array() {
 
 			seeds.resize(seeds.size() - 1);
@@ -263,6 +275,7 @@ namespace octet {
 			rule_type_stoc.resize(rule_type_stoc.size() - 1);
 		}
 
+		//Access to the axiom containing the rules
 		dynarray<char> get_axiom() {
 			return axiom;
 		}
