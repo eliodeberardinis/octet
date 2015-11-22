@@ -43,7 +43,6 @@ namespace octet {
 		//Declaration of the array containing the information about each node
 		dynarray<node> node_stack;
 
-		
 		//Declaration of Materials/colors to use
 		material *material_wood;
 		material *material_leaf;
@@ -78,7 +77,6 @@ namespace octet {
 		float rotation_amount = 0.0f;
 		bool auto_scale = false;
 		bool rotation_on = false;
-
 
 	public:
 		lsystems(int argc, char **argv) : app(argc, argv) {
