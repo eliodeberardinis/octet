@@ -7,7 +7,6 @@
 
 #include "tree_elio.h"
 
-
 namespace octet {
 	class lsystems : public app {
 
