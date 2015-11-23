@@ -6,7 +6,7 @@ namespace octet {
 		dynarray<char> constants;
 		dynarray<char> axiom;
 		hash_map<char, dynarray<char>> rules;
-		dynarray<unsigned int> seeds;
+		//dynarray<unsigned int> seeds;
 		dynarray<char> rule_type_stoc;
 		
 
@@ -136,11 +136,8 @@ namespace octet {
 			//Generate the seed using the current time
 			unsigned int seed = static_cast<unsigned int>(time(NULL));
 
-			//Save the seed in an array (for use in devolve_stoc2 function)
-			seeds.push_back(seed);
-
 			//Seeding the random funciton
-			srand(seed);
+			srand(static_cast<unsigned int>(time(NULL)));
 
 			char rule_type;
 
@@ -265,65 +262,15 @@ namespace octet {
 			
 		}
 
-		//Re-draws the stochastic system using the seeds array saved in evolve_stoc() (Alternative method, NOT used))
-		void devolve_stoc_2(unsigned int iteration) {
-
-			unsigned int seed = seeds[iteration - 1];
-			srand(seed);
-
-			char rule_type;
-
-			float random = (float)((rand() % 10)*0.1) * 3;
-			int i = 0;
-			for (i = 1; i <= 3; i++)
-			{
-				if (random < i) break;
-			}
-
-			switch (i)
-			{
-			case 1:
-				rule_type = 'X';
-				break;
-			case 2:
-				rule_type = 'Y';
-				break;
-			case 3:
-				rule_type = 'Z';
-
-				break;
-			}
-
-			dynarray<char> new_axiom;
-			for (unsigned int i = 0; i < axiom.size(); ++i) {
-				if (is_char_in_array(axiom[i], variables)) {
-					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) {
-						new_axiom.push_back(rules[rule_type][j]);
-					}
-				}
-				else {
-					new_axiom.push_back(axiom[i]);
-				}
-			}
-
-			axiom.resize(new_axiom.size());
-			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
-				axiom[i] = new_axiom[i];
-			}
-		}
-
 		//Clears the arrays containing the rule_type and seeds
 		void reset_stoc(){
 
-			seeds.reset();
 			rule_type_stoc.reset();
 
 		}
 
 		//Deletes the last element of the arrays containing the rule_type or seeds and rezises them
 		void decrese_stoc_array() {
-
-			seeds.resize(seeds.size() - 1);
 
 			rule_type_stoc.resize(rule_type_stoc.size() - 1);
 		}
