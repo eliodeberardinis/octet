@@ -482,7 +482,7 @@ namespace octet {
 			}
 
 			//Changes color of the "leaves"
-			if (is_key_going_down(key_f3) && current_example!=7) {
+			if (is_key_going_down(key_f3) && current_example!=7 && current_iteration < MAX_iteration) {
 
 				t.read_text_file(current_example);
 				if (season == 4)
