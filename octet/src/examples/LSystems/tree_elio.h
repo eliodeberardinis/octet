@@ -6,10 +6,8 @@ namespace octet {
 		dynarray<char> constants;
 		dynarray<char> axiom;
 		hash_map<char, dynarray<char>> rules;
-		//dynarray<unsigned int> seeds;
 		dynarray<char> rule_type_stoc;
 		
-
 		//Store data read from text file in the relevant arrays 
 		void read_data(dynarray<uint8_t> file_) {
 
@@ -130,11 +128,8 @@ namespace octet {
 			}
 		}
 
-		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems)
+		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems) - 1 Random Rule for each iteration (Not Used)
 		void evolve_stoc() {
-
-			//Generate the seed using the current time
-			unsigned int seed = static_cast<unsigned int>(time(NULL));
 
 			//Seeding the random funciton
 			srand(static_cast<unsigned int>(time(NULL)));
@@ -184,8 +179,8 @@ namespace octet {
 			}
 		}
 
-		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems)
-		void evolve_stoc_new() {
+		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems) - A different Random Rule for each character in each iteration
+		void evolve_stoc_type_2() {
 
 			dynarray<char> new_axiom;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
@@ -215,13 +210,14 @@ namespace octet {
 						break;
 					case 3:
 						rule_type = 'Z';
-
 						break;
 					}
 
+					//Saving the rule type in an array (for use in devolve_stoc function)
+					rule_type_stoc.push_back(rule_type);
+
 					for (unsigned int j = 0; j < rules[rule_type].size(); ++j)
 					{
-
 
 						new_axiom.push_back(rules[rule_type][j]);
 					}
@@ -237,7 +233,7 @@ namespace octet {
 			}
 		}
 
-		//Re-draws the stochastic system using the rule_type array saved in evolve_stoc() (Method used)
+		//Re-draws the stochastic system using the rule_type array saved in evolve_stoc()
 		void devolve_stoc(unsigned int iteration) {
 
 			char rule_type;
@@ -262,14 +258,14 @@ namespace octet {
 			
 		}
 
-		//Clears the arrays containing the rule_type and seeds
+		//Clears the arrays containing the rule_type
 		void reset_stoc(){
 
 			rule_type_stoc.reset();
 
 		}
 
-		//Deletes the last element of the arrays containing the rule_type or seeds and rezises them
+		//Deletes the last element of the arrays containing the rule_type and rezises them
 		void decrese_stoc_array() {
 
 			rule_type_stoc.resize(rule_type_stoc.size() - 1);
