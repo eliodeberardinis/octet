@@ -133,8 +133,14 @@ namespace octet {
 		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems)
 		void evolve_stoc() {
 
+			//Generate the seed using the current time
+			unsigned int seed = static_cast<unsigned int>(time(NULL));
+
+			//Save the seed in an array (for use in devolve_stoc2 function)
+			seeds.push_back(seed);
+
 			//Seeding the random funciton
-			srand(static_cast<unsigned int>(time(NULL)));
+			srand(seed);
 
 			char rule_type;
 
@@ -181,60 +187,7 @@ namespace octet {
 			}
 		}
 
-		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems)
-		void evolve_stoc_new() {
-
-			dynarray<char> new_axiom;
-			for (unsigned int i = 0; i < axiom.size(); ++i) {
-
-				if (is_char_in_array(axiom[i], variables)) {
-
-					char rule_type;
-
-					//Seeding the random function
-					srand(static_cast<unsigned int>(time(NULL)));
-
-					//Generating the random variable to choose wich rule tu use with equal probability
-					float random = (float)((rand() % 10)*0.1) * 3;
-					int k = 0;
-					for (k = 1; k <= 3; k++)
-					{
-						if (random < k) break;
-					}
-
-					switch (k)
-					{
-					case 1:
-						rule_type = 'X';
-						break;
-					case 2:
-						rule_type = 'Y';
-						break;
-					case 3:
-						rule_type = 'Z';
-
-						break;
-					}
-
-					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) 
-					{
-
-						
-						new_axiom.push_back(rules[rule_type][j]);
-					}
-				}
-				else {
-					new_axiom.push_back(axiom[i]);
-				}
-			}
-
-			axiom.resize(new_axiom.size());
-			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
-				axiom[i] = new_axiom[i];
-			}
-		}
-
-		//Re-draws the stochastic system (Type 1) using the rule_type array saved in evolve_stoc() 
+		//Re-draws the stochastic system using the rule_type array saved in evolve_stoc() (Method used)
 		void devolve_stoc(unsigned int iteration) {
 
 			char rule_type;
@@ -259,9 +212,57 @@ namespace octet {
 			
 		}
 
+		//Re-draws the stochastic system using the seeds array saved in evolve_stoc() (Alternative method, NOT used))
+		void devolve_stoc_2(unsigned int iteration) {
+
+			unsigned int seed = seeds[iteration - 1];
+			srand(seed);
+
+			char rule_type;
+
+			float random = (float)((rand() % 10)*0.1) * 3;
+			int i = 0;
+			for (i = 1; i <= 3; i++)
+			{
+				if (random < i) break;
+			}
+
+			switch (i)
+			{
+			case 1:
+				rule_type = 'X';
+				break;
+			case 2:
+				rule_type = 'Y';
+				break;
+			case 3:
+				rule_type = 'Z';
+
+				break;
+			}
+
+			dynarray<char> new_axiom;
+			for (unsigned int i = 0; i < axiom.size(); ++i) {
+				if (is_char_in_array(axiom[i], variables)) {
+					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) {
+						new_axiom.push_back(rules[rule_type][j]);
+					}
+				}
+				else {
+					new_axiom.push_back(axiom[i]);
+				}
+			}
+
+			axiom.resize(new_axiom.size());
+			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
+				axiom[i] = new_axiom[i];
+			}
+		}
+
 		//Clears the arrays containing the rule_type and seeds
 		void reset_stoc(){
 
+			seeds.reset();
 			rule_type_stoc.reset();
 
 		}
