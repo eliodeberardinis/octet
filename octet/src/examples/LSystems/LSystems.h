@@ -66,7 +66,7 @@ namespace octet {
 		int color_type = 1;
 		unsigned int current_iteration = 0;
 		const int min_example = 1;
-		const int MAX_example = 8;
+		const int MAX_example = 9;
 		unsigned int MAX_iteration = 10;
 		float far_plane = 500.0f;
 		float angle_increment = 0.0f;
@@ -143,6 +143,7 @@ namespace octet {
 			std::cout << "- delete: Rotate the model\n";
 			std::cout << "- Shift/Ctrl: Zoom in/Zoom out\n\n";
 			std::cout << "Current example: "<<current_example<<"\n";
+			std::cout << "Season: Summer\n";
 
 			if (is_stoc())
 			{
@@ -177,6 +178,8 @@ namespace octet {
 				    break;
 			case 8: MAX_iteration = 5;
 				    break;
+			case 9: MAX_iteration = 5;
+				break;
 			}
 
 		
@@ -185,13 +188,13 @@ namespace octet {
 		//Checks if the example is Stochastic or Deterministic
 		bool is_stoc(){
 		
-			if (current_example <= 7)
+			if (current_example == 8)
 			{
-				return false;
+				return true;
 			}
 
 			else {
-				return true;
+				return false;
 			}
 		
 		}
@@ -205,14 +208,19 @@ namespace octet {
 				++current_iteration;
 				
 				//Checks if the system is deterministic or stochastic and uses the relevant evolution method
-				if (is_stoc())
-				{
-					t.evolve_stoc();
+				if (current_example != 9){
+					if (is_stoc())
+					{
+						t.evolve_stoc();
+					}
+
+					else {
+						t.evolve();
+					}
 				}
 
-				else {
-					t.evolve();
-				}
+				//Example 9 is handled in a different stochastic way
+				else { t.evolve_stoc_type_2();}
 
 				//It optimizes the size of the lines for certain examples so they are visibile from further away
 				if ((current_example == 4 || current_example == 5) && current_iteration == MAX_iteration && SEGMENT_WIDTH < 0.2)
@@ -225,7 +233,7 @@ namespace octet {
 				draw_again();
 
 				//Optimizes camera position for some examples so they fit the screen
-				if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){ 
+				if (current_example != 7 && current_example != 2 && current_example != 8 && current_example != 9 && current_iteration > 3){
 
 					app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 40.0f));
 					zoom_increment += 40.0f;
@@ -251,35 +259,36 @@ namespace octet {
 			// Devolve the system
 			if (is_key_going_down(key_backspace) && current_iteration > 0) {
 
-				if (current_iteration > 1){
+				if (current_iteration > 1 && current_example!=9){
 
 					//Read the current file again
 					t.read_text_file(current_example);
 
-					//Re-draws the L-system up the the previous iteration
-					for (unsigned int i = 1; i <= current_iteration - 1; i++){
+					
+						//Re-draws the L-system up the the previous iteration
+						for (unsigned int i = 1; i <= current_iteration - 1; i++){
 
-						if (is_stoc())
-						{
-							t.devolve_stoc(i);
+							if (is_stoc())
+							{
+								t.devolve_stoc(i);
+							}
+
+							else {
+								t.evolve();
+							}
+
+							//Reverts the autoscale in the evolve function for certain examples
+							if (auto_scale)
+							{
+								SEGMENT_WIDTH -= 0.1f;
+								auto_scale = false;
+							}
+
+							draw_again();
 						}
-
-						else {
-							t.evolve();
-						}
-
-						//Reverts the autoscale in the evolve function for certain examples
-						if (auto_scale)
-						{
-							SEGMENT_WIDTH -= 0.1f;
-							auto_scale = false;
-						}
-
-						draw_again();
-					}
-
+					
 					//Camera adjustments equal and opposite to the evolution method
-					if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){
+						if (current_example != 7 && current_example != 2 && current_example != 8 && current_iteration > 3){
 
 						app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -40.0f));
 						zoom_increment -= 40.0f;
@@ -291,14 +300,21 @@ namespace octet {
 						zoom_increment -= 20.0f;
 					}
 
+					
 					current_iteration--;
 					std::cout << "Current iteration: " << current_iteration << "\n";
 				}
 
-				else if (current_iteration <= 1){
+				//Example 9 gets redrawn from scratch
+				else if (current_iteration <= 1 || current_example==9){
 						t.read_text_file(current_example);
 						draw_again();
-						current_iteration--;
+
+						if (current_example != 9){
+							current_iteration--;
+						}
+						else { current_iteration = 0; }
+
 						std::cout << "Current iteration: " << current_iteration << "\n";
 					   }
 
@@ -327,7 +343,7 @@ namespace octet {
 
 					std::cout << "\nCurrent example: " << current_example << "\n";
 
-					if (is_stoc())
+					if (is_stoc()||current_example == 9)
 					{
 						std::cout << "\nStochastic\n";
 					}
@@ -355,7 +371,7 @@ namespace octet {
 					draw_again();
 					std::cout << "\nCurrent example: " << current_example << "\n";
 
-					if (is_stoc())
+					if (is_stoc() ||current_example == 9)
 					{
 						std::cout << "\nStochastic\n";
 					}
@@ -421,7 +437,7 @@ namespace octet {
 			}
 
 			//Increase angle between branches (possible until the iteration before the maximum to protect from possible crash)
-			if (is_key_down(key_esc) && current_iteration > 0 && current_iteration <= MAX_iteration-1) {
+			if (is_key_down(key_esc) && current_iteration <= MAX_iteration-1) {
 
 				if (current_iteration >= 1){
 
@@ -432,7 +448,7 @@ namespace octet {
 			}
 
 			//Decrese angle between brances (possible until the iteration before the maximum to protect from crash)
-			if (is_key_down(key_tab) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
+			if (is_key_down(key_tab) && current_iteration <= MAX_iteration - 1) {
 
 				if (current_iteration >= 1){
 
@@ -443,7 +459,7 @@ namespace octet {
 			}
 
 			//Increase Thickness of the lines (possible until the iteration before the maximum to protect from crash)
-			if (is_key_down(key_f2) && current_iteration > 0 && current_iteration <= MAX_iteration - 1) {
+			if (is_key_down(key_f2) && current_iteration <= MAX_iteration - 1) {
 
 				if (current_iteration >= 1){
 
@@ -455,7 +471,7 @@ namespace octet {
 			}
 
 			//Decrease Thickness of the lines
-			if (is_key_down(key_f1) && current_iteration > 0 && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
+			if (is_key_down(key_f1) && current_iteration <= MAX_iteration - 1 && SEGMENT_WIDTH > 0.1f) {
 
 				if (current_iteration >= 1){
 
@@ -479,13 +495,13 @@ namespace octet {
 
 				switch (season)
 				{
-				case 1: std::cout << "\nSeason: Summer";
+				case 1: std::cout << "\nSeason: Summer\n";
 					break;
-				case 2: std::cout << "\nSeason: Autumn";
+				case 2: std::cout << "\nSeason: Autumn\n";
 					break;
-				case 3: std::cout << "\nSeason: Spring";
+				case 3: std::cout << "\nSeason: Spring\n";
 					break;
-				case 4: std::cout << "\nSeason: Winter";
+				case 4: std::cout << "\nSeason: Winter\n";
 					break;
 				}
 			}
@@ -545,6 +561,8 @@ namespace octet {
 						break;
 					case 8: angle += (25.7f + angle_increment);
 						break;
+					case 9: angle += (25.7f + angle_increment);
+						break;
 					}
 				}
 
@@ -567,6 +585,8 @@ namespace octet {
 					case 7: angle -= (60.0f + angle_increment);
 						break;
 					case 8: angle -= (25.7f + angle_increment);
+						break;
+					case 9: angle -= (25.7f + angle_increment);
 						break;
 					}
 				}
@@ -732,7 +752,7 @@ namespace octet {
 
 		//Re-draws the L-system up to the current iteration with new user-modified parameters (color, angle, thickness)
 		void re_draw(){
-
+			if (current_example!=9){
 			for (unsigned int i = 1; i <= current_iteration; ++i){
 				if (is_stoc())
 				{
@@ -743,6 +763,14 @@ namespace octet {
 					t.evolve();
 				}
 				draw_again();
+			}
+		}
+			//Example 9 gets redrawn from scratch each time a parameter is changed
+			else{
+				draw_again();
+				current_iteration = 0; 
+
+				std::cout << "\nCurrent iteration: " << current_iteration << "\n";
 			}
 		}
 

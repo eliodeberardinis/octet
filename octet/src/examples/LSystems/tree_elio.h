@@ -214,7 +214,7 @@ namespace octet {
 					}
 
 					//Saving the rule type in an array (for use in devolve_stoc function)
-					rule_type_stoc.push_back(rule_type);
+					//rule_type_stoc.push_back(rule_type);
 
 					for (unsigned int j = 0; j < rules[rule_type].size(); ++j)
 					{
@@ -237,7 +237,7 @@ namespace octet {
 		void devolve_stoc(unsigned int iteration) {
 
 			char rule_type;
-			rule_type = rule_type_stoc[iteration-1];
+			rule_type = rule_type_stoc[iteration - 1];
 
 			dynarray<char> new_axiom;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
@@ -255,7 +255,7 @@ namespace octet {
 			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
 				axiom[i] = new_axiom[i];
 			}
-			
+
 		}
 
 		//Clears the arrays containing the rule_type
