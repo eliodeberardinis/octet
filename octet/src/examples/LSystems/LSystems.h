@@ -142,7 +142,17 @@ namespace octet {
 			std::cout << "- f3: Change season (Summer, Fall, Spring, Winter)\n";
 			std::cout << "- delete: Rotate the model\n";
 			std::cout << "- Shift/Ctrl: Zoom in/Zoom out\n\n";
-			std::cout << "Current example: 1\n";
+			std::cout << "Current example: "<<current_example<<"\n";
+
+			if (is_stoc())
+			{
+				std::cout << "\nStochastic\n";
+			}
+
+			else
+			{
+				std::cout << "\nDeterministic\n";
+			}
 		
 		}
 
@@ -228,7 +238,7 @@ namespace octet {
 				}
 
 				//Print current Iteration to the console
-				std::cout << "\nCurrent iteration: " << current_iteration<<"\n";	
+				std::cout << "Current iteration: " << current_iteration<<"\n";	
 			}
 
 			//If the maximum evolution has been reached prints a warning message
@@ -282,14 +292,14 @@ namespace octet {
 					}
 
 					current_iteration--;
-					std::cout << "\nCurrent iteration: " << current_iteration << "\n";
+					std::cout << "Current iteration: " << current_iteration << "\n";
 				}
 
 				else if (current_iteration <= 1){
 						t.read_text_file(current_example);
 						draw_again();
 						current_iteration--;
-						std::cout << "\nCurrent iteration: " << current_iteration << "\n";
+						std::cout << "Current iteration: " << current_iteration << "\n";
 					   }
 
 				//If the system is stochastic this deletes the last element in the array containing the information on the rule to use
@@ -314,7 +324,18 @@ namespace octet {
 					t.read_text_file(current_example);
 
 					draw_again();
-					std::cout << "\nCurrent example: " << current_example << "\n";	
+
+					std::cout << "\nCurrent example: " << current_example << "\n";
+
+					if (is_stoc())
+					{
+						std::cout << "\nStochastic\n";
+					}
+
+					else
+					{
+						std::cout << "\nDeterministic\n";
+					}
 			}
 
 			//change example: go the previous example (mouse right click)
@@ -332,7 +353,17 @@ namespace octet {
 					t.read_text_file(current_example);
 
 					draw_again();
-					std::cout << "\nCurrent example: " << current_example << "\n";//check
+					std::cout << "\nCurrent example: " << current_example << "\n";
+
+					if (is_stoc())
+					{
+						std::cout << "\nStochastic\n";
+					}
+
+					else
+					{
+						std::cout << "\nDeterministic\n";
+					}
 			}
 
 			//Zoom in
