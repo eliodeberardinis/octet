@@ -9,7 +9,7 @@ namespace octet {
 		dynarray<char> rule_type_stoc;
 		
 		//Store data read from text file in the relevant arrays 
-		void read_data(dynarray<uint8_t> file_) {
+		void read_data(dynarray<uint8_t> file_content) {
 
 			variables.reset();
 			constants.reset();
@@ -18,7 +18,7 @@ namespace octet {
 			
 
 			dynarray<uint8_t> _data;
-			for each(uint8_t c in file_) {
+			for each(uint8_t c in file_content) {
 				if (c != ' ' && c != '\n' && c != '\r') {
 					_data.push_back(c);
 				}
