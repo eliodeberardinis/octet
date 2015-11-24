@@ -213,9 +213,6 @@ namespace octet {
 						break;
 					}
 
-					//Saving the rule type in an array (for use in devolve_stoc function)
-					//rule_type_stoc.push_back(rule_type);
-
 					for (unsigned int j = 0; j < rules[rule_type].size(); ++j)
 					{
 
