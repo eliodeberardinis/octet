@@ -275,6 +275,5 @@ namespace octet {
 		dynarray<char> get_axiom() {
 			return axiom;
 		}
-
 	};
 }
