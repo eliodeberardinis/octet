@@ -306,22 +306,33 @@ namespace octet {
 				}
 
 				//Example 9 gets redrawn from scratch
-				else if (current_iteration <= 1 || current_example==9){
-						t.read_text_file(current_example);
+				else if (current_example==9 && current_iteration > 1){
+					t.read_text_file(current_example);
+
+					for (unsigned int i = 1; i <= current_iteration - 1; ++i){
+
+						t.devolve_stoc_type_2(i);
+
 						draw_again();
 
-						if (current_example != 9){
-							current_iteration--;
-						}
-						else { current_iteration = 0; }
-
+					}
+					    current_iteration--;
 						std::cout << "Current iteration: " << current_iteration << "\n";
 					   }
 
-				//If the system is stochastic this deletes the last element in the array containing the information on the rule to use
-				if (is_stoc()){
+				else if (current_iteration <= 1){
+					t.reset_stoc();
+					t.read_text_file(current_example);
+					draw_again();
+					current_iteration--;
+					std::cout << "Current iteration: " << current_iteration << "\n";
+					
+				}
 
-					t.decrese_stoc_array();
+				//If the system is stochastic this deletes the last element in the array containing the information on the rule to use
+				if (current_example==9 && current_iteration >= 1){
+
+					t.decrese_stoc_array(current_iteration);
 				}	
 			}
 
@@ -485,6 +496,7 @@ namespace octet {
 			if (is_key_going_down(key_f3) && current_example!=7 && current_iteration < MAX_iteration) {
 
 				t.read_text_file(current_example);
+
 				if (season == 4)
 				{
 					season = 1;
@@ -766,11 +778,17 @@ namespace octet {
 			}
 		}
 			//Example 9 gets redrawn from scratch each time a parameter is changed
-			else{
-				draw_again();
-				current_iteration = 0; 
+			else {
+				
+					for (unsigned int i = 1; i <= current_iteration; ++i){
 
-				std::cout << "\nCurrent iteration: " << current_iteration << "\n";
+						t.devolve_stoc_type_2(i);
+
+						draw_again();
+
+					}
+					
+				
 			}
 		}
 

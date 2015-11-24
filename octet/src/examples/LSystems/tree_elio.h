@@ -7,6 +7,7 @@ namespace octet {
 		dynarray<char> axiom;
 		hash_map<char, dynarray<char>> rules;
 		dynarray<char> rule_type_stoc;
+		dynarray<char> rule_type_stoc2;
 		
 		//Store data read from text file in the relevant arrays 
 		void read_data(dynarray<uint8_t> file_) {
@@ -179,6 +180,11 @@ namespace octet {
 			}
 		}
 
+		unsigned int variables_in_axiom = 0;
+		unsigned int variables_in_axiom_sum = 0;
+		dynarray<unsigned int> last_numb_var_in_axiom;
+		dynarray<unsigned int> sum_of_variable_in_axiom;
+
 		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems) - A different Random Rule for each character in each iteration
 		void evolve_stoc_type_2() {
 
@@ -214,7 +220,10 @@ namespace octet {
 					}
 
 					//Saving the rule type in an array (for use in devolve_stoc function)
-					//rule_type_stoc.push_back(rule_type);
+					rule_type_stoc2.push_back(rule_type);
+					variables_in_axiom++;
+					variables_in_axiom_sum++;
+					
 
 					for (unsigned int j = 0; j < rules[rule_type].size(); ++j)
 					{
@@ -227,10 +236,15 @@ namespace octet {
 				}
 			}
 
+			last_numb_var_in_axiom.push_back(variables_in_axiom);
+			sum_of_variable_in_axiom.push_back(variables_in_axiom_sum);
+
 			axiom.resize(new_axiom.size());
 			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
 				axiom[i] = new_axiom[i];
 			}
+
+			variables_in_axiom = 0;
 		}
 
 		//Re-draws the stochastic system using the rule_type array saved in evolve_stoc()
@@ -258,17 +272,61 @@ namespace octet {
 
 		}
 
+		
+
+		//Re-draws the stochastic system using the rule_type array saved in evolve_stoc()
+		void devolve_stoc_type_2(unsigned int iteration) {
+			int m;
+
+			if (iteration > 1){
+				m = sum_of_variable_in_axiom[iteration - 1];
+			}
+			else if(iteration==1){ m = 0; }
+
+			char rule_type;
+
+			rule_type = rule_type_stoc2[m];
+
+			dynarray<char> new_axiom;
+			for (unsigned int i = 0; i < axiom.size(); ++i) {
+				if (is_char_in_array(axiom[i], variables)) {
+					for (unsigned int j = 0; j < rules[rule_type].size(); ++j) {
+						new_axiom.push_back(rules[rule_type][j]);
+					}
+					m++;
+				}
+				else {
+					new_axiom.push_back(axiom[i]);
+				}
+			}
+
+			axiom.resize(new_axiom.size());
+			for (unsigned int i = 0; i < new_axiom.size(); ++i) {
+				axiom[i] = new_axiom[i];
+			}
+
+		}
+
 		//Clears the arrays containing the rule_type
 		void reset_stoc(){
 
 			rule_type_stoc.reset();
+			rule_type_stoc2.reset();
+			variables_in_axiom = 0;
+			variables_in_axiom_sum = 0;
+			last_numb_var_in_axiom.reset();
+			sum_of_variable_in_axiom.reset();
 
 		}
 
 		//Deletes the last element of the arrays containing the rule_type and rezises them
-		void decrese_stoc_array() {
+		void decrese_stoc_array(unsigned int iteration) {
 
-			rule_type_stoc.resize(rule_type_stoc.size() - 1);
+			//rule_type_stoc.resize(rule_type_stoc.size() - 1);
+			rule_type_stoc2.resize(rule_type_stoc2.size() - last_numb_var_in_axiom[iteration-1]);
+			variables_in_axiom_sum -= last_numb_var_in_axiom[iteration - 1];
+			last_numb_var_in_axiom.resize(last_numb_var_in_axiom.size() - 1);
+			
 		}
 
 		//Access to the axiom containing the rules
