@@ -182,15 +182,15 @@ namespace octet {
 		//Used to expand the rule that will be read by create_geometry at each iteration (Stochastic L-Systems) - A different Random Rule for each character in each iteration
 		void evolve_stoc_type_2() {
 
+			//Seeding the random function
+			srand(static_cast<unsigned int>(time(NULL)));
+
 			dynarray<char> new_axiom;
 			for (unsigned int i = 0; i < axiom.size(); ++i) {
 
 				if (is_char_in_array(axiom[i], variables)) {
 
 					char rule_type;
-
-					//Seeding the random function
-					srand(static_cast<unsigned int>(time(NULL)));
 
 					//Generating the random variable to choose wich rule tu use with equal probability
 					float random = (float)((rand() % 10)*0.1) * 3;
