@@ -143,7 +143,7 @@ namespace octet {
 			std::cout << "- delete: Rotate the model\n";
 			std::cout << "- Shift/Ctrl: Zoom in/Zoom out\n\n";
 			std::cout << "- Arrow keys: Move camera";
-			std::cout << "Current example: "<<current_example<<"\n";
+			std::cout << "\nCurrent example: "<<current_example<<"\n";
 			std::cout << "Season: Summer\n";
 
 			if (is_stoc())
