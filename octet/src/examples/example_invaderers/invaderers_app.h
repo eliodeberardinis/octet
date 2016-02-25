@@ -1170,7 +1170,7 @@ namespace octet {
 		   sprite &border = map_sprites_bush[i]; 
 		   if (mushroom_collide(border)) {
 			  mushroom_velocity = -mushroom_velocity;
-			  move_invaders(mushroom_velocity, 0);
+			  move_mushroom(mushroom_velocity, 0);
 		   }
 	    }
 
