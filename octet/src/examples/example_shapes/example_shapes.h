@@ -84,8 +84,13 @@ namespace octet {
       // ground
       mat.loadIdentity();
       mat.translate(0, -1, 0);
-      app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
-    }
+
+	  //Following Mircea's methods (Alternative way to obtain the Rigidbody property from the object)
+	  btRigidBody *rb1 = NULL;
+	  mesh_instance *ground = app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
+	  rb1 = ground->get_node()->get_rigid_body();
+    
+	}
 
 
 
