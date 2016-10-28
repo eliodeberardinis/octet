@@ -46,8 +46,9 @@ namespace octet {
 	  btRigidBody* firstBox = NULL;
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
 	  
+	  //Adding Hinge Constraints
 
-	 /* btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
+	/*  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
 	  hinge->setLimit(0, 180);
 	  world->addConstraint(hinge);*/
 	  
