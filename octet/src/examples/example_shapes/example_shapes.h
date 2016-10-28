@@ -4,9 +4,15 @@
 //
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
+
+
+#include "BridgePlank.h"
+
 namespace octet {
   /// Scene containing a box with octet.
+
   class example_shapes : public app {
+
     // scene for drawing box
     ref<visual_scene> app_scene;
 	btDiscreteDynamicsWorld* world; 
@@ -18,10 +24,9 @@ namespace octet {
     ~example_shapes() {
     }
 
-	//btRigidBody* firstBox = NULL;//declaring the first box globally
-
     /// this is called once OpenGL is initialized
     void app_init() {
+
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
