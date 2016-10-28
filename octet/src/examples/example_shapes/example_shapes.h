@@ -24,6 +24,9 @@ namespace octet {
     ~example_shapes() {
     }
 
+	btRigidBody* firstSphere = NULL;
+	btRigidBody* firstBox = NULL;
+
     /// this is called once OpenGL is initialized
     void app_init() {
 
@@ -38,45 +41,17 @@ namespace octet {
 
       mat4t mat;
       mat.translate(0, 20, 0);
-	  btRigidBody* firstSphere = NULL;
+	  //firstsphere declared globally
 	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
 
       mat.loadIdentity();
 	  mat.translate(2, 5, 0);
-	  btRigidBody* firstBox = NULL;
+	 //firstBox declared globally
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
 	  
-	  //Adding Hinge Constraints
-
-	/*  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
-	  hinge->setLimit(0, 180);
-	  world->addConstraint(hinge);*/
+	  //CreateHingeConstrain();
 	  
-	  //add spring contraint
-
-	  btTransform frameInA, frameInB;
-	  frameInA = btTransform::getIdentity();
-	  frameInA.setOrigin(btVector3(btScalar(10.), btScalar(0.), btScalar(0.)));
-	  frameInB = btTransform::getIdentity();
-	  frameInB.setOrigin(btVector3(btScalar(0.), btScalar(0.), btScalar(0.)));
-
-	  btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*firstBox, *firstSphere, frameInA, frameInB, true);
-	  pGen6DOFSpring->setLinearUpperLimit(btVector3(5., 0., 0.));
-	  pGen6DOFSpring->setLinearLowerLimit(btVector3(-5., 0., 0.));
-
-	  pGen6DOFSpring->setAngularLowerLimit(btVector3(0.f, 0.f, -1.5f));
-	  pGen6DOFSpring->setAngularUpperLimit(btVector3(0.f, 0.f, 1.5f));
-
-	  world->addConstraint(pGen6DOFSpring, true);
-	  pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
-
-	  pGen6DOFSpring->enableSpring(0, true);
-	  pGen6DOFSpring->setStiffness(0, 39.478f);
-	  pGen6DOFSpring->setDamping(0, 0.5f);
-	  pGen6DOFSpring->enableSpring(5, true);
-	  pGen6DOFSpring->setStiffness(5, 39.478f);
-	  pGen6DOFSpring->setDamping(0, 0.3f);
-	  pGen6DOFSpring->setEquilibriumPoint();
+	  CreateSpringConstrain();
 
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
@@ -86,15 +61,50 @@ namespace octet {
       mat.loadIdentity();
       mat.translate(0, -1, 0);
 
-	  //Following Mircea's methods (Alternative way to obtain the Rigidbody property from the object)
+	  //Following Mircea's methods (Alternative way to obtain the Rigidbody property from the object) (not needed for this)
 	  btRigidBody *rb1 = NULL;
 	  mesh_instance *ground = app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
 	  rb1 = ground->get_node()->get_rigid_body();
     
 	}
 
+	void CreateHingeConstrain()
+	{
+		//Adding Hinge Constraints
 
+		btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
+		hinge->setLimit(0, 180);
+		world->addConstraint(hinge);
+	}
 
+	void CreateSpringConstrain()
+	{
+		//add spring contraint
+
+		btTransform frameInA, frameInB;
+		frameInA = btTransform::getIdentity();
+		frameInA.setOrigin(btVector3(btScalar(10.), btScalar(0.), btScalar(0.)));
+		frameInB = btTransform::getIdentity();
+		frameInB.setOrigin(btVector3(btScalar(0.), btScalar(0.), btScalar(0.)));
+
+		btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*firstBox, *firstSphere, frameInA, frameInB, true);
+		pGen6DOFSpring->setLinearUpperLimit(btVector3(5., 0., 0.));
+		pGen6DOFSpring->setLinearLowerLimit(btVector3(-5., 0., 0.));
+
+		pGen6DOFSpring->setAngularLowerLimit(btVector3(0.f, 0.f, -1.5f));
+		pGen6DOFSpring->setAngularUpperLimit(btVector3(0.f, 0.f, 1.5f));
+
+		world->addConstraint(pGen6DOFSpring, true);
+		pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
+
+		pGen6DOFSpring->enableSpring(0, true);
+		pGen6DOFSpring->setStiffness(0, 39.478f);
+		pGen6DOFSpring->setDamping(0, 0.5f);
+		pGen6DOFSpring->enableSpring(5, true);
+		pGen6DOFSpring->setStiffness(5, 39.478f);
+		pGen6DOFSpring->setDamping(0, 0.3f);
+		pGen6DOFSpring->setEquilibriumPoint();
+	}
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
