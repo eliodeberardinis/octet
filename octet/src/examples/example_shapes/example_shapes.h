@@ -18,7 +18,7 @@ namespace octet {
     ~example_shapes() {
     }
 
-	btRigidBody* firstBox = NULL;//declaring the first box globally
+	//btRigidBody* firstBox = NULL;//declaring the first box globally
 
     /// this is called once OpenGL is initialized
     void app_init() {
@@ -38,11 +38,11 @@ namespace octet {
 
       mat.loadIdentity();
 	  mat.translate(2, 5, 0);
-	  /*btRigidBody* firstBox = NULL;*/
+	  btRigidBody* firstBox = NULL;
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
 	  
 
-	/*  btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
+	 /* btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
 	  hinge->setLimit(0, 180);
 	  world->addConstraint(hinge);*/
 	  
@@ -81,6 +81,9 @@ namespace octet {
       mat.translate(0, -1, 0);
       app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
     }
+
+
+
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
