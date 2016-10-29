@@ -17,6 +17,10 @@ namespace octet {
     ref<visual_scene> app_scene;
 	btDiscreteDynamicsWorld* world; 
 
+	const float PI = 3.14159;
+
+	//btDiscreteDynamicsWorld *dynamics_world;
+
   public:
     example_shapes(int argc, char **argv) : app(argc, argv) {
     }
@@ -52,6 +56,8 @@ namespace octet {
 	  //CreateHingeConstrain();
 	  
 	  CreateSpringConstrain();
+
+	  create_bridge();//Change this function
 
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
@@ -105,6 +111,68 @@ namespace octet {
 		pGen6DOFSpring->setDamping(0, 0.3f);
 		pGen6DOFSpring->setEquilibriumPoint();
 	}
+
+
+	//From Mircea. Change it
+	void create_bridge() {
+		mat4t mtw;
+		mtw.loadIdentity();
+		mtw.translate(vec3(0, 0.5f, 0));
+		mesh_instance *b1 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
+
+		mtw.loadIdentity();
+		mtw.translate(vec3(1.6f, 1.25f, 0.0f));
+		mesh_instance *p1 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.25f, 1)), new material(vec4(0, 1, 0, 1)), true);
+
+		mtw.loadIdentity();
+		mtw.translate(vec3(2.7f, 1.25f, 0.0f));
+		mesh_instance *p2 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.25f, 1)), new material(vec4(0, 1, 1, 1)), true);
+
+		mtw.loadIdentity();
+		mtw.translate(vec3(3.8f, 1.25f, 0.0f));
+		mesh_instance *p3 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.25f, 1)), new material(vec4(0, 1, 0, 1)), true);
+
+		mtw.loadIdentity();
+		mtw.translate(vec3(4.9f, 1.25f, 0.0f));
+		mesh_instance *p4 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.25f, 1)), new material(vec4(0, 1, 1, 1)), true);
+
+		mtw.loadIdentity();
+		mtw.translate(vec3(6.5f, 0.5f, 0.0f));
+		mesh_instance *b2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
+
+		// hinges
+
+		btHingeConstraint *c1 = new btHingeConstraint(*(b1->get_node()->get_rigid_body()), *(p1->get_node()->get_rigid_body()),
+			btVector3(0.5f, 0.5f, 0.0f), btVector3(-0.5f, 0.25f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+		c1->setLimit(-PI * 0.1f, PI* 0.1f);
+		world->addConstraint(c1);
+
+		btHingeConstraint *c2 = new btHingeConstraint(*(p1->get_node()->get_rigid_body()), *(p2->get_node()->get_rigid_body()),
+			btVector3(0.5f, 0.25f, 0.0f), btVector3(-0.5f, 0.25f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+		c2->setLimit(-PI * 0.1f, PI* 0.1f);
+		world->addConstraint(c2);
+
+		btHingeConstraint *c3 = new btHingeConstraint(*(p2->get_node()->get_rigid_body()), *(p3->get_node()->get_rigid_body()),
+			btVector3(0.5f, 0.25f, 0.0f), btVector3(-0.5f, 0.25f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+		c3->setLimit(-PI * 0.1f, PI* 0.1f);
+		world->addConstraint(c3);
+
+		btHingeConstraint *c4 = new btHingeConstraint(*(p3->get_node()->get_rigid_body()), *(p4->get_node()->get_rigid_body()),
+			btVector3(0.5f, 0.25f, 0.0f), btVector3(-0.5f, 0.25f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+		c4->setLimit(-PI * 0.1f, PI* 0.1f);
+		world->addConstraint(c4);
+
+		btHingeConstraint *c5 = new btHingeConstraint(*(p4->get_node()->get_rigid_body()), *(b2->get_node()->get_rigid_body()),
+			btVector3(0.5f, 0.25f, 0.0f), btVector3(-0.5f, 0.5f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+		c5->setLimit(-PI * 0.1f, PI* 0.1f);
+		world->addConstraint(c5);
+	}
+
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
