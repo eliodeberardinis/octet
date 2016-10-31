@@ -19,6 +19,13 @@ namespace octet {
 
 	const float PI = 3.14159;
 
+	//camera & View and Move instances
+	mouse_look mouse_look_instance;
+	ref<camera_instance> main_camera;
+
+	helper_fps_controller fps_instance;
+	ref<scene_node> player_instance;
+
 	//btDiscreteDynamicsWorld *dynamics_world;
 
   public:
@@ -31,13 +38,21 @@ namespace octet {
 	btRigidBody* firstSphere = NULL;
 	btRigidBody* firstBox = NULL;
 
+
     /// this is called once OpenGL is initialized
     void app_init() {
 
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
-      app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
+      //app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 	  world = app_scene->getWorld();
+
+	  mouse_look_instance.init(this, 200.0f / 360, false);
+	  fps_instance.init(this);
+
+	  main_camera = app_scene->get_camera_instance(0);
+	  main_camera->get_node()->translate(vec3(0, 4, 0));
+	  main_camera->set_far_plane(10000);
 
       material *red = new material(vec4(1, 0, 0, 1));
       material *green = new material(vec4(0, 1, 0, 1));
@@ -183,11 +198,17 @@ namespace octet {
       // update matrices. assume 30 fps.
       app_scene->update(1.0f/30);
 
+	  //update camera
+	  scene_node *camera_node = main_camera->get_node();
+	  mat4t &camera_to_world = camera_node->access_nodeToParent();
+	  
+	  mouse_look_instance.update(camera_to_world);
+	  fps_instance.update(player_instance, camera_node);
+
       // draw the scene
       app_scene->render((float)vx / vy);
 
-	  /*firstBox->setLinearVelocity(btVector3(0, 0, 0));
-	*/
+	
     }
   };
 }
