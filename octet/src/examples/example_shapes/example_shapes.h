@@ -51,12 +51,12 @@ namespace octet {
       //app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 	  world = app_scene->getWorld();
 
-	  //if (this != nullptr) 
-	  //{
-		 // mouse_look_instance.init(this, 200.0f / 360, false);
-		 // fps_instance.init(this);
-		 // printf("Entered Here\n");
-	  //}
+	  if (this != nullptr) 
+	  {
+		  mouse_look_instance.init(this, 200.0f / 360, false);
+		  //fps_instance.init(this);
+		  printf("Entered Here\n");
+	  }
 
 	  main_camera = app_scene->get_camera_instance(0);
 	  main_camera->get_node()->translate(vec3(0, 4, 0));
@@ -286,14 +286,14 @@ namespace octet {
 	  scene_node *camera_node = main_camera->get_node();
 	  mat4t &camera_to_world = camera_node->access_nodeToParent();
 	  
-	  //if (this != nullptr)
-	  //{
-		 // 
-		 // mouse_look_instance.update(camera_to_world);
-		 // fps_instance.update(player_node, camera_node);
+	  if (this != nullptr)
+	  {
+		  
+		  mouse_look_instance.update(camera_to_world);
+		  //fps_instance.update(player_node, camera_node);
 
 		 // printf("Entered Draw World no Null\n");
-	  //}
+	  }
 
 	  // update matrices. assume 30 fps.
 	  app_scene->update(1.0f / 30);
