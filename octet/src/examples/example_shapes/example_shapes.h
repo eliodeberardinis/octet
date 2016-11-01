@@ -26,6 +26,10 @@ namespace octet {
 	helper_fps_controller fps_instance;
 	ref<scene_node> player_node;
 
+	float zoom_increment = 0.0f;
+	float x_increment = 0.0f;
+	float y_increment = 0.0f;
+
 	//btDiscreteDynamicsWorld *dynamics_world;
 
   public:
@@ -47,12 +51,12 @@ namespace octet {
       //app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 	  world = app_scene->getWorld();
 
-	  if (this != nullptr) 
-	  {
-		  mouse_look_instance.init(this, 200.0f / 360, false);
-		  fps_instance.init(this);
-		  printf("Entered Here\n");
-	  }
+	  //if (this != nullptr) 
+	  //{
+		 // mouse_look_instance.init(this, 200.0f / 360, false);
+		 // fps_instance.init(this);
+		 // printf("Entered Here\n");
+	  //}
 
 	  main_camera = app_scene->get_camera_instance(0);
 	  main_camera->get_node()->translate(vec3(0, 4, 0));
@@ -64,6 +68,7 @@ namespace octet {
 
 	  mat4t mat;
 
+	  //Creating the player object as a red sphere
 	  mat.loadIdentity();
 	  mat.translate(0.0f, player_height*6.0f, 50.0f);
 
@@ -76,6 +81,8 @@ namespace octet {
 	  );
 	  player_node = mi2->get_node();
 	  //player_index = player_node->get_rigid_body()->getUserIndex();
+	  //Finished creating a player
+
 
       material *red = new material(vec4(1, 0, 0, 1));
       material *green = new material(vec4(0, 1, 0, 1));
@@ -110,6 +117,54 @@ namespace octet {
 	  mesh_instance *ground = app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), green, false);
 	  rb1 = ground->get_node()->get_rigid_body();
     
+	}
+
+	void HandleInput() 
+	
+	{
+	
+		//Zoom in
+		if (is_key_down(key_shift))
+		{
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
+			zoom_increment -= 1.50f;
+		}
+
+		//Zoom out
+		if (is_key_down(key_ctrl))
+		{
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
+			zoom_increment += 1.50f;
+		}
+
+		//Move camera left
+		if (is_key_down(key_left))
+		{
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(-0.5f, 0, 0.0f));
+			x_increment -= 0.5f;
+		}
+
+		//Move camera right
+		if (is_key_down(key_right))
+		{
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.5f, 0, 0.0f));
+			x_increment += 0.5f;
+		}
+
+		//Move camera up
+		if (is_key_down(key_up))
+		{
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.5f, 0.0f));
+			y_increment += 0.5f;
+		}
+
+		//Move camera down
+		if (is_key_down(key_down))
+		{
+			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
+			y_increment -= 0.5f;
+		}
+
 	}
 
 	void CreateHingeConstrain()
@@ -217,20 +272,22 @@ namespace octet {
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
+	 
+	  HandleInput();
       app_scene->begin_render(vx, vy);
 
 	  //update camera
 	  scene_node *camera_node = main_camera->get_node();
 	  mat4t &camera_to_world = camera_node->access_nodeToParent();
 	  
-	  if (this != nullptr)
-	  {
-		  
-		  mouse_look_instance.update(camera_to_world);
-		  fps_instance.update(player_node, camera_node);
+	  //if (this != nullptr)
+	  //{
+		 // 
+		 // mouse_look_instance.update(camera_to_world);
+		 // fps_instance.update(player_node, camera_node);
 
-		  printf("Entered Draw World no Null\n");
-	  }
+		 // printf("Entered Draw World no Null\n");
+	  //}
 
 	  // update matrices. assume 30 fps.
 	  app_scene->update(1.0f / 30);
