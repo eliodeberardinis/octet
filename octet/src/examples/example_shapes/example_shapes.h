@@ -24,7 +24,7 @@ namespace octet {
 	ref<camera_instance> main_camera;
 
 	helper_fps_controller fps_instance;
-	ref<scene_node> player_instance;
+	ref<scene_node> player_node;
 
 	//btDiscreteDynamicsWorld *dynamics_world;
 
@@ -47,18 +47,41 @@ namespace octet {
       //app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 	  world = app_scene->getWorld();
 
-	  mouse_look_instance.init(this, 200.0f / 360, false);
-	  fps_instance.init(this);
+	  if (this != nullptr) 
+	  {
+		  mouse_look_instance.init(this, 200.0f / 360, false);
+		  fps_instance.init(this);
+		  printf("Entered Here\n");
+	  }
 
 	  main_camera = app_scene->get_camera_instance(0);
 	  main_camera->get_node()->translate(vec3(0, 4, 0));
 	  main_camera->set_far_plane(10000);
 
+	  float player_height = 1.8f;
+	  float player_radius = 0.25f;
+	  float player_mass = 90.0f;
+
+	  mat4t mat;
+
+	  mat.loadIdentity();
+	  mat.translate(0.0f, player_height*6.0f, 50.0f);
+
+	  mesh_instance *mi2 = app_scene->add_shape(
+		  mat,
+		  new mesh_sphere(vec3(0), player_radius),
+		  new material(vec4(1, 0, 0, 1)),
+		  true, player_mass,
+		  new btCapsuleShape(0.25f, player_height)
+	  );
+	  player_node = mi2->get_node();
+	  //player_index = player_node->get_rigid_body()->getUserIndex();
+
       material *red = new material(vec4(1, 0, 0, 1));
       material *green = new material(vec4(0, 1, 0, 1));
       material *blue = new material(vec4(0, 0, 1, 1));
 
-      mat4t mat;
+	  mat.loadIdentity();
       mat.translate(0, 20, 0);
 	  //firstsphere declared globally
 	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
@@ -191,19 +214,26 @@ namespace octet {
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
+
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
-
-      // update matrices. assume 30 fps.
-      app_scene->update(1.0f/30);
 
 	  //update camera
 	  scene_node *camera_node = main_camera->get_node();
 	  mat4t &camera_to_world = camera_node->access_nodeToParent();
 	  
-	  mouse_look_instance.update(camera_to_world);
-	  fps_instance.update(player_instance, camera_node);
+	  if (this != nullptr)
+	  {
+		  
+		  mouse_look_instance.update(camera_to_world);
+		  fps_instance.update(player_node, camera_node);
+
+		  printf("Entered Draw World no Null\n");
+	  }
+
+	  // update matrices. assume 30 fps.
+	  app_scene->update(1.0f / 30);
 
       // draw the scene
       app_scene->render((float)vx / vy);
