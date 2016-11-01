@@ -127,6 +127,7 @@ namespace octet {
 		if (is_key_down(key_shift))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
+			//player_node->translate(vec3(0, 0, -1.50f)); //Trying to move the player (not working)
 			zoom_increment -= 1.50f;
 		}
 
@@ -134,6 +135,7 @@ namespace octet {
 		if (is_key_down(key_ctrl))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
+			//player_node->translate(vec3(0, 0, 1.50f));
 			zoom_increment += 1.50f;
 		}
 
@@ -141,6 +143,7 @@ namespace octet {
 		if (is_key_down(key_left))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(-0.5f, 0, 0.0f));
+			//player_node->translate(vec3(-0.5f, 0, 0.0f));
 			x_increment -= 0.5f;
 		}
 
@@ -148,6 +151,7 @@ namespace octet {
 		if (is_key_down(key_right))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.5f, 0, 0.0f));
+			//player_node->translate(vec3(0.5f, 0, 0.0f));
 			x_increment += 0.5f;
 		}
 
@@ -155,6 +159,7 @@ namespace octet {
 		if (is_key_down(key_up))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.5f, 0.0f));
+			//player_node->translate(vec3(0.0f, 0.5f, 0.0f));
 			y_increment += 0.5f;
 		}
 
@@ -162,6 +167,7 @@ namespace octet {
 		if (is_key_down(key_down))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
+			//player_node->translate(vec3(0.0f, -0.5f, 0.0f));
 			y_increment -= 0.5f;
 		}
 
