@@ -7,6 +7,7 @@
 
 
 #include "BridgePlank.h"
+#include <string>
 
 namespace octet {
   /// Scene containing a box with octet.
@@ -215,12 +216,19 @@ namespace octet {
 
 	//From Mircea. Change it
 	void create_bridge() {
+
+		float plankDistance = 0.0f;
+		mesh_instance *p1;
+		mesh_instance *p2;
+		mesh_instance *p3;
+		mesh_instance *p4;
+
 		mat4t mtw;
 		mtw.loadIdentity();
 		mtw.translate(vec3(0, 0.5f, 0));
 		mesh_instance *b1 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
 
-		mtw.loadIdentity();
+		/*mtw.loadIdentity();
 		mtw.translate(vec3(1.6f, 1.25f, 0.0f));
 		mesh_instance *p1 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true,  20.0f);
 
@@ -234,7 +242,31 @@ namespace octet {
 
 		mtw.loadIdentity();
 		mtw.translate(vec3(4.9f, 1.25f, 0.0f));
-		mesh_instance *p4 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
+		mesh_instance *p4 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);*/
+
+		for (int i = 0; i < 4; ++i)
+		{
+			mtw.loadIdentity();
+			mtw.translate(vec3(1.6f + plankDistance, 1.25f, 0.0f));
+			std::string CurrentPlank = "p" + std::to_string(i + 1);
+
+			switch (i)
+			{
+			case 0: 
+				p1 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
+				break;
+			case 1:
+				p2 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
+				break; 
+			case 2:
+				p3 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
+				break;
+			case 3:
+				p4 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
+				break;
+			}
+			plankDistance += 1.1f;
+		}
 
 		mtw.loadIdentity();
 		mtw.translate(vec3(6.5f, 0.5f, 0.0f));
