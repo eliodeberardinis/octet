@@ -223,6 +223,8 @@ namespace octet {
 		mesh_instance *p3;
 		mesh_instance *p4;
 
+		mesh_instance *PlankArray[4];
+
 		mat4t mtw;
 		mtw.loadIdentity();
 		mtw.translate(vec3(0, 0.5f, 0));
@@ -250,20 +252,14 @@ namespace octet {
 			mtw.translate(vec3(1.6f + plankDistance, 1.25f, 0.0f));
 			std::string CurrentPlank = "p" + std::to_string(i + 1);
 
-			switch (i)
+			if (i % 2 != 0)
 			{
-			case 0: 
-				p1 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
-				break;
-			case 1:
-				p2 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
-				break; 
-			case 2:
-				p3 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
-				break;
-			case 3:
-				p4 = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
-				break;
+				PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
+			}
+
+			else
+			{
+				PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
 			}
 			plankDistance += 1.1f;
 		}
@@ -273,32 +269,31 @@ namespace octet {
 		mesh_instance *b2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
 
 		// hinges
-
-		btHingeConstraint *c1 = new btHingeConstraint(*(b1->get_node()->get_rigid_body()), *(p1->get_node()->get_rigid_body()),
+		btHingeConstraint *c1 = new btHingeConstraint(*(b1->get_node()->get_rigid_body()), *(PlankArray[0]->get_node()->get_rigid_body()),
 			btVector3(1.0f, 0.5f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 		c1->setLimit(-PI * 0.1f, PI* 0.1f );
 		world->addConstraint(c1);
 
-		btHingeConstraint *c2 = new btHingeConstraint(*(p1->get_node()->get_rigid_body()), *(p2->get_node()->get_rigid_body()),
+		btHingeConstraint *c2 = new btHingeConstraint(*(PlankArray[0]->get_node()->get_rigid_body()), *(PlankArray[1]->get_node()->get_rigid_body()),
 			btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 		c2->setLimit(-PI * 0.1f,  PI* 0.1f );
 		world->addConstraint(c2);
 
-		btHingeConstraint *c3 = new btHingeConstraint(*(p2->get_node()->get_rigid_body()), *(p3->get_node()->get_rigid_body()),
+		btHingeConstraint *c3 = new btHingeConstraint(*(PlankArray[1]->get_node()->get_rigid_body()), *(PlankArray[2]->get_node()->get_rigid_body()),
 			btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 		c3->setLimit(-PI * 0.1f,  PI* 0.1f );
 		world->addConstraint(c3);
 
-		btHingeConstraint *c4 = new btHingeConstraint(*(p3->get_node()->get_rigid_body()), *(p4->get_node()->get_rigid_body()),
+		btHingeConstraint *c4 = new btHingeConstraint(*(PlankArray[2]->get_node()->get_rigid_body()), *(PlankArray[3]->get_node()->get_rigid_body()),
 			btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 		c4->setLimit(-PI * 0.1f,  PI* 0.1f);
 		world->addConstraint(c4);
 
-		btHingeConstraint *c5 = new btHingeConstraint(*(p4->get_node()->get_rigid_body()), *(b2->get_node()->get_rigid_body()),
+		btHingeConstraint *c5 = new btHingeConstraint(*(PlankArray[3]->get_node()->get_rigid_body()), *(b2->get_node()->get_rigid_body()),
 			btVector3(0.5f, 0.125f, 0.0f), btVector3(-1.0f, 0.5f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 		c5->setLimit(-PI * 0.1f,  PI* 0.1f);
