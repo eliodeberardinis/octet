@@ -219,11 +219,11 @@ namespace octet {
 		float plankDistance = 0.0f;
 		int numPlanks = 7;
 
-		dynarray<mesh_instance> PlankDynamicArray;
-		dynarray<btHingeConstraint> PlankHingesDynamicArray;
+		dynarray<mesh_instance> PlankDynamicArray; //Not Used
+		dynarray<btHingeConstraint> PlankHingesDynamicArray; //Not Used
 
 		mesh_instance *PlankArray[20];
-		btHingeConstraint *PlankHinges[19];
+		btHingeConstraint *PlankHinges[20];
 
 		mat4t mtw;
 		mtw.loadIdentity();
