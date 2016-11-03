@@ -5,7 +5,6 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 
-
 #include "BridgePlank.h"
 #include <string>
 
@@ -65,7 +64,7 @@ namespace octet {
 
 	  float player_height = 1.8f;
 	  float player_radius = 0.25f;
-	  float player_mass = 90.0f;
+	  float player_mass   = 90.0f;
 
 	  mat4t mat;
 
