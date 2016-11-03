@@ -213,7 +213,7 @@ namespace octet {
 	}
 
 
-	//From Mircea. Change it
+	
 	void create_bridge() {
 
 		float plankDistance = 0.0f;
@@ -234,7 +234,6 @@ namespace octet {
 		{
 			mtw.loadIdentity();
 			mtw.translate(vec3(1.6f + plankDistance, 1.25f, 0.0f));
-			std::string CurrentPlank = "p" + std::to_string(i + 1);
 
 			if (i % 2 != 0)
 			{
