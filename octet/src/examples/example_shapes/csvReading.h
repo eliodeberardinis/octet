@@ -6,7 +6,7 @@ namespace octet {
 	class ReadCsv {
 		//test implementation to read csv into variable
 
-		//store data from text file in variables. At the end I should have a version of {'D', 'p', 'p', 'D'} etc
+		//store data from text file in variables. At the end I should have a version of {'B', 'p', 'p', 'B'} etc
 
 	public:
 		dynarray<char> variables;

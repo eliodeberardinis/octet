@@ -241,20 +241,20 @@ namespace octet {
 				mat4t mtw;
 				mtw.loadIdentity();
 
-				if (Read_csv.variables[i] == 'D')
+				if (Read_csv.variables[i] == 'B')
 				{
 
 					mtw.translate(vec3(plankDistance, 0.5f, 0));
 					PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
 					plankDistance += 0.5f;
 
-					if (Read_csv.variables[i + 1] == 'D')
+					if (Read_csv.variables[i + 1] == 'B')
 					{
 						plankDistance += 0.5f;
 					}
 				}
 
-				else if (Read_csv.variables[i] == 's')
+				else if (Read_csv.variables[i] == 'p')
 				{
 					mtw.translate(vec3(plankDistance, 1.25f, 0));
 
@@ -268,7 +268,7 @@ namespace octet {
 						PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
 					}
 
-					if (Read_csv.variables[i + 1] == 'D')
+					if (Read_csv.variables[i + 1] == 'B')
 					{
 						plankDistance += 0.5f;
 					}
@@ -280,22 +280,22 @@ namespace octet {
 			// create hinges
 			for (int i = 0; i < Read_csv.variables.size() - 1; ++i)
 			{
-				if (Read_csv.variables[i] == 'D' && Read_csv.variables[i + 1] == 's')
+				if (Read_csv.variables[i] == 'B' && Read_csv.variables[i + 1] == 'p')
 				{
 					HingeType = 1;
 				}
 
-				else if (Read_csv.variables[i] == 's' && Read_csv.variables[i + 1] == 's')
+				else if (Read_csv.variables[i] == 'p' && Read_csv.variables[i + 1] == 'p')
 				{
 					HingeType = 2;
 				}
 
-				else if (Read_csv.variables[i] == 's' && Read_csv.variables[i + 1] == 'D')
+				else if (Read_csv.variables[i] == 'p' && Read_csv.variables[i + 1] == 'B')
 				{
 					HingeType = 3;
 				}
 
-				else if (Read_csv.variables[i] == 'D' && Read_csv.variables[i + 1] == 'D')
+				else if (Read_csv.variables[i] == 'B' && Read_csv.variables[i + 1] == 'B')
 				{
 					HingeType = 4;
 				}

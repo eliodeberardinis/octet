@@ -1,1 +1,1 @@
-D,s,s,s,s,s,s,s,D,s,s,s,D,s,s,D,D,D,s,s,D;
+B,p,p,p,p,p,p,p,B,p,p,p,B,p,p,B,B,B,p,p,B;
