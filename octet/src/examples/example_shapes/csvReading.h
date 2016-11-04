@@ -41,7 +41,7 @@ namespace octet {
 
 		void read_file() {
 			dynarray<uint8_t> file_content;
-			std::string file_name = "assets/bridges.txt";
+			std::string file_name = "assets/bridge.txt";
 			app_utils::get_url(file_content, file_name.c_str());
 
 			read_csv_data(file_content);

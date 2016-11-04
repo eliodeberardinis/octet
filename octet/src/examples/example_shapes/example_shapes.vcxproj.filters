@@ -429,6 +429,7 @@
     </ClInclude>
     <ClInclude Include="example_shapes.h" />
     <ClInclude Include="BridgePlank.h" />
+    <ClInclude Include="csvReading.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\resources\mesh_builder.inl">

@@ -31,6 +31,8 @@ namespace octet {
 	float x_increment = 0.0f;
 	float y_increment = 0.0f;
 
+	ReadCsv Read_csv;
+
 	//btDiscreteDynamicsWorld *dynamics_world;
 
   public:
@@ -66,6 +68,8 @@ namespace octet {
 	  float player_height = 1.8f;
 	  float player_radius = 0.25f;
 	  float player_mass   = 90.0f;
+
+	  Read_csv.read_file();
 
 	  mat4t mat;
 
@@ -226,11 +230,59 @@ namespace octet {
 		mesh_instance *PlankArray[20];
 		btHingeConstraint *PlankHinges[20];
 
+		float deck_x = 0.0f;
+		float plank_x = 0.0f;
+		float increment_deck = 0.0f;
+		float increment_plank = 0.0f;
+
+		//create and add meshes read from Csv file
+		for (int i = 0; i < Read_csv.variables.size(); i++) 
+		{
+			mat4t mtw;
+			mtw.loadIdentity();
+
+			if (Read_csv.variables[i] == 'D') 
+			{
+
+				mtw.translate(vec3(plankDistance, 0.5f, 0));
+				PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
+				plankDistance += 0.5f;
+			}
+
+			else if (Read_csv.variables[i] == 's')
+			{
+				mtw.translate(vec3(plankDistance, 1.25f, 0));
+
+				if (i % 2 != 0)
+				{
+					PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
+				}
+
+				else
+				{
+					PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
+				}
+			}
+
+			plankDistance += 1.1f;
+		}
+
+		// create hinges
+		for (int i = 0; i < rcsv.variables.size() - 1; i++) {
+			hinges[i] = new btHingeConstraint(*(slabs[i]->get_node()->get_rigid_body()), *(slabs[i + 1]->get_node()->get_rigid_body()),
+				btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
+				btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+			hinges[i]->setLimit(-PI * 0.1f, PI* 0.1f);
+			physicalWorld->addConstraint(hinges[i]);
+		}
+
+		//Base 1
 		mat4t mtw;
 		mtw.loadIdentity();
 		mtw.translate(vec3(0, 0.5f, 0));
 		mesh_instance *b1 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
 
+		//Planks
 		for (int i = 0; i < numPlanks; ++i)
 		{
 			mtw.loadIdentity();
@@ -239,29 +291,30 @@ namespace octet {
 			if (i % 2 != 0)
 			{
 				PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
-				//PlankDynamicArray.push_back(*app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f));
 			}
 
 			else
 			{
 				PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
-				//PlankDynamicArray.push_back(*app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f));
 			}
 
 			plankDistance += 1.1f;
 		}
 
+		//Base 2
 		mtw.loadIdentity();
 		mtw.translate(vec3(1.6f + plankDistance + 0.5f, 0.5f, 0.0f));
 		mesh_instance *b2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
 
-		// hinges
+		//hinges
+		//First hinge
 		btHingeConstraint *c1 = new btHingeConstraint(*(b1->get_node()->get_rigid_body()), *(PlankArray[0]->get_node()->get_rigid_body()),
 			btVector3(1.0f, 0.5f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 		c1->setLimit(-PI * 0.1f, PI* 0.1f );
 		world->addConstraint(c1);
 
+		//In Between hinges
 		for (int i = 0; i < numPlanks - 1; ++i)
 		{
 			PlankHinges[i] = new btHingeConstraint(*(PlankArray[i]->get_node()->get_rigid_body()), *(PlankArray[i + 1]->get_node()->get_rigid_body()),
@@ -271,6 +324,7 @@ namespace octet {
 			world->addConstraint(PlankHinges[i]);
 		}
 
+		//Last Hinge
 		btHingeConstraint *c5 = new btHingeConstraint(*(PlankArray[numPlanks - 1]->get_node()->get_rigid_body()), *(b2->get_node()->get_rigid_body()),
 			btVector3(0.5f, 0.125f, 0.0f), btVector3(-1.0f, 0.5f, 0.0f),
 			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
