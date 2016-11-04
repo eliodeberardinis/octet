@@ -7,6 +7,7 @@
 
 #include "BridgePlank.h"
 #include <string>
+#include "csvReading.h"
 
 namespace octet {
   /// Scene containing a box with octet.
