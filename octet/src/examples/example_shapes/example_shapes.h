@@ -224,11 +224,7 @@ namespace octet {
 		float plankDistance = 0.0f;
 		int numPlanks = 7;
 		int HingeType = 1;
-
 		bool useCSV = true;
-
-		dynarray<mesh_instance> PlankDynamicArray; //Not Used
-		dynarray<btHingeConstraint> PlankHingesDynamicArray; //Not Used
 
 		mesh_instance *PlankArray[50];
 		btHingeConstraint *PlankHinges[50];
