@@ -51,13 +51,13 @@ namespace octet {
 
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
-      //app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
+      app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 	  world = app_scene->getWorld();
 
 	  if (this != nullptr) 
 	  {
 		  mouse_look_instance.init(this, 200.0f / 360, false);
-		  //fps_instance.init(this);
+		  fps_instance.init(this);
 		  printf("Entered Here\n");
 	  }
 
@@ -97,12 +97,12 @@ namespace octet {
 	  mat.loadIdentity();
       mat.translate(0, 20, 0);
 	  //firstsphere declared globally
-	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(0, 0, 0), 2), red, &firstSphere, false);
+	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2), 2), red, &firstSphere, false);
 
       mat.loadIdentity();
-	  mat.translate(0, 5, 0);
+	  mat.translate(0, 15, 0);
 	 //firstBox declared globally
-	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 20.0f);
+	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 1.0f);
 	  
 	  //CreateHingeConstrain();
 	  
@@ -126,9 +126,29 @@ namespace octet {
     
 	}
 
+
+	void shoot()
+	{
+		mat4t mtw;
+		mtw.translate(main_camera->get_node()->get_position());
+
+		//btRigidBody *projRB = NULL;
+
+		vec3 forward = -main_camera->get_node()->get_z();
+		mesh_instance *projectile = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 1.5f);
+
+		projectile->get_node()->apply_central_force(forward*900.0f);
+		
+	}
+
 	void HandleInput() 
 	
 	{
+
+		if (is_key_going_down(key_lmb)) 
+		{
+			shoot();
+		}
 	
 		//Zoom in
 		if (is_key_down(key_shift))
@@ -198,7 +218,7 @@ namespace octet {
 		rb1 = mi1->get_node()->get_rigid_body();
 
 		mtw.loadIdentity();
-		mtw.translate(-3, 8, 0);
+		mtw.translate(-5, 8, 0);
 		btRigidBody *rb2 = NULL;
 		mesh_instance *mi2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(0, 1, 0, 1)), true, 1.0f);
 		rb2 = mi2->get_node()->get_rigid_body();
@@ -209,19 +229,19 @@ namespace octet {
 		frameInB = btTransform::getIdentity();
 		frameInB.setOrigin(btVector3(btScalar(0.0f), btScalar(0.5f), btScalar(0.0f)));
 
-		btGeneric6DofSpringConstraint *c1 = new btGeneric6DofSpringConstraint(*rb2, *rb1, frameInA, frameInB, true);
-		c1->setLinearUpperLimit(btVector3(0.0f, 5.0f, 0.0f));
-		c1->setLinearLowerLimit(btVector3(0.0f, -5.0f, 0.0f));
+		btGeneric6DofSpringConstraint *c1 = new btGeneric6DofSpringConstraint(*rb1, *rb2, frameInA, frameInB, true);
+		c1->setLinearUpperLimit(btVector3(0., 5.0f, 0.));
+		c1->setLinearLowerLimit(btVector3(0., -5.0f, 0.));
 
-		c1->setAngularLowerLimit(btVector3(-1.5f, -1.5f, -1.5f));
-		c1->setAngularUpperLimit(btVector3(1.5f, 1.5f, 1.5f));
+		c1->setAngularLowerLimit(btVector3(-1.5f, -1.5f, 0));
+		c1->setAngularUpperLimit(btVector3(1.5f, 1.5f, 0));
 
 		world->addConstraint(c1, false);
 
 		c1->setDbgDrawSize(btScalar(5.f));
-		c1->enableSpring(0.0f, true);
-		c1->setStiffness(0.0f, 10.0f);
-		c1->setDamping(0.0f, 0.5f);
+		c1->enableSpring(0, true);
+		c1->setStiffness(0, 10.0f);
+		c1->setDamping(0, 0.5f);
 	}
 
 	//Elio (Migno)
@@ -246,18 +266,14 @@ namespace octet {
 		pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
 
 		pGen6DOFSpring->enableSpring(0, true);
-		pGen6DOFSpring->setStiffness(0, 39.478f);
+		pGen6DOFSpring->setStiffness(0, 10.0f);
 		pGen6DOFSpring->setDamping(0, 0.3f);
 
-		pGen6DOFSpring->enableSpring(1, true);
-		pGen6DOFSpring->setStiffness(1, 10.0f);
-		pGen6DOFSpring->setDamping(1, 0.3f);
+		//pGen6DOFSpring->enableSpring(5, true);
+		//pGen6DOFSpring->setStiffness(5, 39.478f);
+		//pGen6DOFSpring->setDamping(5, 0.3f);
 
-		pGen6DOFSpring->enableSpring(5, true);
-		pGen6DOFSpring->setStiffness(5, 39.478f);
-		pGen6DOFSpring->setDamping(5, 0.3f);
-
-		pGen6DOFSpring->setEquilibriumPoint();
+		//pGen6DOFSpring->setEquilibriumPoint();
 	}
 	
 	void create_bridge() {
