@@ -97,16 +97,17 @@ namespace octet {
 	  mat.loadIdentity();
       mat.translate(0, 20, 0);
 	  //firstsphere declared globally
-	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, false);
+	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(0, 0, 0), 2), red, &firstSphere, false);
 
       mat.loadIdentity();
 	  mat.translate(0, 5, 0);
 	 //firstBox declared globally
-	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
+	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 20.0f);
 	  
 	  //CreateHingeConstrain();
 	  
 	  CreateSpringConstrain();
+	  //create_springs();
 
 	  create_bridge();//Change this function
 
@@ -188,22 +189,58 @@ namespace octet {
 		world->addConstraint(hinge);
 	}
 
+	//Mircea
+	void create_springs() {
+		mat4t mtw;
+		mtw.translate(-3, 10, 0);
+		btRigidBody *rb1 = NULL;
+		mesh_instance *mi1 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
+		rb1 = mi1->get_node()->get_rigid_body();
+
+		mtw.loadIdentity();
+		mtw.translate(-3, 8, 0);
+		btRigidBody *rb2 = NULL;
+		mesh_instance *mi2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(0, 1, 0, 1)), true, 1.0f);
+		rb2 = mi2->get_node()->get_rigid_body();
+
+		btTransform frameInA, frameInB;
+		frameInA = btTransform::getIdentity();
+		frameInA.setOrigin(btVector3(btScalar(0.0f), btScalar(-0.5f), btScalar(0.0f)));
+		frameInB = btTransform::getIdentity();
+		frameInB.setOrigin(btVector3(btScalar(0.0f), btScalar(0.5f), btScalar(0.0f)));
+
+		btGeneric6DofSpringConstraint *c1 = new btGeneric6DofSpringConstraint(*rb2, *rb1, frameInA, frameInB, true);
+		c1->setLinearUpperLimit(btVector3(0.0f, 5.0f, 0.0f));
+		c1->setLinearLowerLimit(btVector3(0.0f, -5.0f, 0.0f));
+
+		c1->setAngularLowerLimit(btVector3(-1.5f, -1.5f, -1.5f));
+		c1->setAngularUpperLimit(btVector3(1.5f, 1.5f, 1.5f));
+
+		world->addConstraint(c1, false);
+
+		c1->setDbgDrawSize(btScalar(5.f));
+		c1->enableSpring(0.0f, true);
+		c1->setStiffness(0.0f, 10.0f);
+		c1->setDamping(0.0f, 0.5f);
+	}
+
+	//Elio (Migno)
 	void CreateSpringConstrain()
 	{
 		//add spring contraint
 
 		btTransform frameInA, frameInB;
 		frameInA = btTransform::getIdentity();
-		frameInA.setOrigin(btVector3(btScalar(0.), btScalar(5.), btScalar(0.)));
+		frameInA.setOrigin(btVector3(btScalar(0.), btScalar(1.), btScalar(0.)));
 		frameInB = btTransform::getIdentity();
-		frameInB.setOrigin(btVector3(btScalar(0.), btScalar(0.), btScalar(0.)));
+		frameInB.setOrigin(btVector3(btScalar(0.), btScalar(-2.), btScalar(0.)));
 
 		btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*firstBox, *firstSphere, frameInA, frameInB, true);
-		pGen6DOFSpring->setLinearUpperLimit(btVector3(5., 0., 0.));
-		pGen6DOFSpring->setLinearLowerLimit(btVector3(-5., 0., 0.));
+		pGen6DOFSpring->setLinearUpperLimit(btVector3(0., 5., 0.));
+		pGen6DOFSpring->setLinearLowerLimit(btVector3(0., -5., 0.));
 
-		pGen6DOFSpring->setAngularLowerLimit(btVector3(0.f, 0.f, -1.5f));
-		pGen6DOFSpring->setAngularUpperLimit(btVector3(0.f, 0.f, 1.5f));
+		pGen6DOFSpring->setAngularLowerLimit(btVector3(-1.5f, -1.5f, -1.5f));
+		pGen6DOFSpring->setAngularUpperLimit(btVector3(1.5f, 1.5f, 1.5f));
 
 		world->addConstraint(pGen6DOFSpring, true);
 		pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
@@ -212,13 +249,16 @@ namespace octet {
 		pGen6DOFSpring->setStiffness(0, 39.478f);
 		pGen6DOFSpring->setDamping(0, 0.3f);
 
+		pGen6DOFSpring->enableSpring(1, true);
+		pGen6DOFSpring->setStiffness(1, 10.0f);
+		pGen6DOFSpring->setDamping(1, 0.3f);
+
 		pGen6DOFSpring->enableSpring(5, true);
 		pGen6DOFSpring->setStiffness(5, 39.478f);
+		pGen6DOFSpring->setDamping(5, 0.3f);
 
 		pGen6DOFSpring->setEquilibriumPoint();
 	}
-
-
 	
 	void create_bridge() {
 
