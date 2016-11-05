@@ -97,10 +97,10 @@ namespace octet {
 	  mat.loadIdentity();
       mat.translate(0, 20, 0);
 	  //firstsphere declared globally
-	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, true);
+	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2, 2, 2), 2), red, &firstSphere, false);
 
       mat.loadIdentity();
-	  mat.translate(2, 5, 0);
+	  mat.translate(0, 5, 0);
 	 //firstBox declared globally
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true);
 	  
@@ -194,7 +194,7 @@ namespace octet {
 
 		btTransform frameInA, frameInB;
 		frameInA = btTransform::getIdentity();
-		frameInA.setOrigin(btVector3(btScalar(10.), btScalar(0.), btScalar(0.)));
+		frameInA.setOrigin(btVector3(btScalar(0.), btScalar(5.), btScalar(0.)));
 		frameInB = btTransform::getIdentity();
 		frameInB.setOrigin(btVector3(btScalar(0.), btScalar(0.), btScalar(0.)));
 
@@ -210,10 +210,11 @@ namespace octet {
 
 		pGen6DOFSpring->enableSpring(0, true);
 		pGen6DOFSpring->setStiffness(0, 39.478f);
-		pGen6DOFSpring->setDamping(0, 0.5f);
+		pGen6DOFSpring->setDamping(0, 0.3f);
+
 		pGen6DOFSpring->enableSpring(5, true);
 		pGen6DOFSpring->setStiffness(5, 39.478f);
-		pGen6DOFSpring->setDamping(0, 0.3f);
+
 		pGen6DOFSpring->setEquilibriumPoint();
 	}
 
