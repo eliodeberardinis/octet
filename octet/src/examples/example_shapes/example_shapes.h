@@ -112,10 +112,10 @@ namespace octet {
 	  player_node = mi2->get_node();
 	  playerIndex = player_node->get_rigid_body()->getUserIndex();
 
-	  //Creating the Music player
+	  //Creating the Music player as a yellow box
 	  mat.loadIdentity();
 	  mat.translate(vec3(-8, 1, -5));
-	  mesh_instance *mi3 = app_scene->add_shape(mat, new mesh_box(vec3(2)), new material(vec4(0.2, 0.1, 0.5, 1)), false);
+	  mesh_instance *mi3 = app_scene->add_shape(mat, new mesh_box(vec3(2)), new material(vec4(1, 1, 0.0f, 1)), false);
 	  soundsIndex = mi3->get_node()->get_rigid_body()->getUserIndex();
 
 	  //Initializing Music player
@@ -195,7 +195,7 @@ namespace octet {
 				}
 			}
 
-			//If instead we hit another object such as the purple musicBox we play another sound
+			//If instead we hit another object such as the yellow musicBox we play another sound
 			if (index0 == projectileIndex || index1 == projectileIndex) {
 				if (index0 == soundsIndex || index1 == soundsIndex) {
 					if (playSound) {
@@ -241,9 +241,11 @@ namespace octet {
 		
 	}
 
+	//Function that handles camera control (in God Mode) and the shooting. Moving of the player in Player-Mode is handled by fps_instance
 	void HandleInput() 
 	
 	{
+		//Shoot the projectiles
 		if (is_key_going_down(key_lmb)) 
 		{
 			ShootProjectiles();
@@ -292,31 +294,40 @@ namespace octet {
 		}
 	}
 
-
+	//Function that creates a spring contraint between the box and the sphere pendulum
 	void CreateSpringConstrain()
 	{
-
+		//Frames are needed in bullet to define the offset at which the spring attaches to the objects
 		btTransform frameInA, frameInB;
+
+		//We set the offset for the 2 objects
 		frameInA = btTransform::getIdentity();
 		frameInA.setOrigin(btVector3(btScalar(0.), btScalar(1.), btScalar(0.)));
 		frameInB = btTransform::getIdentity();
 		frameInB.setOrigin(btVector3(btScalar(0.), btScalar(-2.), btScalar(0.)));
 
+		//Create the Actual Contraint between the two meshes with the offsets set in the Frames
 		btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*PendantBox, *PendantSphere, frameInA, frameInB, true);
+		
+		//Setting Linear Limits
 		pGen6DOFSpring->setLinearUpperLimit(btVector3(0., 5., 0.));
 		pGen6DOFSpring->setLinearLowerLimit(btVector3(0., -5., 0.));
 
+		//Setting Rotational Limits
 		pGen6DOFSpring->setAngularLowerLimit(btVector3(-1.5f, -1.5f, -1.5f));
 		pGen6DOFSpring->setAngularUpperLimit(btVector3(1.5f, 1.5f, 1.5f));
 
+		//Adding the Contraint to the world
 		world->addConstraint(pGen6DOFSpring, true);
-		pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
 
+		//Setting some additional physics parameters such as size, stiffness and damping
+		pGen6DOFSpring->setDbgDrawSize(btScalar(5.f));
 		pGen6DOFSpring->enableSpring(0, true);
 		pGen6DOFSpring->setStiffness(0, 10.0f);
 		pGen6DOFSpring->setDamping(0, 0.3f);
 	}
 	
+	//This function demonstrate the Hinge Constraint and the CSV reading and instantiation with a simulation of a suspended bridge.
 	void create_bridge() {
 
 		float plankDistance = 0.0f;
@@ -485,7 +496,6 @@ namespace octet {
 			world->addConstraint(c5);
 		}
 	}
-
 
     /// this is called to draw the world
     void draw_world(int x, int y, int w, int h) {
