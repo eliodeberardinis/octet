@@ -47,9 +47,11 @@ namespace octet {
 	int soundsIndex;
 	int playerIndex;
 	int hangBoxIndex;
+	int blueCylinderIndex;
 
 	ALuint sound;
 	ALuint sound2;
+	ALuint sound3;
 	unsigned int soundSource;
 	unsigned int numSoundSources = 32;
 	ALuint sources[32];
@@ -122,8 +124,9 @@ namespace octet {
 	  soundsIndex = mi3->get_node()->get_rigid_body()->getUserIndex();
 
 	  //Initializing Music player
-	  sound = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
-	  sound2 = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
+	  sound = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/powerup.wav");
+	  sound2 = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/Coin.wav");
+	  sound3 = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bump.wav");
 	  soundSource = 0;
 	  alGenSources(numSoundSources, sources);
 	  playSound = true;
@@ -156,7 +159,8 @@ namespace octet {
 	  //Blue cylinder (another object to interact with in the scene)
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
-      app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
+      mesh_instance * blueCylinder = app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
+	  blueCylinderIndex = blueCylinder->get_node()->get_rigid_body()->getUserIndex();
 
       // Terrain
       mat.loadIdentity();
@@ -204,6 +208,18 @@ namespace octet {
 					if (playSound) {
 						ALuint source = GetSoundSource();
 						alSourcei(source, AL_BUFFER, sound);
+						alSourcePlay(source);
+						playSound = false;
+					}
+				}
+			}
+
+			//And another one if it hits the blue cylinder
+			if (index0 == projectileIndex || index1 == projectileIndex) {
+				if (index0 == blueCylinderIndex || index1 == blueCylinderIndex) {
+					if (playSound) {
+						ALuint source = GetSoundSource();
+						alSourcei(source, AL_BUFFER, sound3);
 						alSourcePlay(source);
 						playSound = false;
 					}
