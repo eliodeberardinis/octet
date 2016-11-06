@@ -33,6 +33,18 @@ namespace octet {
 
 	ReadCsv Read_csv;
 
+	// Sound effects to play on hitting something
+	int soundsIndex;
+	int playerIndex;
+
+	ALuint sound;
+	unsigned int soundSource;
+	unsigned int numSoundSources = 32;
+	ALuint sources[32];
+	bool playSound;
+
+	int frame_count = 0;
+
 	//btDiscreteDynamicsWorld *dynamics_world;
 
   public:
@@ -85,8 +97,14 @@ namespace octet {
 		  new btCapsuleShape(0.25f, player_height)
 	  );
 	  player_node = mi2->get_node();
-	  //player_index = player_node->get_rigid_body()->getUserIndex();
-	  //Finished creating a player
+	  playerIndex = player_node->get_rigid_body()->getUserIndex();
+	  //Finished creating a player and obtaining its index
+
+	  //Creating the Music player
+	  mat.loadIdentity();
+	  mat.translate(vec3(30, 1, 0));
+	  mesh_instance *mi3 = app_scene->add_shape(mat, new mesh_box(vec3(2)), new material(vec4(0.2, 0.1, 0.5, 1)), false);
+	  soundsIndex = mi3->get_node()->get_rigid_body()->getUserIndex();
 
 
       material *red = new material(vec4(1, 0, 0, 1));
@@ -154,7 +172,6 @@ namespace octet {
 		if (is_key_down(key_shift))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, -1.50f));
-			//player_node->translate(vec3(0, 0, -1.50f)); //Trying to move the player (not working)
 			zoom_increment -= 1.50f;
 		}
 
@@ -162,7 +179,6 @@ namespace octet {
 		if (is_key_down(key_ctrl))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 0, 1.50f));
-			//player_node->translate(vec3(0, 0, 1.50f));
 			zoom_increment += 1.50f;
 		}
 
@@ -170,7 +186,6 @@ namespace octet {
 		if (is_key_down(key_left))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(-0.5f, 0, 0.0f));
-			//player_node->translate(vec3(-0.5f, 0, 0.0f));
 			x_increment -= 0.5f;
 		}
 
@@ -178,7 +193,6 @@ namespace octet {
 		if (is_key_down(key_right))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.5f, 0, 0.0f));
-			//player_node->translate(vec3(0.5f, 0, 0.0f));
 			x_increment += 0.5f;
 		}
 
@@ -186,7 +200,6 @@ namespace octet {
 		if (is_key_down(key_up))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, 0.5f, 0.0f));
-			//player_node->translate(vec3(0.0f, 0.5f, 0.0f));
 			y_increment += 0.5f;
 		}
 
@@ -194,7 +207,6 @@ namespace octet {
 		if (is_key_down(key_down))
 		{
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
-			//player_node->translate(vec3(0.0f, -0.5f, 0.0f));
 			y_increment -= 0.5f;
 		}
 
@@ -463,7 +475,7 @@ namespace octet {
 	  {
 		  
 		  mouse_look_instance.update(camera_to_world);
-		  //fps_instance.update(player_node, camera_node);
+		  fps_instance.update(player_node, camera_node);
 
 		 // printf("Entered Draw World no Null\n");
 	  }
