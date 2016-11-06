@@ -87,15 +87,16 @@ namespace octet {
 	  main_camera->get_node()->translate(vec3(0, 4, 0));
 	  main_camera->set_far_plane(10000);
 
+	  //Setting the Player's "body" dimensions
 	  float player_height = 1.8f;
 	  float player_radius = 0.25f;
 	  float player_mass   = 90.0f;
 
+	  //Read the CSV file to create the bridge and store the data in arrays
 	  Read_csv.read_file();
 
-	  mat4t mat;
-
 	  //Creating the player object as a red sphere
+	  mat4t mat;
 	  mat.loadIdentity();
 	  mat.translate(0.0f, player_height*6.0f, 50.0f);
 
@@ -106,9 +107,10 @@ namespace octet {
 		  true, player_mass,
 		  new btCapsuleShape(0.25f, player_height)
 	  );
+
+	  //Obtaining the Player Index to use for collision detection
 	  player_node = mi2->get_node();
 	  playerIndex = player_node->get_rigid_body()->getUserIndex();
-	  //Finished creating a player and obtaining its index
 
 	  //Creating the Music player
 	  mat.loadIdentity();
@@ -129,60 +131,59 @@ namespace octet {
       material *blue = new material(vec4(0, 0, 1, 1));
 	  material *black = new material(vec4(0, 0, 0, 1));
 
+	  //Creating the Spring Pendulum Sphere (Static Object)
 	  mat.loadIdentity();
       mat.translate(0, 20, 0);
-	  //firstsphere declared globally
-	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2), 2), red, &PendantSphere, false);
+	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2), 2), blue, &PendantSphere, false);
 
+	  //Creating the spring pendulum Box (Moving Object)
       mat.loadIdentity();
 	  mat.translate(0, 15, 0);
-	 //firstBox declared globally
+
+	  //Obtaining the pendulum Box index to use for collision detection
 	  mesh_instance *hangBox = app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &PendantBox, true, 1.0f);
 	  hangBoxIndex = hangBox->get_node()->get_rigid_body()->getUserIndex();
-
-	  //Test Sphere
-	  mat.loadIdentity();
-	  mat.translate(-20, 2, 0);
-	  //firstsphere declared globally
-	  
-	  //CreateHingeConstrain();
-	  
+	  	  
+	  //Create a spring Contrain between the Sphere and the Box, Creating a pendulum
 	  CreateSpringConstrain();
-	  //create_springs();
 
-	  create_bridge();//Change this function
+	  //Used to demonstrate Hinge Contraints and CSV-reading and instantiation
+	  create_bridge();
 
-
-	  //Blue cylinder (do something with it)
+	  //Blue cylinder (another object to interact with in the scene)
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
       app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
 
-      // ground
+      // Terrain
       mat.loadIdentity();
       mat.translate(0, -1, 0);
-
-	  //Following Mircea's methods (Alternative way to obtain the Rigidbody property from the object) (not needed for this)
 	  btRigidBody *rb1 = NULL;
 	  mesh_instance *ground = app_scene->add_shape(mat, new mesh_box(vec3(200, 1, 200)), black, false);
 	  rb1 = ground->get_node()->get_rigid_body();
-    
+
 	}
 
-
+	//Function used to obtain the sound to play
 	ALuint GetSoundSource() {
 		soundSource = soundSource % numSoundSources;
 		soundSource++;
 		return sources[soundSource];
 	}
 
-	void check_collisions() {
+	//Function used to detect collissions and play sounds in response
+	void CollisionsCall() {
+
+		//Manifolds are created in Bullet and represent active collisions
 		int num_manifolds = world->getDispatcher()->getNumManifolds();
+
+		//For Every active manifold we obtain the indexes of the objects involed in the collision
 		for (unsigned int i = 0; i < num_manifolds; ++i) {
 			btPersistentManifold *manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
 			int index0 = manifold->getBody0()->getUserIndex();
 			int index1 = manifold->getBody1()->getUserIndex();
 
+			//We check if the 2 indexes involved are from the projectiles and the pendulum and we play a type of sound
 			if (index0 == projectileIndex|| index1 == projectileIndex) {
 				if (index0 == hangBoxIndex || index1 == hangBoxIndex) {
 					if (playSound) {
@@ -194,6 +195,7 @@ namespace octet {
 				}
 			}
 
+			//If instead we hit another object such as the purple musicBox we play another sound
 			if (index0 == projectileIndex || index1 == projectileIndex) {
 				if (index0 == soundsIndex || index1 == soundsIndex) {
 					if (playSound) {
@@ -207,25 +209,26 @@ namespace octet {
 		}
 	}
 
-	void shoot()
+	//Function that creates small projectiles and adds forces to it to simulate projectiles
+	void ShootProjectiles()
 	{
+		//We set the spawn position and the direction of the projectiles to the camera
 		mat4t mtw;
 		mtw.translate(main_camera->get_node()->get_position());
-
 		vec3 forward = -main_camera->get_node()->get_z();
 
+		//Projectiles are instantiated as set of 5 and saved in an array where we add a force and obtain their indexes for collisions
 		if (numProjectiles < 5)
 		{
 			ProjectilesArray[numProjectiles] = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 0.5f);
 			projectile_node = ProjectilesArray[numProjectiles]->get_node();
-			projectileIndex/*[numProjectiles]*/ = projectile_node->get_rigid_body()->getUserIndex();
+			projectileIndex = projectile_node->get_rigid_body()->getUserIndex();
 			ProjectilesArray[numProjectiles]->get_node()->apply_central_force(forward*300.0f);
-	
 			numProjectiles++;
 		}
 
+		//After a set of 5 is created the first 5 are deleted.
 		else
-
 		{
 			for (int i = 0; i < 5; ++i)
 			{
@@ -243,7 +246,7 @@ namespace octet {
 	{
 		if (is_key_going_down(key_lmb)) 
 		{
-			shoot();
+			ShootProjectiles();
 		}
 	
 		//Zoom in
@@ -287,57 +290,11 @@ namespace octet {
 			app_scene->get_camera_instance(0)->get_node()->translate(vec3(0.0f, -0.5f, 0.0f));
 			y_increment -= 0.5f;
 		}
-
 	}
 
-	void CreateHingeConstrain()
-	{
-		//Adding Hinge Constraints
 
-		btHingeConstraint* hinge = new btHingeConstraint(*PendantSphere, *PendantBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
-		hinge->setLimit(0, 180);
-		world->addConstraint(hinge);
-	}
-
-	//Mircea
-	void create_springs() {
-		mat4t mtw;
-		mtw.translate(-3, 10, 0);
-		btRigidBody *rb1 = NULL;
-		mesh_instance *mi1 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
-		rb1 = mi1->get_node()->get_rigid_body();
-
-		mtw.loadIdentity();
-		mtw.translate(-5, 8, 0);
-		btRigidBody *rb2 = NULL;
-		mesh_instance *mi2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(0, 1, 0, 1)), true, 1.0f);
-		rb2 = mi2->get_node()->get_rigid_body();
-
-		btTransform frameInA, frameInB;
-		frameInA = btTransform::getIdentity();
-		frameInA.setOrigin(btVector3(btScalar(0.0f), btScalar(-0.5f), btScalar(0.0f)));
-		frameInB = btTransform::getIdentity();
-		frameInB.setOrigin(btVector3(btScalar(0.0f), btScalar(0.5f), btScalar(0.0f)));
-
-		btGeneric6DofSpringConstraint *c1 = new btGeneric6DofSpringConstraint(*rb1, *rb2, frameInA, frameInB, true);
-		c1->setLinearUpperLimit(btVector3(0., 5.0f, 0.));
-		c1->setLinearLowerLimit(btVector3(0., -5.0f, 0.));
-
-		c1->setAngularLowerLimit(btVector3(-1.5f, -1.5f, 0));
-		c1->setAngularUpperLimit(btVector3(1.5f, 1.5f, 0));
-
-		world->addConstraint(c1, false);
-
-		c1->setDbgDrawSize(btScalar(5.f));
-		c1->enableSpring(0, true);
-		c1->setStiffness(0, 10.0f);
-		c1->setDamping(0, 0.5f);
-	}
-
-	//Elio
 	void CreateSpringConstrain()
 	{
-		//add spring contraint
 
 		btTransform frameInA, frameInB;
 		frameInA = btTransform::getIdentity();
@@ -358,12 +315,6 @@ namespace octet {
 		pGen6DOFSpring->enableSpring(0, true);
 		pGen6DOFSpring->setStiffness(0, 10.0f);
 		pGen6DOFSpring->setDamping(0, 0.3f);
-
-		//pGen6DOFSpring->enableSpring(5, true);
-		//pGen6DOFSpring->setStiffness(5, 39.478f);
-		//pGen6DOFSpring->setDamping(5, 0.3f);
-
-		//pGen6DOFSpring->setEquilibriumPoint();
 	}
 	
 	void create_bridge() {
@@ -545,7 +496,7 @@ namespace octet {
 
 	  HandleInput();
 
-	  check_collisions();
+	  CollisionsCall();
 
 	  if (++framePassed > 60) {
 		  framePassed = 0;
