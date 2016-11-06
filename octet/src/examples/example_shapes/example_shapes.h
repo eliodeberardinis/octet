@@ -38,6 +38,8 @@ namespace octet {
 
 	ReadCsv Read_csv;
 
+	mesh_instance *TEST;
+
 	// Sound effects to play on hitting something
 	int soundsIndex;
 	int playerIndex;
@@ -133,6 +135,12 @@ namespace octet {
 	  mat.translate(0, 15, 0);
 	 //firstBox declared globally
 	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 1.0f);
+
+	  //Test Sphere
+	  mat.loadIdentity();
+	  mat.translate(-20, 2, 0);
+	  //firstsphere declared globally
+	  TEST = app_scene->add_shape(mat, new mesh_sphere(vec3(2), 2), red, false);
 	  
 	  //CreateHingeConstrain();
 	  
@@ -207,12 +215,12 @@ namespace octet {
 	
 			numProjectiles++;
 		}
+
 		else
 
 		{
 			for (int i = 0; i < 5; ++i)
 			{
-
 				app_scene->delete_mesh_instance(ProjectilesArray[i]->get_mesh_instance());
 			}
 
@@ -225,6 +233,12 @@ namespace octet {
 	void HandleInput() 
 	
 	{
+		//TEST
+		if (is_key_going_down(key_backspace))
+		{
+			app_scene->delete_mesh_instance(TEST);
+			printf("\nPressed backspace\n");
+		}
 
 		if (is_key_going_down(key_lmb)) 
 		{
