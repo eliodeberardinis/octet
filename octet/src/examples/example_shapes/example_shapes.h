@@ -5,7 +5,6 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 
-#include "BridgePlank.h"
 #include <string>
 #include "csvReading.h"
 
@@ -34,6 +33,7 @@ namespace octet {
 
 	mesh_instance *ProjectilesArray[5];
 	int numProjectiles = 0;
+	//int projectileIndex[5];
 	int projectileIndex;
 
 	ReadCsv Read_csv;
@@ -43,9 +43,11 @@ namespace octet {
 	// Sound effects to play on hitting something
 	int soundsIndex;
 	int playerIndex;
+	int hangBoxIndex;
 
 
 	ALuint sound;
+	ALuint sound2;
 	unsigned int soundSource;
 	unsigned int numSoundSources = 32;
 	ALuint sources[32];
@@ -116,6 +118,7 @@ namespace octet {
 
 	  //Initializing Music player
 	  sound = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
+	  sound2 = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/whoosh.wav");
 	  soundSource = 0;
 	  alGenSources(numSoundSources, sources);
 	  playSound = true;
@@ -134,7 +137,8 @@ namespace octet {
       mat.loadIdentity();
 	  mat.translate(0, 15, 0);
 	 //firstBox declared globally
-	  app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 1.0f);
+	  mesh_instance *hangBox = app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 1.0f);
+	  hangBoxIndex = hangBox->get_node()->get_rigid_body()->getUserIndex();
 
 	  //Test Sphere
 	  mat.loadIdentity();
@@ -180,6 +184,17 @@ namespace octet {
 			int index0 = manifold->getBody0()->getUserIndex();
 			int index1 = manifold->getBody1()->getUserIndex();
 
+			if (index0 == projectileIndex|| index1 == projectileIndex) {
+				if (index0 == hangBoxIndex || index1 == hangBoxIndex) {
+					if (playSound) {
+						ALuint source = GetSoundSource();
+						alSourcei(source, AL_BUFFER, sound2);
+						alSourcePlay(source);
+						playSound = false;
+					}
+				}
+			}
+
 			if (index0 == projectileIndex || index1 == projectileIndex) {
 				if (index0 == soundsIndex || index1 == soundsIndex) {
 					if (playSound) {
@@ -197,20 +212,14 @@ namespace octet {
 	{
 		mat4t mtw;
 		mtw.translate(main_camera->get_node()->get_position());
-		//mesh_instance *projectile = nullptr;
 
 		vec3 forward = -main_camera->get_node()->get_z();
-
-		//mesh_instance *projectile = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 0.5f);
-		//projectile_node = projectile->get_node();
-		//projectileIndex = projectile_node->get_rigid_body()->getUserIndex();
-		//projectile->get_node()->apply_central_force(forward*300.0f);
 
 		if (numProjectiles < 5)
 		{
 			ProjectilesArray[numProjectiles] = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 0.5f);
 			projectile_node = ProjectilesArray[numProjectiles]->get_node();
-			projectileIndex = projectile_node->get_rigid_body()->getUserIndex();
+			projectileIndex/*[numProjectiles]*/ = projectile_node->get_rigid_body()->getUserIndex();
 			ProjectilesArray[numProjectiles]->get_node()->apply_central_force(forward*300.0f);
 	
 			numProjectiles++;
@@ -221,7 +230,7 @@ namespace octet {
 		{
 			for (int i = 0; i < 5; ++i)
 			{
-				app_scene->delete_mesh_instance(ProjectilesArray[i]->get_mesh_instance());
+				app_scene->delete_mesh_instance(ProjectilesArray[i]->get_mesh_instance());//Not working
 			}
 
 			numProjectiles = 0;
@@ -510,8 +519,8 @@ namespace octet {
 			//hinges
 			//First hinge
 			btHingeConstraint *c1 = new btHingeConstraint(*(b1->get_node()->get_rigid_body()), *(PlankArray[0]->get_node()->get_rigid_body()),
-				btVector3(1.0f, 0.5f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
-				btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+			btVector3(1.0f, 0.5f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 			c1->setLimit(-PI * 0.1f, PI* 0.1f);
 			world->addConstraint(c1);
 
@@ -519,16 +528,16 @@ namespace octet {
 			for (int i = 0; i < numPlanks - 1; ++i)
 			{
 				PlankHinges[i] = new btHingeConstraint(*(PlankArray[i]->get_node()->get_rigid_body()), *(PlankArray[i + 1]->get_node()->get_rigid_body()),
-					btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
-					btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+				btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
+				btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 				PlankHinges[i]->setLimit(-PI * 0.1f, PI* 0.1f);
 				world->addConstraint(PlankHinges[i]);
 			}
 
 			//Last Hinge
 			btHingeConstraint *c5 = new btHingeConstraint(*(PlankArray[numPlanks - 1]->get_node()->get_rigid_body()), *(b2->get_node()->get_rigid_body()),
-				btVector3(0.5f, 0.125f, 0.0f), btVector3(-1.0f, 0.5f, 0.0f),
-				btVector3(0, 0, 1), btVector3(0, 0, 1), false);
+			btVector3(0.5f, 0.125f, 0.0f), btVector3(-1.0f, 0.5f, 0.0f),
+			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
 			c5->setLimit(-PI * 0.1f, PI* 0.1f);
 			world->addConstraint(c5);
 		}
@@ -555,14 +564,8 @@ namespace octet {
 	  scene_node *camera_node = main_camera->get_node();
 	  mat4t &camera_to_world = camera_node->access_nodeToParent();
 	  
-	  if (this != nullptr)
-	  {
-		  
-		  mouse_look_instance.update(camera_to_world);
-		  fps_instance.update(player_node, camera_node);
-
-		 // printf("Entered Draw World no Null\n");
-	  }
+      mouse_look_instance.update(camera_to_world);
+	  fps_instance.update(player_node, camera_node);
 
 	  // update matrices. assume 30 fps.
 	  app_scene->update(1.0f / 30);
