@@ -26,10 +26,15 @@ namespace octet {
 
 	helper_fps_controller fps_instance;
 	ref<scene_node> player_node;
+	ref<scene_node> projectile_node;
 
 	float zoom_increment = 0.0f;
 	float x_increment = 0.0f;
 	float y_increment = 0.0f;
+
+	mesh_instance *ProjectilesArray[5];
+	int numProjectiles = 0;
+	int projectileIndex;
 
 	ReadCsv Read_csv;
 
@@ -37,13 +42,14 @@ namespace octet {
 	int soundsIndex;
 	int playerIndex;
 
+
 	ALuint sound;
 	unsigned int soundSource;
 	unsigned int numSoundSources = 32;
 	ALuint sources[32];
 	bool playSound;
 
-	int frame_count = 0;
+	int framePassed = 0;
 
 	//btDiscreteDynamicsWorld *dynamics_world;
 
@@ -102,7 +108,7 @@ namespace octet {
 
 	  //Creating the Music player
 	  mat.loadIdentity();
-	  mat.translate(vec3(30, 1, 0));
+	  mat.translate(vec3(-8, 1, -5));
 	  mesh_instance *mi3 = app_scene->add_shape(mat, new mesh_box(vec3(2)), new material(vec4(0.2, 0.1, 0.5, 1)), false);
 	  soundsIndex = mi3->get_node()->get_rigid_body()->getUserIndex();
 
@@ -153,17 +159,63 @@ namespace octet {
 	}
 
 
+	ALuint GetSoundSource() {
+		soundSource = soundSource % numSoundSources;
+		soundSource++;
+		return sources[soundSource];
+	}
+
+	void check_collisions() {
+		int num_manifolds = world->getDispatcher()->getNumManifolds();
+		for (unsigned int i = 0; i < num_manifolds; ++i) {
+			btPersistentManifold *manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+			int index0 = manifold->getBody0()->getUserIndex();
+			int index1 = manifold->getBody1()->getUserIndex();
+
+			if (index0 == projectileIndex || index1 == projectileIndex) {
+				if (index0 == soundsIndex || index1 == soundsIndex) {
+					if (playSound) {
+						ALuint source = GetSoundSource();
+						alSourcei(source, AL_BUFFER, sound);
+						alSourcePlay(source);
+						playSound = false;
+					}
+				}
+			}
+		}
+	}
+
 	void shoot()
 	{
 		mat4t mtw;
 		mtw.translate(main_camera->get_node()->get_position());
 
-		//btRigidBody *projRB = NULL;
-
 		vec3 forward = -main_camera->get_node()->get_z();
-		mesh_instance *projectile = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 1.5f);
 
-		projectile->get_node()->apply_central_force(forward*900.0f);
+		//mesh_instance *projectile = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 0.5f);
+		//projectile_node = projectile->get_node();
+		//projectileIndex = projectile_node->get_rigid_body()->getUserIndex();
+		//projectile->get_node()->apply_central_force(forward*300.0f);
+
+		if (numProjectiles < 5)
+		{
+			ProjectilesArray[numProjectiles] = app_scene->add_shape(mtw, new mesh_sphere(vec3(1), 0.2f), new material(vec4(0, 1, 0.8f, 1)), true, 0.5f);
+			projectile_node = ProjectilesArray[numProjectiles]->get_node();
+			projectileIndex = projectile_node->get_rigid_body()->getUserIndex();
+			ProjectilesArray[numProjectiles]->get_node()->apply_central_force(forward*300.0f);
+			numProjectiles++;
+		}
+		else
+		{
+			for (int i = 0; i < 5; ++i)
+			{
+				app_scene->delete_mesh_instance(ProjectilesArray[i]); // NOT WORKING WHY???
+				//ProjectilesArray[i] = nullptr;
+			}
+
+			numProjectiles = 0;
+		}
+
 		
 	}
 
@@ -264,7 +316,7 @@ namespace octet {
 		c1->setDamping(0, 0.5f);
 	}
 
-	//Elio (Migno)
+	//Elio
 	void CreateSpringConstrain()
 	{
 		//add spring contraint
@@ -471,9 +523,16 @@ namespace octet {
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
-	 
-	  HandleInput();
       app_scene->begin_render(vx, vy);
+
+	  HandleInput();
+
+	  check_collisions();
+
+	  if (++framePassed > 60) {
+		  framePassed = 0;
+		  playSound = true;
+	  }
 
 	  //update camera
 	  scene_node *camera_node = main_camera->get_node();
