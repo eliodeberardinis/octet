@@ -154,7 +154,7 @@ namespace octet {
 	  CreateSpringConstrain();
 
 	  //Used to demonstrate Hinge Contraints and CSV-reading and instantiation
-	  create_bridge();
+	  CreateCSVbridge();
 
 	  //Blue cylinder (another object to interact with in the scene)
       mat.loadIdentity();
@@ -182,17 +182,17 @@ namespace octet {
 	void CollisionsCall() {
 
 		//Manifolds are created in Bullet and represent active collisions
-		int num_manifolds = world->getDispatcher()->getNumManifolds();
+		int manifoldsNumber = world->getDispatcher()->getNumManifolds();
 
 		//For Every active manifold we obtain the indexes of the objects involed in the collision
-		for (unsigned int i = 0; i < num_manifolds; ++i) {
+		for (unsigned int i = 0; i < manifoldsNumber; ++i) {
 			btPersistentManifold *manifold = world->getDispatcher()->getManifoldByIndexInternal(i);
-			int index0 = manifold->getBody0()->getUserIndex();
-			int index1 = manifold->getBody1()->getUserIndex();
+			int FirstIndex = manifold->getBody0()->getUserIndex();
+			int SecondIndex = manifold->getBody1()->getUserIndex();
 
 			//We check if the 2 indexes involved are from the projectiles and the pendulum and we play a type of sound
-			if (index0 == projectileIndex|| index1 == projectileIndex) {
-				if (index0 == hangBoxIndex || index1 == hangBoxIndex) {
+			if (FirstIndex == projectileIndex|| SecondIndex == projectileIndex) {
+				if (FirstIndex == hangBoxIndex || SecondIndex == hangBoxIndex) {
 					if (playSound) {
 						ALuint source = GetSoundSource();
 						alSourcei(source, AL_BUFFER, sound2);
@@ -203,8 +203,8 @@ namespace octet {
 			}
 
 			//If instead we hit another object such as the yellow musicBox we play another sound
-			if (index0 == projectileIndex || index1 == projectileIndex) {
-				if (index0 == soundsIndex || index1 == soundsIndex) {
+			if (FirstIndex == projectileIndex || SecondIndex == projectileIndex) {
+				if (FirstIndex == soundsIndex || SecondIndex == soundsIndex) {
 					if (playSound) {
 						ALuint source = GetSoundSource();
 						alSourcei(source, AL_BUFFER, sound);
@@ -215,8 +215,8 @@ namespace octet {
 			}
 
 			//And another one if it hits the blue cylinder
-			if (index0 == projectileIndex || index1 == projectileIndex) {
-				if (index0 == blueCylinderIndex || index1 == blueCylinderIndex) {
+			if (FirstIndex == projectileIndex || SecondIndex == projectileIndex) {
+				if (FirstIndex == blueCylinderIndex || SecondIndex == blueCylinderIndex) {
 					if (playSound) {
 						ALuint source = GetSoundSource();
 						alSourcei(source, AL_BUFFER, sound3);
@@ -255,9 +255,7 @@ namespace octet {
 			}
 
 			numProjectiles = 0;
-		}
-
-		
+		}	
 	}
 
 	//Function that handles camera control (in God Mode) and the shooting. Moving of the player in Player-Mode is handled by fps_instance
@@ -363,7 +361,7 @@ namespace octet {
 	}
 	
 	//This function demonstrate the Hinge Constraint and the CSV reading and instantiation with a simulation of a suspended bridge.
-	void create_bridge() {
+	void CreateCSVbridge() {
 
 		//Parameter used to keep track of the distanc ebetween the planks and the bases
 		float plankDistance = 0.0f;
