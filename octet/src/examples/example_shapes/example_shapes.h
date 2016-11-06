@@ -106,7 +106,13 @@ namespace octet {
 	  mesh_instance *mi3 = app_scene->add_shape(mat, new mesh_box(vec3(2)), new material(vec4(0.2, 0.1, 0.5, 1)), false);
 	  soundsIndex = mi3->get_node()->get_rigid_body()->getUserIndex();
 
+	  //Initializing Music player
+	  sound = resource_dict::get_sound_handle(AL_FORMAT_MONO16, "assets/invaderers/bang.wav");
+	  soundSource = 0;
+	  alGenSources(numSoundSources, sources);
+	  playSound = true;
 
+	  //Inizializing some materials used in the Demo for simplicity
       material *red = new material(vec4(1, 0, 0, 1));
       material *green = new material(vec4(0, 1, 0, 1));
       material *blue = new material(vec4(0, 0, 1, 1));
@@ -129,6 +135,8 @@ namespace octet {
 
 	  create_bridge();//Change this function
 
+
+	  //Blue cylinder (do something with it)
       mat.loadIdentity();
       mat.translate( 3, 6, 0);
       app_scene->add_shape(mat, new mesh_cylinder(zcylinder(vec3(0, 0, 0), 2, 4)), blue, true);
