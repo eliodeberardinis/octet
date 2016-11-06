@@ -1,5 +1,7 @@
 #TOOLS & MIDDLEWARE Assignment 1 - Physics Playground
 
+###Elio de Berardinis
+
 ##INTRODUCTION
 
 The Project Started from "Example_Shapes" already present in Octet and providing basic OpenGL rendering for 3D shape. In particular, the scene displays 3 falling shapes.
