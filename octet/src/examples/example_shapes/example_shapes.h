@@ -5,7 +5,6 @@
 // Modular Framework for OpenGLES2 rendering on multiple platforms.
 //
 
-#include <string>
 #include "csvReading.h"
 
 namespace octet {
@@ -17,34 +16,37 @@ namespace octet {
     ref<visual_scene> app_scene;
 	btDiscreteDynamicsWorld* world; 
 
+	//Constant to set rotation limits
 	const float PI = 3.14159;
 
 	//camera & View and Move instances
 	mouse_look mouse_look_instance;
 	ref<camera_instance> main_camera;
 
+	//Instance of the fps_controller
 	helper_fps_controller fps_instance;
+
+	//References to the scene nodes of the projectiles and the player
 	ref<scene_node> player_node;
 	ref<scene_node> projectile_node;
 
+	//Parameters for Camera zooming and movement
 	float zoom_increment = 0.0f;
 	float x_increment = 0.0f;
 	float y_increment = 0.0f;
 
+	//Parameters to store data of the projectiles
 	mesh_instance *ProjectilesArray[5];
 	int numProjectiles = 0;
-	//int projectileIndex[5];
 	int projectileIndex;
 
+	//Instance of the ReadCsv class #included as external .h file
 	ReadCsv Read_csv;
 
-	mesh_instance *TEST;
-
-	// Sound effects to play on hitting something
+	// Sound effects to play on hitting some things in the demo
 	int soundsIndex;
 	int playerIndex;
 	int hangBoxIndex;
-
 
 	ALuint sound;
 	ALuint sound2;
@@ -53,9 +55,12 @@ namespace octet {
 	ALuint sources[32];
 	bool playSound;
 
+	//Frame Counter
 	int framePassed = 0;
 
-	//btDiscreteDynamicsWorld *dynamics_world;
+	//Declaration of global RigidBodies parameters for the pendlum example
+	btRigidBody* PendantSphere = NULL;
+	btRigidBody* PendantBox = NULL;
 
   public:
     example_shapes(int argc, char **argv) : app(argc, argv) {
@@ -64,25 +69,20 @@ namespace octet {
     ~example_shapes() {
     }
 
-	btRigidBody* firstSphere = NULL;
-	btRigidBody* firstBox = NULL;
-
-
     /// this is called once OpenGL is initialized
     void app_init() {
 
+      //Initial settings for camera, light and geometry
       app_scene =  new visual_scene();
       app_scene->create_default_camera_and_lights();
       app_scene->get_camera_instance(0)->get_node()->translate(vec3(0, 4, 0));
 	  world = app_scene->getWorld();
 
-	  if (this != nullptr) 
-	  {
-		  mouse_look_instance.init(this, 200.0f / 360, false);
-		  fps_instance.init(this);
-		  printf("Entered Here\n");
-	  }
+	  //Initializing mouse pointer and fps_instance
+	  mouse_look_instance.init(this, 200.0f / 360, false);
+      fps_instance.init(this);
 
+	  //Translating camera and setting clipping planes
 	  main_camera = app_scene->get_camera_instance(0);
 	  main_camera->get_node()->translate(vec3(0, 4, 0));
 	  main_camera->set_far_plane(10000);
@@ -132,19 +132,18 @@ namespace octet {
 	  mat.loadIdentity();
       mat.translate(0, 20, 0);
 	  //firstsphere declared globally
-	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2), 2), red, &firstSphere, false);
+	  app_scene->add_shapeRB(mat, new mesh_sphere(vec3(2), 2), red, &PendantSphere, false);
 
       mat.loadIdentity();
 	  mat.translate(0, 15, 0);
 	 //firstBox declared globally
-	  mesh_instance *hangBox = app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &firstBox, true, 1.0f);
+	  mesh_instance *hangBox = app_scene->add_shapeRB(mat, new mesh_box(vec3(2, 2, 2)), red, &PendantBox, true, 1.0f);
 	  hangBoxIndex = hangBox->get_node()->get_rigid_body()->getUserIndex();
 
 	  //Test Sphere
 	  mat.loadIdentity();
 	  mat.translate(-20, 2, 0);
 	  //firstsphere declared globally
-	  TEST = app_scene->add_shape(mat, new mesh_sphere(vec3(2), 2), red, false);
 	  
 	  //CreateHingeConstrain();
 	  
@@ -242,13 +241,6 @@ namespace octet {
 	void HandleInput() 
 	
 	{
-		//TEST
-		if (is_key_going_down(key_backspace))
-		{
-			app_scene->delete_mesh_instance(TEST);
-			printf("\nPressed backspace\n");
-		}
-
 		if (is_key_going_down(key_lmb)) 
 		{
 			shoot();
@@ -302,7 +294,7 @@ namespace octet {
 	{
 		//Adding Hinge Constraints
 
-		btHingeConstraint* hinge = new btHingeConstraint(*firstSphere, *firstBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
+		btHingeConstraint* hinge = new btHingeConstraint(*PendantSphere, *PendantBox, btVector3(-3, 6, 0), btVector3(0, 10, 0), btVector3(0, 1, 0), btVector3(0, 1, 0));
 		hinge->setLimit(0, 180);
 		world->addConstraint(hinge);
 	}
@@ -353,7 +345,7 @@ namespace octet {
 		frameInB = btTransform::getIdentity();
 		frameInB.setOrigin(btVector3(btScalar(0.), btScalar(-2.), btScalar(0.)));
 
-		btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*firstBox, *firstSphere, frameInA, frameInB, true);
+		btGeneric6DofSpringConstraint* pGen6DOFSpring = new btGeneric6DofSpringConstraint(*PendantBox, *PendantSphere, frameInA, frameInB, true);
 		pGen6DOFSpring->setLinearUpperLimit(btVector3(0., 5., 0.));
 		pGen6DOFSpring->setLinearLowerLimit(btVector3(0., -5., 0.));
 
