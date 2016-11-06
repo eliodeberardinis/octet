@@ -189,6 +189,7 @@ namespace octet {
 	{
 		mat4t mtw;
 		mtw.translate(main_camera->get_node()->get_position());
+		//mesh_instance *projectile = nullptr;
 
 		vec3 forward = -main_camera->get_node()->get_z();
 
@@ -203,14 +204,16 @@ namespace octet {
 			projectile_node = ProjectilesArray[numProjectiles]->get_node();
 			projectileIndex = projectile_node->get_rigid_body()->getUserIndex();
 			ProjectilesArray[numProjectiles]->get_node()->apply_central_force(forward*300.0f);
+	
 			numProjectiles++;
 		}
 		else
+
 		{
 			for (int i = 0; i < 5; ++i)
 			{
-				app_scene->delete_mesh_instance(ProjectilesArray[i]); // NOT WORKING WHY???
-				//ProjectilesArray[i] = nullptr;
+
+				app_scene->delete_mesh_instance(ProjectilesArray[i]->get_mesh_instance());
 			}
 
 			numProjectiles = 0;
