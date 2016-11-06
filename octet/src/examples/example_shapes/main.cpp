@@ -11,7 +11,6 @@
 #define OCTET_BULLET 1
 
 #include "../../octet.h"
-
 #include "example_shapes.h"
 
 /// Create a box with octet

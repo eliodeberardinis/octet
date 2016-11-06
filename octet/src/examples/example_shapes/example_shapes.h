@@ -330,39 +330,42 @@ namespace octet {
 	//This function demonstrate the Hinge Constraint and the CSV reading and instantiation with a simulation of a suspended bridge.
 	void create_bridge() {
 
+		//Parameter used to keep track of the distanc ebetween the planks and the bases
 		float plankDistance = 0.0f;
-		int numPlanks = 7;
+		
+		//Parameter used to decide which kind of hinge to apply
 		int HingeType = 1;
-		bool useCSV = true;
 
+		//Arrays to store information of the elements of the bridge and the contraints
 		mesh_instance *PlankArray[50];
 		btHingeConstraint *PlankHinges[50];
 
-		if (useCSV)
-		{
 			//create and add meshes read from Csv file
 			for (int i = 0; i < Read_csv.variables.size(); ++i)
 			{
 				mat4t mtw;
 				mtw.loadIdentity();
 
+				//If in the CSV file a B is read a "Base" element for the bridge is created (Bigger, thiker box, static)
 				if (Read_csv.variables[i] == 'B')
 				{
-
 					mtw.translate(vec3(plankDistance, 0.5f, 0));
 					PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
 					plankDistance += 0.5f;
 
+					//Extra distance if the following element is another base
 					if (Read_csv.variables[i + 1] == 'B')
 					{
 						plankDistance += 0.5f;
 					}
 				}
 
+				//If a p is read, a plank is created (Smaller, thinner box, dynamic)
 				else if (Read_csv.variables[i] == 'p')
 				{
 					mtw.translate(vec3(plankDistance, 1.25f, 0));
 
+					//Alternating the planks colors
 					if (i % 2 != 0)
 					{
 						PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
@@ -373,16 +376,18 @@ namespace octet {
 						PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
 					}
 
+					//Adding extra distance if the following element is a base
 					if (Read_csv.variables[i + 1] == 'B')
 					{
 						plankDistance += 0.5f;
 					}
 				}
 
+				//Standard distance is added each time a new element is built
 				plankDistance += 1.1f;
 			}
 
-			// create hinges
+			// create hinges according to the 2 objects involved to obtain precise size and offset
 			for (int i = 0; i < Read_csv.variables.size() - 1; ++i)
 			{
 				if (Read_csv.variables[i] == 'B' && Read_csv.variables[i + 1] == 'p')
@@ -434,80 +439,26 @@ namespace octet {
 					break;
 				}
 
+				//Set the limits for the hinge and add the contraints to the world
 				PlankHinges[i]->setLimit(-PI * 0.1f, PI* 0.1f);
 				world->addConstraint(PlankHinges[i]);
-			}
-		}
-
-		else {
-			//Base 1
-			mat4t mtw;
-			mtw.loadIdentity();
-			mtw.translate(vec3(0, 0.5f, 0));
-			mesh_instance *b1 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
-
-			//Planks
-			for (int i = 0; i < numPlanks; ++i)
-			{
-				mtw.loadIdentity();
-				mtw.translate(vec3(1.6f + plankDistance, 1.25f, 0.0f));
-
-				if (i % 2 != 0)
-				{
-					PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 0, 1)), true, 20.0f);
-				}
-
-				else
-				{
-					PlankArray[i] = app_scene->add_shape(mtw, new mesh_box(vec3(0.5f, 0.125f, 1)), new material(vec4(0, 1, 1, 1)), true, 20.0f);
-				}
-
-				plankDistance += 1.1f;
-			}
-
-			//Base 2
-			mtw.loadIdentity();
-			mtw.translate(vec3(1.6f + plankDistance + 0.5f, 0.5f, 0.0f));
-			mesh_instance *b2 = app_scene->add_shape(mtw, new mesh_box(vec3(1, 1, 1)), new material(vec4(1, 0, 0, 1)), false);
-
-			//hinges
-			//First hinge
-			btHingeConstraint *c1 = new btHingeConstraint(*(b1->get_node()->get_rigid_body()), *(PlankArray[0]->get_node()->get_rigid_body()),
-			btVector3(1.0f, 0.5f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
-			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
-			c1->setLimit(-PI * 0.1f, PI* 0.1f);
-			world->addConstraint(c1);
-
-			//In Between hinges
-			for (int i = 0; i < numPlanks - 1; ++i)
-			{
-				PlankHinges[i] = new btHingeConstraint(*(PlankArray[i]->get_node()->get_rigid_body()), *(PlankArray[i + 1]->get_node()->get_rigid_body()),
-				btVector3(0.5f, 0.125f, 0.0f), btVector3(-0.5f, 0.125f, 0.0f),
-				btVector3(0, 0, 1), btVector3(0, 0, 1), false);
-				PlankHinges[i]->setLimit(-PI * 0.1f, PI* 0.1f);
-				world->addConstraint(PlankHinges[i]);
-			}
-
-			//Last Hinge
-			btHingeConstraint *c5 = new btHingeConstraint(*(PlankArray[numPlanks - 1]->get_node()->get_rigid_body()), *(b2->get_node()->get_rigid_body()),
-			btVector3(0.5f, 0.125f, 0.0f), btVector3(-1.0f, 0.5f, 0.0f),
-			btVector3(0, 0, 1), btVector3(0, 0, 1), false);
-			c5->setLimit(-PI * 0.1f, PI* 0.1f);
-			world->addConstraint(c5);
-		}
+			}	
 	}
 
-    /// this is called to draw the world
+    /// This is called to draw the world at every frame
     void draw_world(int x, int y, int w, int h) {
 
       int vx = 0, vy = 0;
       get_viewport_size(vx, vy);
       app_scene->begin_render(vx, vy);
 
+	  //Udpade the inputs
 	  HandleInput();
 
+	  //Update the collision calls
 	  CollisionsCall();
 
+	  //Reset the sound Bool
 	  if (++framePassed > 60) {
 		  framePassed = 0;
 		  playSound = true;
@@ -517,6 +468,7 @@ namespace octet {
 	  scene_node *camera_node = main_camera->get_node();
 	  mat4t &camera_to_world = camera_node->access_nodeToParent();
 	  
+	  //Update mouse position and fbs_instance
       mouse_look_instance.update(camera_to_world);
 	  fps_instance.update(player_node, camera_node);
 
@@ -525,8 +477,6 @@ namespace octet {
 
       // draw the scene
       app_scene->render((float)vx / vy);
-
-	
     }
   };
 }
