@@ -68,6 +68,7 @@ namespace octet {
 	bool isGod = false;
 
   public:
+	//Constructor and destructor
     example_shapes(int argc, char **argv) : app(argc, argv) {
     }
 
