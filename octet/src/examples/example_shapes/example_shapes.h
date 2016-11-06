@@ -62,6 +62,9 @@ namespace octet {
 	btRigidBody* PendantSphere = NULL;
 	btRigidBody* PendantBox = NULL;
 
+	//Bool to switch from player to God Mode
+	bool isGod = false;
+
   public:
     example_shapes(int argc, char **argv) : app(argc, argv) {
     }
@@ -245,6 +248,22 @@ namespace octet {
 	void HandleInput() 
 	
 	{
+		//Activate/Deactivate God Mode
+		if (is_key_going_down(key_backspace))
+		{
+			if (!isGod) 
+			{
+				isGod = true;
+				printf("\nGod Mode Activated\n");
+			}
+
+			else
+			{
+				isGod = false;
+				printf("\nPlayer Mode Activated\n");
+			}
+		}
+
 		//Shoot the projectiles
 		if (is_key_going_down(key_lmb)) 
 		{
@@ -459,7 +478,8 @@ namespace octet {
 	  CollisionsCall();
 
 	  //Reset the sound Bool
-	  if (++framePassed > 60) {
+	  if (++framePassed > 60) 
+	  {
 		  framePassed = 0;
 		  playSound = true;
 	  }
@@ -470,8 +490,12 @@ namespace octet {
 	  
 	  //Update mouse position and fbs_instance
       mouse_look_instance.update(camera_to_world);
-	  fps_instance.update(player_node, camera_node);
 
+	  if (!isGod) 
+	  {
+		  fps_instance.update(player_node, camera_node);
+	  }
+	  
 	  // update matrices. assume 30 fps.
 	  app_scene->update(1.0f / 30);
 
