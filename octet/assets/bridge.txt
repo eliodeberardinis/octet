@@ -1,1 +1,1 @@
-B,p,p,p,p,p,p,p,B,p,p,p,B,p,p,,p,p,p,B,B,B,p,p,p,p,B;
+B,p,p,p,p,p,B,B,B,p,p,p,p,p,p,B,B,B,p,p,B;
